@@ -8,11 +8,11 @@
 #ifndef DARKNET_DC26_H_
 #define DARKNET_DC26_H_
 
-#include "libstm32/app/app.h"
-#include "libstm32/leds/ws2812.h"
-#include "libstm32/display/display_device.h"
-#include "libstm32/app/display_message_state.h"
-#include "libstm32/display/gui.h"
+#include <app/app.h>
+#include <leds/ws2812.h>
+#include <display/display_device.h>
+#include <app/display_message_state.h>
+#include <display/gui.h>
 #include "KeyStore.h"
 
 class MenuState;

@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=D:/My Stuff/dev/defcon/defcon26/dc26-badge/firmware/DevBoard/darknet-7/Inc
+HeaderPath=C:/Dev/dc26-badge/firmware/DevBoard/darknet-7/Inc
 HeaderFiles=gpio.h;dma.h;i2c.h;libjpeg.h;jconfig.h;jmorecfg.h;jdata_conf.h;spi.h;tim.h;usart.h;usb_device.h;usbd_conf.h;usbd_desc.h;usbd_cdc_if.h;stm32f4xx_it.h;stm32f4xx_hal_conf.h;main.h;ffconf.h;user_diskio.h;fatfs.h;
-SourcePath=D:/My Stuff/dev/defcon/defcon26/dc26-badge/firmware/DevBoard/darknet-7/Src
+SourcePath=C:/Dev/dc26-badge/firmware/DevBoard/darknet-7/Src
 SourceFiles=gpio.c;dma.c;i2c.c;libjpeg.c;spi.c;tim.c;usart.c;usb_device.c;usbd_conf.c;usbd_desc.c;usbd_cdc_if.c;stm32f4xx_it.c;stm32f4xx_hal_msp.c;main.c;user_diskio.c;fatfs.c;jdata_conf.c;
 
 [PreviousLibFiles]

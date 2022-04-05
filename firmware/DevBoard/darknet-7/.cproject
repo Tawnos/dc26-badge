@@ -33,7 +33,8 @@
 								<option defaultValue="gnu.c.optimization.level.none" id="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level.1008998744" name="Optimization Level" superClass="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.c.optimization.level.most" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.2065542300" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.default" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.200426168" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Src/darknet/libstm32}&quot;"/>
+									<listOptionValue builtIn="false" value="../Src/darknet/libstm32"/>
+									<listOptionValue builtIn="false" value="../Src/darknet/libstm32/etl/include/"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Middlewares/Third_Party/FatFs/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Src/darknet/3dParty/flatbuffer}&quot;"/>
 									<listOptionValue builtIn="false" value="../Inc"/>
@@ -62,24 +63,17 @@
 								<option id="gnu.cpp.compiler.option.optimization.level.2004700989" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.cpp.optimization.level.most" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.debugging.level.234530418" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.default" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.217893771" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Src/darknet/libstm32}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Src/darknet/3dParty/flatbuffer}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Middlewares/Third_Party/FatFs/src}&quot;"/>
 									<listOptionValue builtIn="false" value="../Inc"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Src/darknet/libstm32/etl/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Src/darknet/libstm32}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Src/darknet/3dParty/flatbuffer}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Middlewares/Third_Party/FatFs/src}&quot;"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32F4xx_HAL_Driver/Inc"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Device_Library/Core/Inc"/>
 									<listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc"/>
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Device/ST/STM32F4xx/Include"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src"/>
-									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1044481805" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
@@ -302,19 +296,16 @@
 							<option id="fr.ac6.managedbuild.option.gnu.cross.fpu.569701915" name="Floating point hardware" superClass="fr.ac6.managedbuild.option.gnu.cross.fpu" useByScannerDiscovery="false" value="fr.ac6.managedbuild.option.gnu.cross.fpu.fpv4-sp-d16" valueType="enumerated"/>
 							<option id="fr.ac6.managedbuild.option.gnu.cross.floatabi.380131183" name="Floating-point ABI" superClass="fr.ac6.managedbuild.option.gnu.cross.floatabi" useByScannerDiscovery="false" value="fr.ac6.managedbuild.option.gnu.cross.floatabi.hard" valueType="enumerated"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="fr.ac6.managedbuild.targetPlatform.gnu.cross.1220480697" isAbstract="false" osList="all" superClass="fr.ac6.managedbuild.targetPlatform.gnu.cross"/>
-							<builder buildPath="${workspace_loc:/darknet-7}/Debug" id="fr.ac6.managedbuild.builder.gnu.cross.961614576" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="fr.ac6.managedbuild.builder.gnu.cross">
-								<outputEntries>
-									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Debug"/>
-								</outputEntries>
-							</builder>
+							<builder buildPath="${workspace_loc:/darknet-7}/Debug-Size" id="cdt.managedbuild.builder.gnu.cross.187897194" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="cdt.managedbuild.builder.gnu.cross"/>
 							<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.897260105" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler">
 								<option defaultValue="gnu.c.optimization.level.none" id="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level.991584457" name="Optimization Level" superClass="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.c.optimization.level.most" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.903209409" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.default" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.2091713854" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Src/darknet/libstm32}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/darknet-7/Inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/darknet-7/Src/darknet/libstm32}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/darknet-7/Src/darknet/libstm32/etl/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Middlewares/Third_Party/FatFs/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Src/darknet/3dParty/flatbuffer}&quot;"/>
-									<listOptionValue builtIn="false" value="../Inc"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32F4xx_HAL_Driver/Inc"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Device_Library/Core/Inc"/>
@@ -327,8 +318,8 @@
 									<listOptionValue builtIn="false" value="USE_HAL_DRIVER"/>
 									<listOptionValue builtIn="false" value="FLATBUFFERS_TRACK_VERIFIER_BUFFER_SIZE"/>
 									<listOptionValue builtIn="false" value="STM32F411xE"/>
-									<listOptionValue builtIn="false" value="__weak=__attribute__((weak))"/>
-									<listOptionValue builtIn="false" value="__packed=__attribute__((__packed__))"/>
+									<listOptionValue builtIn="false" value="__weak=&quot;__attribute__((weak))&quot;"/>
+									<listOptionValue builtIn="false" value="__packed=&quot;__attribute__((__packed__))&quot;"/>
 								</option>
 								<option id="fr.ac6.managedbuild.gnu.c.compiler.option.misc.other.952394780.2024313582" superClass="fr.ac6.managedbuild.gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-fmessage-length=0" valueType="string"/>
 								<option id="gnu.c.compiler.option.dialect.std.2044541507" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.c11" valueType="enumerated"/>
@@ -339,10 +330,11 @@
 								<option id="gnu.cpp.compiler.option.optimization.level.1545937019" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.cpp.optimization.level.most" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.debugging.level.1298412810" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.default" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.700651048" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Src/darknet/libstm32}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Src/darknet/3dParty/flatbuffer}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/darknet-7/Inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/darknet-7/Src/darknet/libstm32}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/darknet-7/Src/darknet/libstm32/etl/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Middlewares/Third_Party/FatFs/src}&quot;"/>
-									<listOptionValue builtIn="false" value="../Inc"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Src/darknet/3dParty/flatbuffer}&quot;"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32F4xx_HAL_Driver/Inc"/>
 									<listOptionValue builtIn="false" value="../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Device_Library/Core/Inc"/>
@@ -350,21 +342,13 @@
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Device/ST/STM32F4xx/Include"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src"/>
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.2035772688" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="USE_HAL_DRIVER"/>
 									<listOptionValue builtIn="false" value="FLATBUFFERS_TRACK_VERIFIER_BUFFER_SIZE"/>
 									<listOptionValue builtIn="false" value="STM32F411xE"/>
-									<listOptionValue builtIn="false" value="__weak=__attribute__((weak))"/>
-									<listOptionValue builtIn="false" value="__packed=__attribute__((__packed__))"/>
+									<listOptionValue builtIn="false" value="__weak=&quot;__attribute__((weak))&quot;"/>
+									<listOptionValue builtIn="false" value="__packed=&quot;__attribute__((__packed__))&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.dialect.std.1430646158" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
 								<option id="fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.nortti.454500161" name="Disable generation of information about every class with virtual functions (-fno-rtti)" superClass="fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.nortti" useByScannerDiscovery="false" value="false" valueType="boolean"/>
@@ -492,13 +476,13 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="USB_DEVICE"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="LIBJPEG"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FATFS"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FATFS"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Inc"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="LIBJPEG"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
-						<entry excluding="darknet/libstm32/etl/uml|darknet/libstm32/etl/test|darknet/libstm32/etl/temp|darknet/libstm32/etl/support|darknet/libstm32/etl/examples|darknet/libstm32/etl/unittest-cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Src"/>
+						<entry excluding="darknet/libstm32/etl/**/" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="Src"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="USB_DEVICE"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>
 					</sourceEntries>
 				</configuration>
@@ -511,12 +495,14 @@
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Debug-Size"/>
 		<configuration configurationName="Debug">
-			<resource resourceType="PROJECT" workspacePath="darknet-7"/>
+			<resource resourceType="PROJECT" workspacePath="/darknet-7"/>
 		</configuration>
 		<configuration configurationName="Release"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 	<storageModule moduleId="scannerConfiguration">
 		<!--scannerConfigBuildInfo instanceId="fr.ac6.managedbuild.config.gnu.cross.exe.release.$(RELEASE_CONFIG_UID);fr.ac6.managedbuild.config.gnu.cross.exe.release.$(RELEASE_CONFIG_UID).;fr.ac6.managedbuild.tool.gnu.cross.c.compiler.$(RELEASE_TOOL_COMPILER_UID);cdt.managedbuild.tool.gnu.c.compiler.input.$(RELEASE_TOOL_COMPILER_INPUT_UID)">
 			<autodiscovery enabled="false" problemReportingEnabled="true" selectedProfileId=""/>
@@ -527,12 +513,17 @@
 		<scannerConfigBuildInfo instanceId="fr.ac6.managedbuild.config.gnu.cross.exe.release.1209757737;fr.ac6.managedbuild.config.gnu.cross.exe.release.1209757737.;fr.ac6.managedbuild.tool.gnu.cross.c.compiler.1699466532;fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.543226444">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="fr.ac6.managedbuild.config.gnu.cross.exe.debug.1913502598.531346535;fr.ac6.managedbuild.config.gnu.cross.exe.debug.1913502598.531346535.;fr.ac6.managedbuild.tool.gnu.cross.c.compiler.897260105;fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.128977121">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="fr.ac6.managedbuild.config.gnu.cross.exe.debug.1913502598;fr.ac6.managedbuild.config.gnu.cross.exe.debug.1913502598.;fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.888462259;fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.input.cpp.1345379440">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="fr.ac6.managedbuild.config.gnu.cross.exe.debug.1913502598;fr.ac6.managedbuild.config.gnu.cross.exe.debug.1913502598.;fr.ac6.managedbuild.tool.gnu.cross.c.compiler.1699466532;fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.543226444">
 			<autodiscovery enabled="false" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="fr.ac6.managedbuild.config.gnu.cross.exe.debug.1913502598.531346535;fr.ac6.managedbuild.config.gnu.cross.exe.debug.1913502598.531346535.;fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.392504607;fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.input.cpp.1099623880">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
 	</storageModule>
-	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cproject>

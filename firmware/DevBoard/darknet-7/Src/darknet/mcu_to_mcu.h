@@ -2,9 +2,9 @@
 #define DARKNET7_MCU_TO_MCU_H
 
 #include "messaging/esp_to_stm_generated.h"
-#include "libstm32/etl/src/vector.h"
-#include "libstm32/etl/src/queue.h"
-#include "libstm32/observer/event_bus.h"
+#include <etl/vector.h>
+#include <etl/queue.h>
+#include <observer/event_bus.h>
 
 template<typename T>
 struct MSGEvent {
@@ -26,19 +26,31 @@ public:
 	public:
 		const darknet7::ESPToSTM *asESPToSTM();
 		bool verifyESPToSTM();
+		Message(uint16_t sf, uint16_t crc, uint8_t *data)
+			: SizeAndFlags(sf), Crc16(crc)
+		{
+			MessageData[0] = sf & 0xFF;
+			MessageData[1] = (sf & 0xFF00) >> 8;
+			//uint16_t s = MessageData[0];
+			//s |= ((uint16_t) MessageData[1]) << 8;
+			//assert(s==getDataSize());
+			MessageData[2] = Crc16 & 0xFF;
+			MessageData[3] = (Crc16 & 0xFF00) >> 8;
+			memcpy(&MessageData[ENVELOP_HEADER], data, getDataSize());
+		}
+
 	protected:
-		Message();
+		Message() = default;
 		void setFlag(uint16_t flags);
 		bool checkFlags(uint16_t flags);
-		void set(uint16_t sf, uint16_t crc, uint8_t *data);
 		HAL_StatusTypeDef transmit(UART_HandleTypeDef *huart);
 		uint16_t getMessageSize() {return getDataSize()+ENVELOP_HEADER;}
 		uint16_t getDataSize() {return SizeAndFlags&ENVELOP_HEADER_SIZE_MASK;}
 		static uint16_t getDataSize(uint16_t s) {return s&ENVELOP_HEADER_SIZE_MASK;}
 	private:
-		uint16_t SizeAndFlags;
-		uint16_t Crc16;
-		uint8_t MessageData[MAX_MESSAGE_SIZE];
+		uint16_t SizeAndFlags = 0;
+		uint16_t Crc16 = 0;
+		uint8_t MessageData[MAX_MESSAGE_SIZE] = {0};
 		friend class MCUToMCU;
 	};
 public:

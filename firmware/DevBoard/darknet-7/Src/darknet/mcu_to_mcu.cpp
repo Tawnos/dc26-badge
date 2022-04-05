@@ -7,8 +7,8 @@
 
 #include <usart.h>
 #include "mcu_to_mcu.h"
-#include "libstm32/etl/src/crc16.h"
-#include "libstm32/logger.h"
+#include <etl/crc16.h>
+#include <logger.h>
 
 MCUToMCU *MCUToMCU::mSelf = 0;
 uint8_t UartRXBuffer[MCUToMCU::TOTAL_MESSAGE_SIZE * 2] = { 0 };
@@ -31,24 +31,6 @@ bool MCUToMCU::Message::verifyESPToSTM() {
 // bit 15: reserved
 // bit 16-31: CRC 16 of entire message
 //set up for our 4 byte envelop header
-
-MCUToMCU::Message::Message() :
-		SizeAndFlags(0), Crc16(0), MessageData() {
-
-}
-
-void MCUToMCU::Message::set(uint16_t sf, uint16_t crc, uint8_t *data) {
-	SizeAndFlags = sf;
-	Crc16 = crc;
-	MessageData[0] = sf & 0xFF;
-	MessageData[1] = (sf & 0xFF00) >> 8;
-	uint16_t s = MessageData[0];
-	//s |= ((uint16_t) MessageData[1]) << 8;
-	//assert(s==getDataSize());
-	MessageData[2] = Crc16 & 0xFF;
-	MessageData[3] = (Crc16 & 0xFF00) >> 8;
-	memcpy(&MessageData[ENVELOP_HEADER], data, getDataSize());
-}
 
 void MCUToMCU::Message::setFlag(uint16_t flags) {
 	SizeAndFlags|=flags;
@@ -136,12 +118,12 @@ void MCUToMCU::handleMcuToMcu() {
 			if (crc.value() != crcFromESP) {
 				ERRMSG("CRC ERROR in handle MCU To MCU.\n");
 			}
-			Message &m = InComing.push();
-			m.set(firstTwo, crcFromESP, &UartRXBuffer[ENVELOP_HEADER]);
-			if(!m.verifyESPToSTM()) {
+			auto m = Message{firstTwo, crcFromESP, &UartRXBuffer[ENVELOP_HEADER]};
+			if(m.verifyESPToSTM()) {
+				InComing.push(m);
+			}
+			else {
 				ERRMSG("invalid message");
-				//invalid message
-				InComing.pop();
 			}
 			HAL_UART_AbortReceive_IT(UartHandler);
 			HAL_UART_Receive_IT(UartHandler, &UartRXBuffer[0], MAX_MESSAGE_SIZE);
@@ -158,8 +140,7 @@ bool MCUToMCU::send(const flatbuffers::FlatBufferBuilder &fbb) {
 	uint32_t size = fbb.GetSize();
 	assert(size < MAX_MESSAGE_SIZE);
 	etl::crc16 crc(msg, msg + size);
-	Message &m = Outgoing.push();
-	m.set(size, crc.value(), msg);
+	Outgoing.push(Message{size, crc.value(), msg});
 
 	return transmitNow();
 }

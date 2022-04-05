@@ -38,3 +38,5 @@
 #specific annoynaces
 ./firmware/DevBoard/darknet-7/.settings/language.settings.xml
 ./DevBoard/darknet-7/darknet-7\ Debug.cfg
+.vscode
+.ionide

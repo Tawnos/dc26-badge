@@ -47,18 +47,19 @@
   ******************************************************************************
   */
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
-#include "stm32f4xx_hal.h"
-#include "dma.h"
-#include "fatfs.h"
-#include "i2c.h"
-#include "spi.h"
-#include "tim.h"
-#include "usart.h"
-#include "usb_device.h"
-#include "gpio.h"
+
+#include <stm32f4xx_hal.h>
+#include <dma.h>
+#include <fatfs.h>
+#include <i2c.h>
+#include <spi.h>
+#include <tim.h>
+#include <usart.h>
+#include <usb_device.h>
+#include <gpio.h>
 
 /* USER CODE BEGIN Includes */
+#include "main.h"
 #include "darknet/init.h"
 /* USER CODE END Includes */
 

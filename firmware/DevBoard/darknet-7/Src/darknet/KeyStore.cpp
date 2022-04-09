@@ -1,6 +1,6 @@
 #include "KeyStore.h"
 #include <string.h>
-#include "libstm32/crypto/micro-ecc/uECC.h"
+#include <crypto/micro-ecc/uECC.h>
 #include "mcu_to_mcu.h"
 #include "messaging/stm_to_esp_generated.h"
 #include "messaging/esp_to_stm_generated.h"

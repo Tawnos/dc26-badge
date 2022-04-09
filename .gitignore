@@ -40,3 +40,4 @@
 ./DevBoard/darknet-7/darknet-7\ Debug.cfg
 .vscode
 .ionide
+.fake

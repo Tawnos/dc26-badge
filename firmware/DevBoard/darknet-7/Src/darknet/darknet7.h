@@ -10,6 +10,7 @@
 
 #include <app/app.h>
 #include <display/display_device.h>
+#include <display/display_st7735.h>
 #include <app/display_message_state.h>
 #include <display/gui.h>
 #include "KeyStore.h"

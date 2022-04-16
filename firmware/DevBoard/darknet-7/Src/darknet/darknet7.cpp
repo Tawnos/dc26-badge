@@ -9,14 +9,9 @@
 #include "libstm32/display/display_device.h"
 #include "libstm32/display/gui.h"
 #include "libstm32/display/fonts.h"
-#include <main.h>
 #include "libstm32/config.h"
 #include "libstm32/logger.h"
-#include <usart.h>
-#include <spi.h>
-#include <i2c.h>
 #include "libstm32/app/display_message_state.h"
-#include <ff.h>
 #include "KeyStore.h"
 #include "menus/test_state.h"
 #include "menus/SendMsgState.h"
@@ -36,6 +31,13 @@
 #include "menus/scan.h"
 #include "menus/sao_menu.h"
 #include "art/images.h"
+
+#include <main.h>
+#include <usart.h>
+#include <spi.h>
+#include <i2c.h>
+#include <ff.h>
+
 //#include "ws2812b.h"
 
 using cmdc0de::ErrorType;
@@ -67,7 +69,8 @@ const char *DarkNet7::BLE_PAIRING_FAILED = "Failed to Pair.";
 
 
 DarkNet7 *DarkNet7::mSelf = 0;
-
+extern uint32_t HAL_GetTick();
+//extern void HAL_GPIO_ReadPin();
 DarkNet7::ButtonInfo::ButtonInfo() :
 		ButtonState(0),LastButtonState(0), LastTickButtonPushed(0) {
 	LastTickButtonPushed = HAL_GetTick();
@@ -262,7 +265,7 @@ ErrorType DarkNet7::onInit() {
 #endif
 	setCurrentState(getDisplayMenuState());
 
-#define TEST_SD_CARD
+//#define TEST_SD_CARD
 #ifdef TEST_SD_CARD
 	//disk_initialize(0);
 	FATFS myFS;

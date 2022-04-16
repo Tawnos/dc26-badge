@@ -9,11 +9,14 @@
 #define DARKNET_DC26_H_
 
 #include <app/app.h>
-#include <leds/ws2812.h>
 #include <display/display_device.h>
 #include <app/display_message_state.h>
 #include <display/gui.h>
 #include "KeyStore.h"
+
+#if !defined VIRTUAL_DEVICE
+#include <leds/ws2812.h>
+#endif
 
 class MenuState;
 class TestState;
@@ -102,8 +105,8 @@ public:
 	Scan *getScanState();
 	SAO *getSAOMenuState();
 public:
-	cmdc0de::DisplayST7735 &getDisplay();
-	const cmdc0de::DisplayST7735 &getDisplay() const;
+	cmdc0de::DisplayDevice& getDisplay();
+	const cmdc0de::DisplayDevice& getDisplay() const;
 	ContactStore &getContacts();
 	const ContactStore &getContacts() const;
 	cmdc0de::GUI &getGUI();
@@ -118,9 +121,11 @@ protected:
 	private:
 	DarkNet7();
 private:
+#if !defined VIRTUAL_DEVICE
 	cmdc0de::WS2818 Apa106s;
+#endif
 	ContactStore MyContacts;
-	cmdc0de::DisplayST7735 Display;
+	cmdc0de::DisplayDevice* Display;
 	cmdc0de::DrawBuffer2D16BitColor16BitPerPixel1Buffer DisplayBuffer;
 	cmdc0de::DisplayMessageState DMS;
 	cmdc0de::GUI MyGUI;

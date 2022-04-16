@@ -41,3 +41,7 @@
 .vscode
 .ionide
 .fake
+.vs
+build
+CMakeFiles
+CMakeCache.txt

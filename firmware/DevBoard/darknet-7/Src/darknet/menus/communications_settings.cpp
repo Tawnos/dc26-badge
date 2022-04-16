@@ -115,7 +115,9 @@ protected:
 					darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,z);
 				}
 				MCUToMCU::get().send(fbb);
+#if !defined VIRTUAL_DEVICE
 				HAL_Delay(1000);
+#endif
 				nextState = DarkNet7::get().getCommunicationSettingState();
 			}
 		}
@@ -308,7 +310,9 @@ void CommunicationSettingState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7:
 		strcpy(&CurrentDeviceName[0],mevt->InnerMsg->BLEDeviceName()->c_str());
 		DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
 		DarkNet7::get().getGUI().drawList(&CommSettingList);
+#if !defined VIRTUAL_DEVICE
 		MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
+#endif
 		InternalState = DISPLAY_DATA;
 	}
 }
@@ -322,7 +326,9 @@ ErrorType CommunicationSettingState::onInit() {
 	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
 	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
 	const MSGEvent<darknet7::CommunicationStatusResponse> *si = 0;
+#if !defined VIRTUAL_DEVICE
 	MCUToMCU::get().getBus().addListener(this,si,&MCUToMCU::get());
+#endif
 	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
 
 	DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Fetching data from ESP",RGBColor::BLUE);
@@ -337,7 +343,9 @@ StateBase::ReturnStateContext CommunicationSettingState::onRun() {
 	if(InternalState==FETCHING_DATA) {
 		if(this->getTimesRunCalledSinceLastReset()>200) {
 			const MSGEvent<darknet7::CommunicationStatusResponse> *mevt=0;
+#if !defined VIRTUAL_DEVICE
 			MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
+#endif
 			nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(),DarkNet7::get().NO_DATA_FROM_ESP,2000);
 		}
 	} else {

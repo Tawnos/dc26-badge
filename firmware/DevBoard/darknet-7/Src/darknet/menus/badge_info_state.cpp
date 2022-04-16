@@ -60,10 +60,12 @@ ErrorType BadgeInfoState::onInit() {
 			pCP[8], pCP[9], pCP[10], pCP[11], pCP[12], pCP[13], pCP[14],
 			pCP[15], pCP[16], pCP[17], pCP[18], pCP[19], pCP[20], pCP[21],
 			pCP[22], pCP[23], pCP[24]);
+#if !defined VIRTUAL_DEVICE
 	sprintf(&ListBuffer[5][0], "DEVID: %lu", HAL_GetDEVID());
 	sprintf(&ListBuffer[6][0], "REVID: %lu", HAL_GetREVID());
 	sprintf(&ListBuffer[7][0], "HAL Version: %lu", HAL_GetHalVersion());
 	sprintf(&ListBuffer[8][0], "SVer: %s", VERSION);
+#endif
 
 	for (uint32_t i = 0; i < (sizeof(Items) / sizeof(Items[0])); i++) {
 		Items[i].text = &ListBuffer[i][0];

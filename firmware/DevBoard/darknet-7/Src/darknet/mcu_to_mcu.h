@@ -43,7 +43,9 @@ public:
 		Message() = default;
 		void setFlag(uint16_t flags);
 		bool checkFlags(uint16_t flags);
+#if !defined VIRTUAL_DEVICE
 		HAL_StatusTypeDef transmit(UART_HandleTypeDef *huart);
+#endif
 		uint16_t getMessageSize() {return getDataSize()+ENVELOP_HEADER;}
 		uint16_t getDataSize() {return SizeAndFlags&ENVELOP_HEADER_SIZE_MASK;}
 		static uint16_t getDataSize(uint16_t s) {return s&ENVELOP_HEADER_SIZE_MASK;}
@@ -57,14 +59,18 @@ public:
 	static MCUToMCU &get();
 	typedef cmdc0de::EventBus<3,11,5,3> UART_EVENT_BUS_TYPE;
 public:
+#if !defined VIRTUAL_DEVICE
 	void init(UART_HandleTypeDef *);
+#endif
 	bool send(const flatbuffers::FlatBufferBuilder &fbb);
 	void process();
 	void onTransmitionComplete();
 	void onError();
 	void handleMcuToMcu();
+#if !defined VIRTUAL_DEVICE
 	const UART_HandleTypeDef * getUART() const {return UartHandler;}
 	UART_EVENT_BUS_TYPE &getBus() {return MessageBus;}
+#endif
 protected:
 	void resetUART();
 	bool transmitNow();
@@ -74,8 +80,10 @@ private:
 private:
 	etl::queue<Message,4> InComing;
 	etl::queue<Message,4> Outgoing;
+#if !defined VIRTUAL_DEVICE
 	UART_HandleTypeDef *UartHandler;
 	UART_EVENT_BUS_TYPE MessageBus;
+#endif
 };
 
 #endif

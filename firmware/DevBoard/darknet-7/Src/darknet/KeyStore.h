@@ -1,7 +1,7 @@
 #ifndef KEY_STORE_H
 #define KEY_STORE_H
 
-#include <stm32f4xx_hal.h>
+//#include <stm32f4xx_hal.h>
 #include "mcu_to_mcu.h"
 #include "messaging/stm_to_esp_generated.h"
 #include "messaging/esp_to_stm_generated.h"

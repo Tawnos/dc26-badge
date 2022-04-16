@@ -9,6 +9,8 @@
 const uint8_t ContactStore::DaemonPublic[ContactStore::PUBLIC_KEY_LENGTH] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
+#if !defined VIRTUAL_DEVICE
+
 class FLASH_LOCKER {
 public:
 	FLASH_LOCKER() {
@@ -19,11 +21,16 @@ public:
 		HAL_FLASH_Lock();
 	}
 };
+#endif
 
 struct SectorInfo {
 	uint32_t StartAddress;
 	uint32_t Size;
 };
+
+#if !defined FLASH_BASE
+#define FLASH_BASE 0
+#endif
 
 static SectorInfo SectorToAddress[] =
 		{
@@ -68,7 +75,9 @@ void ContactStore::SettingsInfo::receiveSignal(MCUToMCU*, const MSGEvent<darknet
 
 bool ContactStore::SettingsInfo::init() {
 	const MSGEvent<darknet7::BLEInfectionData> *removebob=0;
+#if !defined VIRTUAL_DEVICE
 	MCUToMCU::get().getBus().addListener(this,removebob,&MCUToMCU::get());
+#endif
 
 	for (uint32_t addr = getStartAddress(); addr < getEndAddress(); addr += SettingsInfo::SIZE) {
 		uint32_t value = *((uint32_t*) addr);
@@ -152,6 +161,7 @@ ContactStore::SettingsInfo::DataStructure ContactStore::SettingsInfo::getSetting
 }
 
 void ContactStore::SettingsInfo::resetToFactory() {
+#if !defined VIRTUAL_DEVICE
 	{
 		FLASH_LOCKER f;
 		uint32_t sectorError = 0;
@@ -163,10 +173,13 @@ void ContactStore::SettingsInfo::resetToFactory() {
 		EraseInitStruct.NbSectors = 1;
 		HAL_FLASHEx_Erase(&EraseInitStruct, &sectorError);
 	}
+#endif
 	init();
 }
 
 bool ContactStore::SettingsInfo::writeSettings(const DataStructure &ds) {
+#if !defined VIRTUAL_DEVICE
+
 	FLASH_LOCKER f;
 	uint32_t startNewAddress = CurrentAddress + SettingsInfo::SIZE;
 	uint32_t endNewAddress = startNewAddress + SettingsInfo::SIZE;
@@ -207,6 +220,8 @@ bool ContactStore::SettingsInfo::writeSettings(const DataStructure &ds) {
 			}
 		}
 	}
+	return false;
+#endif
 	return false;
 }
 
@@ -321,17 +336,23 @@ uint8_t *ContactStore::Contact::getPairingSignature() {
 }
 
 void ContactStore::Contact::setUniqueID(uint16_t id) {
+#if !defined VIRTUAL_DEVICE
+
 	FLASH_LOCKER f;
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, StartAddress, id);
+#endif
 }
 
 void ContactStore::Contact::setAgentname(const char name[AGENT_NAME_LENGTH]) {
 	//int len = strlen(name);
+#if !defined VIRTUAL_DEVICE
+
 	FLASH_LOCKER f;
 	uint32_t s = StartAddress + _OFFSET_OF_AGENT_NAME;
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s, (*((uint32_t *) &name[0])));
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s + 4, (*((uint32_t *) &name[4])));
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s + 8, (*((uint32_t *) &name[8])));
+#endif
 }
 
 void ContactStore::Contact::setCompressedPublicKey(const uint8_t key1[PUBLIC_KEY_COMPRESSED_LENGTH]) {
@@ -339,6 +360,7 @@ void ContactStore::Contact::setCompressedPublicKey(const uint8_t key1[PUBLIC_KEY
 	uint8_t key[PUBLIC_KEY_COMPRESSED_STORAGE_LENGTH];
 	memset(&key[0], 0, sizeof(key)); //set array to 0
 	memcpy(&key[0], &key1[0], PUBLIC_KEY_COMPRESSED_LENGTH); //copy over just the 25 bytes of the compressed public key
+#if !defined VIRTUAL_DEVICE
 	FLASH_LOCKER f;
 	//store all bits
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s, (*((uint32_t *) &key[0])));
@@ -348,10 +370,12 @@ void ContactStore::Contact::setCompressedPublicKey(const uint8_t key1[PUBLIC_KEY
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s + 16, (*((uint32_t *) &key[16])));
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s + 20, (*((uint32_t *) &key[20])));
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, s + 24, (*((uint32_t *) &key[24])));
+#endif
 }
 
 void ContactStore::Contact::setPairingSignature(const uint8_t sig[SIGNATURE_LENGTH]) {
 	uint32_t s = StartAddress + _OFFSET_OF_SIG;
+#if !defined VIRTUAL_DEVICE
 	FLASH_LOCKER f;
 	//for(uint32_t i=0;i<sizeof(sig);i+=4) {
 	//	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s+i, (*((uint32_t *) &sig[i])));
@@ -369,6 +393,7 @@ void ContactStore::Contact::setPairingSignature(const uint8_t sig[SIGNATURE_LENG
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s + 36, (*((uint32_t *) &sig[36])));
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s + 40, (*((uint32_t *) &sig[40])));
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s + 44, (*((uint32_t *) &sig[44])));
+#endif
 }
 
 //====================================================
@@ -394,6 +419,7 @@ ContactStore::ContactStore(uint8_t myAddressInfoSector, uint32_t myAddressInfoOf
 
 void ContactStore::resetToFactory() {
 	getSettings().resetToFactory();
+#if !defined VIRTUAL_DEVICE
 	{
 		FLASH_LOCKER f;
 		FLASH_EraseInitTypeDef EraseInitStruct;
@@ -409,6 +435,7 @@ void ContactStore::resetToFactory() {
 			HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError);
 		}
 	}
+#endif
 }
 
 bool ContactStore::init() {

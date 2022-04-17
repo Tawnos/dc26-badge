@@ -29,7 +29,8 @@ set ( COMPILEDEFS
 add_compile_definitions(${COMPILEDEFS})
 
 add_library(darknet7 STATIC 
-    #darknet7.cpp         
+    darknet7.cpp
+    #button_info.cpp
     #hardware_config.cpp  
     init.cpp             
     KeyStore.cpp         

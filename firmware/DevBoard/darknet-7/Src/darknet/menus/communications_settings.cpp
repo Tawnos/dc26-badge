@@ -43,22 +43,23 @@ protected:
 
 	virtual cmdc0de::StateBase::ReturnStateContext onRun() {
 		StateBase *nextState = this;
-		DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+		auto buttonInfo = DarkNet7::instance->getButtonInfo();
+		DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
 
 		VKB.process();
 
-		DarkNet7::get().getDisplay().drawString(0,10,(const char *)"Current Name: ");
-		DarkNet7::get().getDisplay().drawString(0,20, CurrentDeviceName);
-		DarkNet7::get().getDisplay().drawString(0,30, (const char *)"New Name:");
-		DarkNet7::get().getDisplay().drawString(0,40, &NewDeviceName[0]);
-		DarkNet7::get().getDisplay().drawString(0,60,(const char *)"Mid button finishes");
-		if(DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+		DarkNet7::instance->getDisplay().drawString(0,10,(const char *)"Current Name: ");
+		DarkNet7::instance->getDisplay().drawString(0,20, CurrentDeviceName);
+		DarkNet7::instance->getDisplay().drawString(0,30, (const char *)"New Name:");
+		DarkNet7::instance->getDisplay().drawString(0,40, &NewDeviceName[0]);
+		DarkNet7::instance->getDisplay().drawString(0,60,(const char *)"Mid button finishes");
+		if(buttonInfo.wereTheseButtonsReleased(Button::Mid)) {
 			flatbuffers::FlatBufferBuilder fbb;
 			auto r = darknet7::CreateBLESetDeviceNameDirect(fbb,&NewDeviceName[0]);
-			auto z = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::get().nextSeq(),darknet7::STMToESPAny_BLESetDeviceName,r.Union());
+			auto z = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::instance->nextSeq(),darknet7::STMToESPAny_BLESetDeviceName,r.Union());
 			darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,z);
 			MCUToMCU::get().send(fbb);
-			nextState = DarkNet7::get().getCommunicationSettingState();
+			nextState = DarkNet7::instance->getCommunicationSettingState();
 		}
 		return ReturnStateContext(nextState);
 	}
@@ -103,22 +104,23 @@ protected:
 
 	virtual cmdc0de::StateBase::ReturnStateContext onRun() {
 		StateBase *nextState = this;
-		DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
-		DarkNet7::get().getGUI().drawList(&BLEList);
+		auto buttonInfo = DarkNet7::instance->getButtonInfo();
+		DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
+		DarkNet7::instance->getGUI().drawList(&BLEList);
 
 		if (!GUIListProcessor::process(&BLEList,(sizeof(Items) / sizeof(Items[0])))) {
-			if(DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+			if(buttonInfo.wereTheseButtonsReleased(Button::Fire)) {
 				flatbuffers::FlatBufferBuilder fbb;
 				if(Type==AD) {
 					auto r = darknet7::CreateBLEAdvertise(fbb,!BLEList.selectedItem);
-					auto z = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::get().nextSeq(),darknet7::STMToESPAny_BLEAdvertise,r.Union());
+					auto z = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::instance->nextSeq(),darknet7::STMToESPAny_BLEAdvertise,r.Union());
 					darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,z);
 				}
 				MCUToMCU::get().send(fbb);
 #if !defined VIRTUAL_DEVICE
 				HAL_Delay(1000);
 #endif
-				nextState = DarkNet7::get().getCommunicationSettingState();
+				nextState = DarkNet7::instance->getCommunicationSettingState();
 			}
 		}
 		return ReturnStateContext(nextState);
@@ -168,7 +170,8 @@ protected:
 
 	virtual cmdc0de::StateBase::ReturnStateContext onRun() {
 		StateBase *nextState = this;
-		DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+		auto buttonInfo = DarkNet7::instance->getButtonInfo();
+		DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
 		sprintf(&ListBuffer[0][0],"AP Status: %s", darknet7::EnumNameWiFiStatus(CurrentWiFiStatus));
 		if(CurrentWiFiStatus==darknet7::WiFiStatus_DOWN) {
 			ListBuffer[1][0] = '\0';
@@ -187,7 +190,7 @@ protected:
 
 		if(WorkingItem==NO_WORKING_TIME) {
 			if (!GUIListProcessor::process(&WifiSettingList,(sizeof(Items) / sizeof(Items[0])))) {
-				if(DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+				if(buttonInfo.wereTheseButtonsReleased(Button::Fire)) {
 					WorkingItem = WifiSettingList.selectedItem;
 
 					switch(WorkingItem) {
@@ -217,38 +220,38 @@ protected:
 									msgOffset = r.Union();
 									Msg_type = darknet7::STMToESPAny_SetupAP;
 								}
-								auto z = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::get().nextSeq(),Msg_type,msgOffset);
+								auto z = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::instance->nextSeq(),Msg_type,msgOffset);
 								darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,z);
 								MCUToMCU::get().send(fbb);
-								nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getCommunicationSettingState(),(const char *)"Updating ESP",5000);
+								nextState = DarkNet7::instance->getDisplayMessageState(DarkNet7::instance->getCommunicationSettingState(),(const char *)"Updating ESP",5000);
 							} else {
-								DarkNet7::get().getDisplay().drawString(0,80,(const char *)"SID Can't be blank");
+								DarkNet7::instance->getDisplay().drawString(0,80,(const char *)"SID Can't be blank");
 							}
 						}
 						break;
 					}
-				} else if ( DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
-					nextState = DarkNet7::get().getCommunicationSettingState();
+				} else if ( buttonInfo.wereTheseButtonsReleased(Button::Mid)) {
+					nextState = DarkNet7::instance->getCommunicationSettingState();
 				}
 			}
 		} else {
 			switch(WorkingItem) {
 			case 0:
-				if(DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_UP | DarkNet7::ButtonInfo::BUTTON_DOWN)) {
+				if(buttonInfo.wereAnyOfTheseButtonsReleased(Button::Up) || buttonInfo.wereAnyOfTheseButtonsReleased(Button::Down)) {
 					if(CurrentWiFiStatus==darknet7::WiFiStatus_DOWN) CurrentWiFiStatus = darknet7::WiFiStatus_AP_STA;
 					else CurrentWiFiStatus = darknet7::WiFiStatus_DOWN;
-				} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID | DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+				} else if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Mid) || buttonInfo.wereAnyOfTheseButtonsReleased(Button::Fire)) {
 					WorkingItem = NO_WORKING_TIME;
 				}
 				break;
 			case 1:
 			{
-				if(DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_UP)) {
+				if(buttonInfo.wereTheseButtonsReleased(Button::Up)) {
 					uint32_t s = (uint32_t)(SecurityType);
 					++s;
 					s = s%darknet7::WifiMode_MAX;
 					SecurityType = (darknet7::WifiMode)s;
-				} else if (DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_DOWN)) {
+				} else if (buttonInfo.wereTheseButtonsReleased(Button::Down)) {
 					if(SecurityType==darknet7::WifiMode_MIN) {
 						SecurityType = darknet7::WifiMode_MAX;
 					} else {
@@ -256,27 +259,26 @@ protected:
 						--s;
 						SecurityType = (darknet7::WifiMode)s;
 					}
-				} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID
-																					| DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+				} else if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Mid) || buttonInfo.wereAnyOfTheseButtonsReleased(Button::Fire)) {
 					WorkingItem = NO_WORKING_TIME;
 				}
 			}
 			break;
 			case 2:
 				VKB.process();
-				if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+				if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Mid)) {
 					WorkingItem = NO_WORKING_TIME;
 				}
 				break;
 			case 3:
 				VKB.process();
-				if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+				if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Mid)) {
 					WorkingItem = NO_WORKING_TIME;
 				}
 				break;
 			}
 		}
-		DarkNet7::get().getGUI().drawList(&WifiSettingList);
+		DarkNet7::instance->getGUI().drawList(&WifiSettingList);
 		return ReturnStateContext(nextState);
 	}
 
@@ -308,8 +310,8 @@ void CommunicationSettingState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7:
 		sprintf(&ListBuffer[1][0], "BLE Advertise: %s", mevt->InnerMsg->BLEAdvertise()?DarkNet7::sYES:DarkNet7::sNO);
 		sprintf(&ListBuffer[2][0], "BLE DeviceName: %s", mevt->InnerMsg->BLEDeviceName()->c_str());
 		strcpy(&CurrentDeviceName[0],mevt->InnerMsg->BLEDeviceName()->c_str());
-		DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
-		DarkNet7::get().getGUI().drawList(&CommSettingList);
+		DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
+		DarkNet7::instance->getGUI().drawList(&CommSettingList);
 #if !defined VIRTUAL_DEVICE
 		MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
 #endif
@@ -321,7 +323,7 @@ ErrorType CommunicationSettingState::onInit() {
 	InternalState = FETCHING_DATA;
 	flatbuffers::FlatBufferBuilder fbb;
 	auto r = darknet7::CreateCommunicationStatusRequest(fbb);
-	ESPRequestID = DarkNet7::get().nextSeq();
+	ESPRequestID = DarkNet7::instance->nextSeq();
 	auto e = darknet7::CreateSTMToESPRequest(fbb,ESPRequestID,darknet7::STMToESPAny_CommunicationStatusRequest, r.Union());
 	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
 	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
@@ -329,9 +331,9 @@ ErrorType CommunicationSettingState::onInit() {
 #if !defined VIRTUAL_DEVICE
 	MCUToMCU::get().getBus().addListener(this,si,&MCUToMCU::get());
 #endif
-	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+	DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
 
-	DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Fetching data from ESP",RGBColor::BLUE);
+	DarkNet7::instance->getDisplay().drawString(5,10,(const char *)"Fetching data from ESP",RGBColor::BLUE);
 
 	MCUToMCU::get().send(fbb);
 
@@ -340,18 +342,19 @@ ErrorType CommunicationSettingState::onInit() {
 
 StateBase::ReturnStateContext CommunicationSettingState::onRun() {
 	StateBase *nextState = this;
+	auto buttonInfo = DarkNet7::instance->getButtonInfo();
 	if(InternalState==FETCHING_DATA) {
 		if(this->getTimesRunCalledSinceLastReset()>200) {
 			const MSGEvent<darknet7::CommunicationStatusResponse> *mevt=0;
 #if !defined VIRTUAL_DEVICE
 			MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
 #endif
-			nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(),DarkNet7::get().NO_DATA_FROM_ESP,2000);
+			nextState = DarkNet7::instance->getDisplayMessageState(DarkNet7::instance->getDisplayMenuState(),DarkNet7::instance->NO_DATA_FROM_ESP,2000);
 		}
 	} else {
 		if (!GUIListProcessor::process(&CommSettingList,(sizeof(Items) / sizeof(Items[0])))) {
-			if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
-				DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+			if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Fire)) {
+				DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
 				switch(CommSettingList.selectedItem) {
 				case 0:
 					WiFiMenu.setWifiStatus(CurrentWifiStatus);
@@ -365,11 +368,11 @@ StateBase::ReturnStateContext CommunicationSettingState::onRun() {
 					nextState = &BLESetName_Menu;
 					break;
 				}
-			} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
-				nextState = DarkNet7::get().getDisplayMenuState();
+			} else if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Mid)) {
+				nextState = DarkNet7::instance->getDisplayMenuState();
 			}
 		}
-		DarkNet7::get().getGUI().drawList(&CommSettingList);
+		DarkNet7::instance->getGUI().drawList(&CommSettingList);
 	}
 	return ReturnStateContext(nextState);
 }

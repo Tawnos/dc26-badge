@@ -30,9 +30,9 @@ ErrorType AddressState::onInit() {
 	memset(&RadioIDBuf[0], 0, sizeof(RadioIDBuf));
 	memset(&PublicKey[0], 0, sizeof(PublicKey));
 	memset(&SignatureKey[0], 0, sizeof(SignatureKey));
-	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+	DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
 	DisplayList = &AddressList;
-	DarkNet7::get().getGUI().drawList(DisplayList);
+	DarkNet7::instance->getGUI().drawList(DisplayList);
 	Index = 0;
 	return ErrorType();
 }
@@ -42,10 +42,10 @@ void AddressState::resetSelection() {
 }
 
 void AddressState::setNext4Items(uint16_t startAt) {
-	uint8_t num = DarkNet7::get().getContacts().getSettings().getNumContacts();
+	uint8_t num = DarkNet7::instance->getContacts().getSettings().getNumContacts();
 	for (uint16_t i = startAt, j = 0; j < (4); i++, j++) {
 		if (i < num) {
-			if (DarkNet7::get().getContacts().getContactAt(i, CurrentContactList[j])) {
+			if (DarkNet7::instance->getContacts().getContactAt(i, CurrentContactList[j])) {
 				Items[j].id = CurrentContactList[j].getUniqueID();
 				Items[j].text = CurrentContactList[j].getAgentName();
 			}
@@ -58,8 +58,9 @@ void AddressState::setNext4Items(uint16_t startAt) {
 
 StateBase::ReturnStateContext AddressState::onRun() {
 	StateBase *nextState = this;
+	auto buttonInfo = DarkNet7::instance->getButtonInfo();
 	if (DetailItems[0].id == 0) {
-		if(DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_UP)) {
+		if(buttonInfo.wereTheseButtonsReleased(Button::Up)) {
 			if (AddressList.selectedItem == 0) {
 				//keep selection at 0 but load new values
 				int16_t startAt = Index - 4;
@@ -75,8 +76,8 @@ StateBase::ReturnStateContext AddressState::onRun() {
 				AddressList.selectedItem--;
 				Index--;
 			}
-		} else if (DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_DOWN)) {
-			uint16_t num = DarkNet7::get().getContacts().getSettings().getNumContacts();
+		} else if (buttonInfo.wereTheseButtonsReleased(Button::Down)) {
+			uint16_t num = DarkNet7::instance->getContacts().getSettings().getNumContacts();
 			if (Index < num) {
 				if (AddressList.selectedItem == (sizeof(Items) / sizeof(Items[0]) - 1)) {
 					if (num > Index + 4) {
@@ -91,9 +92,9 @@ StateBase::ReturnStateContext AddressState::onRun() {
 					Index++;
 				}
 			}
-		} else if(DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
-			nextState = DarkNet7::get().getDisplayMenuState();
-		} else if (DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+		} else if(buttonInfo.wereTheseButtonsReleased(Button::Mid)) {
+			nextState = DarkNet7::instance->getDisplayMenuState();
+		} else if (buttonInfo.wereTheseButtonsReleased(Button::Fire)) {
 			if (Items[AddressList.selectedItem].id != 0) {
 				DisplayList = &ContactDetails;
 				DetailItems[0].id = 1;
@@ -127,14 +128,14 @@ StateBase::ReturnStateContext AddressState::onRun() {
 		}
 	} else {
 		if(!GUIListProcessor::process(DisplayList,DisplayList->ItemsCount)) {
-			if(DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+			if(buttonInfo.wereTheseButtonsReleased(Button::Mid)) {
 				DetailItems[0].id = 0;
-				DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+				DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
 				DisplayList = &AddressList;
 			}
 		}
 	}
-	DarkNet7::get().getGUI().drawList(DisplayList);
+	DarkNet7::instance->getGUI().drawList(DisplayList);
 	return ReturnStateContext(nextState);
 }
 

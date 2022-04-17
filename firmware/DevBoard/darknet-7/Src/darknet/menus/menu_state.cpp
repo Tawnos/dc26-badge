@@ -25,8 +25,8 @@ using cmdc0de::StateBase;
 using cmdc0de::RGBColor;
 
 MenuState::MenuState() :
-		Darknet7BaseState(), MenuList("Main Menu", Items, 0, 0, DarkNet7::get().getDisplay().getWidth(),
-				DarkNet7::get().getDisplay().getHeight()
+		Darknet7BaseState(), MenuList("Main Menu", Items, 0, 0, DarkNet7::instance->getDisplay().getWidth(),
+				DarkNet7::instance->getDisplay().getHeight()
 				, 0, (sizeof(Items) / sizeof(Items[0])))
 {
 }
@@ -38,7 +38,7 @@ MenuState::~MenuState() {
 
 ErrorType MenuState::onInit() {
 	Items[0].id = 0;
-	if (DarkNet7::get().getContacts().getSettings().isNameSet()) {
+	if (DarkNet7::instance->getContacts().getSettings().isNameSet()) {
 		Items[0].text = (const char *) "Settings";
 	} else {
 		Items[0].text = (const char *) "Settings *";
@@ -65,8 +65,8 @@ ErrorType MenuState::onInit() {
 	Items[10].text = (const char *) "Test Badge";
 	Items[11].id = 11;
 	Items[11].text = (const char *) "Scan: Shitty Addon Badge";
-	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
-	DarkNet7::get().getGUI().drawList(&this->MenuList);
+	DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
+	DarkNet7::instance->getGUI().drawList(&this->MenuList);
 	return ErrorType();
 }
 
@@ -74,59 +74,59 @@ cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
 	StateBase *nextState = this;
 	if (!GUIListProcessor::process(&MenuList,(sizeof(Items) / sizeof(Items[0]))))
 	{
-		if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1))
+		if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(Button::Fire))
 		{
 			switch (MenuList.selectedItem)
 			{
 				case 0:
-					nextState = DarkNet7::get().getSettingState();
+					nextState = DarkNet7::instance->getSettingState();
 					break;
 				case 1:
-					if (DarkNet7::get().getContacts().getSettings().getAgentName()[0] != '\0') {
-						nextState = DarkNet7::get().getPairingState();
+					if (DarkNet7::instance->getContacts().getSettings().getAgentName()[0] != '\0') {
+						nextState = DarkNet7::instance->getPairingState();
 					} else {
-						nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(),
+						nextState = DarkNet7::instance->getDisplayMessageState(DarkNet7::instance->getDisplayMenuState(),
 								(const char *) "You must set your agent name first", 3000);
 					}
 					break;
 				case 2:
-					nextState = DarkNet7::get().getAddressBookState();
+					nextState = DarkNet7::instance->getAddressBookState();
 					break;
 				case 3:
-					nextState = DarkNet7::get().get3DState();
+					nextState = DarkNet7::instance->get3DState();
 					break;
 				case 4:
-					nextState = DarkNet7::get().getGameOfLifeState();
+					nextState = DarkNet7::instance->getGameOfLifeState();
 					break;
 				case 5:
-					nextState = DarkNet7::get().getBadgeInfoState();
+					nextState = DarkNet7::instance->getBadgeInfoState();
 					break;
 				case 6:
-					nextState = DarkNet7::get().getMCUInfoState();
+					nextState = DarkNet7::instance->getMCUInfoState();
 					break;
 				case 7:
-					nextState = DarkNet7::get().getCommunicationSettingState();
+					nextState = DarkNet7::instance->getCommunicationSettingState();
 					break;
 				case 8:
-					nextState = DarkNet7::get().getHealthState();
+					nextState = DarkNet7::instance->getHealthState();
 					break;
 				case 9:
-					DarkNet7::get().getScanState()->setNPCOnly(true);
-					nextState = DarkNet7::get().getScanState();
+					DarkNet7::instance->getScanState()->setNPCOnly(true);
+					nextState = DarkNet7::instance->getScanState();
 					break;
 				case 10:
-					nextState = DarkNet7::get().getTestState();
+					nextState = DarkNet7::instance->getTestState();
 					break;
 				case 11:
-					nextState = DarkNet7::get().getSAOMenuState();
+					nextState = DarkNet7::instance->getSAOMenuState();
 					break;
 
 			}
 		}
 	}
 
-	if (DarkNet7::get().getButtonInfo().wasAnyButtonReleased()) {
-		DarkNet7::get().getGUI().drawList(&this->MenuList);
+	if (DarkNet7::instance->getButtonInfo().wasAnyButtonReleased()) {
+		DarkNet7::instance->getGUI().drawList(&this->MenuList);
 	}
 
 	return StateBase::ReturnStateContext(nextState);

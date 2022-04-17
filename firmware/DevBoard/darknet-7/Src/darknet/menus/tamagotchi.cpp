@@ -28,11 +28,11 @@ ErrorType Tamagotchi::onInit()
 		{
 	/*
 	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
-	sprintf(&ListBuffer[0][0], "Name: %s", DarkNet7::get().getContacts().getSettings().getAgentName());
-	sprintf(&ListBuffer[1][0], "Num contacts: %u", DarkNet7::get().getContacts().getSettings().getNumContacts());
-	sprintf(&ListBuffer[2][0], "REG: %s", getRegCode(DarkNet7::get().getContacts()));
-	sprintf(&ListBuffer[3][0], "UID: %u", DarkNet7::get().getContacts().getMyInfo().getUniqueID());
-	uint8_t *pCP = DarkNet7::get().getContacts().getMyInfo().getCompressedPublicKey();
+	sprintf(&ListBuffer[0][0], "Name: %s", DarkNet7::instance->getContacts().getSettings().getAgentName());
+	sprintf(&ListBuffer[1][0], "Num contacts: %u", DarkNet7::instance->getContacts().getSettings().getNumContacts());
+	sprintf(&ListBuffer[2][0], "REG: %s", getRegCode(DarkNet7::instance->getContacts()));
+	sprintf(&ListBuffer[3][0], "UID: %u", DarkNet7::instance->getContacts().getMyInfo().getUniqueID());
+	uint8_t *pCP = DarkNet7::instance->getContacts().getMyInfo().getCompressedPublicKey();
 	sprintf(&ListBuffer[4][0],
 			"PK: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
 			pCP[0], pCP[1], pCP[2], pCP[3], pCP[4], pCP[5], pCP[6], pCP[7], pCP[8], pCP[9], pCP[10], pCP[11],
@@ -49,8 +49,8 @@ ErrorType Tamagotchi::onInit()
 		Items[i].id = i;
 		Items[i].setShouldScroll();
 	}
-	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
-	DarkNet7::get().getGUI().drawList(&BadgeInfoList);
+	DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
+	DarkNet7::instance->getGUI().drawList(&BadgeInfoList);
 	*/
 	return ErrorType();
 

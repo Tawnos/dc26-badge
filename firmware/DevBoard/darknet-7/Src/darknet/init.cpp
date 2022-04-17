@@ -9,10 +9,10 @@
 #include "darknet7.h"
 
 void init() {
-	DarkNet7::get().init();
+	DarkNet7::instance->init();
 }
 
 void runOnce() {
-	DarkNet7::get().run();
+	DarkNet7::instance->run();
 }
 

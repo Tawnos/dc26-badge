@@ -14,6 +14,7 @@
 #include <app/display_message_state.h>
 #include <display/gui.h>
 #include "KeyStore.h"
+#include "button_info.h"
 
 #if !defined VIRTUAL_DEVICE
 #include <leds/ws2812.h>
@@ -35,109 +36,110 @@ class Health;
 class Scan;
 class SAO;
 
+static const uint8_t MyAddressInfoSector = 3; //same sector as settings just first thing
+static const uint32_t MyAddressInfoOffSet = 0;
+static const uint8_t SettingSector = 1;
+static const uint32_t SettingOffset = 0;
+static const uint8_t StartContactSector = 2;
+static const uint8_t EndContactSector = 3;
 
-class DarkNet7: public cmdc0de::App {
+class DarkNet7 : public cmdc0de::App {
 public:
-	static const char *sYES;
-	static const char *sNO;
-	static const char *NO_DATA_FROM_ESP;
-	static const char *BLE_CONNECT_FAILED;
-	static const char *BLE_DISCONNECTING;
-	static const char *BLE_PAIRING_SUCCESS;
-	static const char *BLE_PAIRING_FAILED;
+  static const char* sYES;
+  static const char* sNO;
+  static const char* NO_DATA_FROM_ESP;
+  static const char* BLE_CONNECT_FAILED;
+  static const char* BLE_DISCONNECTING;
+  static const char* BLE_PAIRING_SUCCESS;
+  static const char* BLE_PAIRING_FAILED;
 
-	#define START_LANDSCAPE
-	#ifdef START_LANDSCAPE
-		static const uint32_t DISPLAY_WIDTH = 160;
-		static const uint32_t DISPLAY_HEIGHT = 128;
-		#define START_ROT DisplayST7735::LandscapeTopLeft
-	#else
-		static const uint32_t DISPLAY_WIDTH = 128;
-		static const uint32_t DISPLAY_HEIGHT = 160;
-		#define START_ROT DisplayST7735::PortraitTopLeft
-	#endif
-	static const uint16_t BROADCAST_ADDR = 0xFFFF;
+#define START_LANDSCAPE
+#ifdef START_LANDSCAPE
+  static const uint32_t DISPLAY_WIDTH = 160;
+  static const uint32_t DISPLAY_HEIGHT = 128;
+#define START_ROT Rotation::LandscapeTopLeft
+#else
+  static const uint32_t DISPLAY_WIDTH = 128;
+  static const uint32_t DISPLAY_HEIGHT = 160;
+#define START_ROT Rotation::PortraitTopLeft
+#endif
+  static const uint16_t BROADCAST_ADDR = 0xFFFF;
 public:
-	static DarkNet7 &get();
-	class ButtonInfo {
-	public:
-		enum BUTTON {
-			BUTTON_LEFT = 0x01
-			, BUTTON_RIGHT = 0x02
-			, BUTTON_UP = 0x04
-			, BUTTON_DOWN = 0x08
-			, BUTTON_MID = 0x10
-			, BUTTON_FIRE1 = 0x20
-			, ANY_KEY = BUTTON_LEFT|BUTTON_RIGHT|BUTTON_UP|BUTTON_DOWN|BUTTON_MID|BUTTON_FIRE1
-		};
-	public:
-		ButtonInfo();
-		bool areTheseButtonsDown(const int32_t &b);
-		bool isAnyOfTheseButtonDown(const int32_t &b);
-		bool isAnyButtonDown();
-		bool wereTheseButtonsReleased(const int32_t &b);
-		bool wereAnyOfTheseButtonsReleased(const int32_t &b);
-		bool wasAnyButtonReleased();
-		void reset();
-		uint32_t lastTickButtonPushed();
-	protected:
-		void processButtons();
-		friend class DarkNet7;
-	private:
-		uint8_t ButtonState;
-		uint8_t LastButtonState;
-		uint32_t LastTickButtonPushed;
-	};
-public:
-	cmdc0de::DisplayMessageState *getDisplayMessageState(cmdc0de::StateBase *bm, const char *message, uint16_t timeToDisplay);
-	MenuState *getDisplayMenuState();
-	TestState *getTestState();
-	SendMsgState *getSendMsgState();
-	SettingState *getSettingState();
-	PairingState *getPairingState();
-	AddressState *getAddressBookState();
-	Menu3D *get3DState();
-	GameOfLife *getGameOfLifeState();
-	CommunicationSettingState *getCommunicationSettingState();
-	BadgeInfoState * getBadgeInfoState();
-	MCUInfoState *getMCUInfoState();
-	//Tamagotchi *getTamagotchiState();
-	Health *getHealthState();
-	Scan *getScanState();
-	SAO *getSAOMenuState();
-public:
-	cmdc0de::DisplayDevice& getDisplay();
-	const cmdc0de::DisplayDevice& getDisplay() const;
-	ContactStore &getContacts();
-	const ContactStore &getContacts() const;
-	cmdc0de::GUI &getGUI();
-	const cmdc0de::GUI &getGUI() const;
-	ButtonInfo &getButtonInfo();
-	const ButtonInfo&getButtonInfo() const;
-	uint32_t nextSeq();
-	virtual ~DarkNet7();
+  static DarkNet7* instance;
+  DarkNet7(
+#if !defined VIRTUAL_DEVICE
+    cmdc0de::WS2818 leds,
+#endif
+  cmdc0de::DisplayDevice* displayDevice,
+  cmdc0de::DrawBuffer2D16BitColor16BitPerPixel1Buffer displayBuffer,
+  ButtonInfo buttons) :
+#if !defined VIRTUAL_DEVICE
+    Apa106s(leds)
+#endif
+    //		       my Info, start setting address, start Contact address, end contact address
+    MyContacts(MyAddressInfoSector, MyAddressInfoOffSet, SettingSector, SettingOffset, StartContactSector, EndContactSector),
+    Display(displayDevice),
+    DisplayBuffer(displayBuffer),
+    DMS(), 
+    MyGUI(Display),
+    MyButtons(buttons),
+    SequenceNum(0) {}
+
+  cmdc0de::DisplayMessageState* getDisplayMessageState(cmdc0de::StateBase* bm, const char* message, uint16_t timeToDisplay);
+  MenuState* getDisplayMenuState();
+  TestState* getTestState();
+  SendMsgState* getSendMsgState();
+  SettingState* getSettingState();
+  PairingState* getPairingState();
+  AddressState* getAddressBookState();
+  Menu3D* get3DState();
+  GameOfLife* getGameOfLifeState();
+  CommunicationSettingState* getCommunicationSettingState();
+  BadgeInfoState* getBadgeInfoState();
+  MCUInfoState* getMCUInfoState();
+  //Tamagotchi *getTamagotchiState();
+  Health* getHealthState();
+  Scan* getScanState();
+  SAO* getSAOMenuState();
+  cmdc0de::DisplayDevice& getDisplay();
+  const cmdc0de::DisplayDevice& getDisplay() const;
+  ContactStore& getContacts();
+  const ContactStore& getContacts() const;
+  cmdc0de::GUI& getGUI();
+  const cmdc0de::GUI& getGUI() const;
+  ButtonInfo& getButtonInfo();
+  const ButtonInfo& getButtonInfo() const;
+  uint32_t nextSeq();
+  virtual ~DarkNet7() = default;
 protected:
-	virtual cmdc0de::ErrorType onInit();
-	virtual cmdc0de::ErrorType onRun();
-	private:
-	DarkNet7();
+  virtual cmdc0de::ErrorType onInit();
+  virtual cmdc0de::ErrorType onRun();
+
 private:
 #if !defined VIRTUAL_DEVICE
-	cmdc0de::WS2818 Apa106s;
+  cmdc0de::WS2818 Apa106s;
 #endif
-	ContactStore MyContacts;
-	cmdc0de::DisplayDevice* Display;
-	cmdc0de::DrawBuffer2D16BitColor16BitPerPixel1Buffer DisplayBuffer;
-	cmdc0de::DisplayMessageState DMS;
-	cmdc0de::GUI MyGUI;
-	ButtonInfo MyButtons;
-	uint32_t SequenceNum;
-private:
-	static DarkNet7 *mSelf;
+  ContactStore MyContacts;
+  cmdc0de::DisplayDevice* Display;
+  cmdc0de::DrawBuffer2D16BitColor16BitPerPixel1Buffer DisplayBuffer;
+  cmdc0de::DisplayMessageState DMS;
+  cmdc0de::GUI MyGUI;
+  ButtonInfo MyButtons;
+  uint32_t SequenceNum;
 };
 
+
+const char* DarkNet7::sYES = "Yes";
+const char* DarkNet7::sNO = "No";
+const char* DarkNet7::NO_DATA_FROM_ESP = "No data returned from ESP, try resetting ESP.";
+const char* DarkNet7::BLE_CONNECT_FAILED = "BLE Connection failed.";
+const char* DarkNet7::BLE_DISCONNECTING = "BLE Disconnecting.";
+const char* DarkNet7::BLE_PAIRING_SUCCESS = "Paired.";
+const char* DarkNet7::BLE_PAIRING_FAILED = "Failed to Pair.";
+
+
 namespace cmdc0de {
-class DisplayMessageState;
+  class DisplayMessageState;
 }
 
 #endif /* DARKNET_DC26_H_ */

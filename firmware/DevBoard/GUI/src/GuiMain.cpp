@@ -4,9 +4,14 @@
 
 #include "virtualHAL.h"
 #include <art/images.h>
+#include <libstm32/rgbcolor.h>
+#include <display_device.h>
 #include <darknet7.h>
-
-//auto darknet = DarkNet7::DarkNet7::get();
+//
+//DarkNet7::instance = new DarkNet7(
+//  Display(DISPLAY_WIDTH, DISPLAY_HEIGHT, START_ROT),
+//  DisplayBuffer(static_cast<uint8_t>(DISPLAY_WIDTH), static_cast<uint8_t>(DISPLAY_HEIGHT), &DrawBuffer[0], &Display),
+//  MyButtons())
 
 class wxCustomButton : public wxWindow
 {
@@ -18,7 +23,7 @@ class wxCustomButton : public wxWindow
   static const int buttonHeight = 50;
 
 public:
-  wxCustomButton(wxFrame* parent, wxString text) :
+  wxCustomButton(wxFrame* parent, wxString text, Button b) :
     wxWindow(parent, wxID_ANY),
     text(text),
     pressedDown(false)
@@ -101,17 +106,19 @@ void wxCustomButton::render(wxDC& dc)
     dc.SetBrush(*wxGREY_BRUSH);
 
   dc.DrawRectangle(0, 0, buttonWidth, buttonHeight);
-  dc.DrawText(text, 20, 15);
+  dc.DrawText(text,5,5);
 }
 
 void wxCustomButton::mouseDown(wxMouseEvent& event)
 {
   pressedDown = true;
+  //ButtonState += button;
   paintNow();
 }
 void wxCustomButton::mouseReleased(wxMouseEvent& event)
 {
   pressedDown = false;
+  //ButtonState -= button;
   paintNow();
 }
 void wxCustomButton::mouseLeftWindow(wxMouseEvent& event)
@@ -119,6 +126,7 @@ void wxCustomButton::mouseLeftWindow(wxMouseEvent& event)
   if (pressedDown)
   {
     pressedDown = false;
+    //ButtonState -= button;
     paintNow();
   }
 }
@@ -130,6 +138,51 @@ void wxCustomButton::rightClick(wxMouseEvent& event) {}
 void wxCustomButton::keyPressed(wxKeyEvent& event) {}
 void wxCustomButton::keyReleased(wxKeyEvent& event) {}
 
+class VirtualDisplayDevice : public cmdc0de::DisplayDevice {
+  // Inherited via DisplayDevice
+  virtual bool drawPixel(uint16_t x0, uint16_t y0, const cmdc0de::RGBColor& color) override
+  {
+    return false;
+  }
+  virtual void fillRec(int16_t x, int16_t y, int16_t w, int16_t h, const cmdc0de::RGBColor& color) override
+  {
+  }
+  virtual void drawRec(int16_t x, int16_t y, int16_t w, int16_t h, const cmdc0de::RGBColor& color) override
+  {
+  }
+  virtual void fillScreen(const cmdc0de::RGBColor& color) override
+  {
+  }
+  virtual void drawImage(int16_t x, int16_t y, const cmdc0de::DCImage& dcImage) override
+  {
+  }
+  virtual uint32_t drawString(uint16_t xPos, uint16_t yPos, const char* pt) override
+  {
+    return uint32_t();
+  }
+  virtual uint32_t drawString(uint16_t xPos, uint16_t yPos, const char* pt, const cmdc0de::RGBColor& textColor) override
+  {
+    return uint32_t();
+  }
+  virtual uint32_t drawString(uint16_t xPos, uint16_t yPos, const char* pt, const cmdc0de::RGBColor& textColor, const cmdc0de::RGBColor& bgColor, uint8_t size, bool lineWrap) override
+  {
+    return uint32_t();
+  }
+  virtual uint32_t drawStringOnLine(uint8_t line, const char* msg) override
+  {
+    return uint32_t();
+  }
+  virtual const FontDef_t* getFont() override
+  {
+    return nullptr;
+  }
+  virtual void drawHorizontalLine(int16_t x, int16_t y, int16_t w) override
+  {
+  }
+  virtual void drawHorizontalLine(int16_t x, int16_t y, int16_t w, cmdc0de::RGBColor color) override
+  {
+  }
+};
 
 class BasicDrawPane : public wxPanel
 {
@@ -182,10 +235,10 @@ bool MyApp::OnInit()
   wxBoxSizer* rightSizer = new wxBoxSizer(wxVERTICAL);
   frame = new wxFrame((wxFrame*)NULL, -1, wxT("Darknet-7"), wxPoint(50, 50), wxSize(1024, 768));
 
-  btnUp = new wxCustomButton(frame, wxT("Up"));
-  btnDown = new wxCustomButton(frame, wxT("Down"));
-  btnLeft = new wxCustomButton(frame, wxT("Left"));
-  btnRight = new wxCustomButton(frame, wxT("Right"));
+  btnUp = new wxCustomButton(frame, wxT("Up"), Button::Up);
+  btnDown = new wxCustomButton(frame, wxT("Down"), Button::Down);
+  btnLeft = new wxCustomButton(frame, wxT("Left"), Button::Left);
+  btnRight = new wxCustomButton(frame, wxT("Right"), Button::Right);
 
   leftSizer->Add(btnUp, 0, wxALL, 5);
   leftSizer->Add(btnDown, 0, wxALL, 5);
@@ -194,7 +247,7 @@ bool MyApp::OnInit()
 
   hSizer->Add(leftSizer);
 
-  auto titsLogo = getLogo2();
+  auto titsLogo = getLogo4();
   auto logoBitmap = wxBitmap{ (int)titsLogo.width, (int)titsLogo.height, 24 };
   auto nativePixels = wxNativePixelData{ logoBitmap };
   auto pixelIterator = wxNativePixelData::Iterator{ nativePixels };
@@ -224,8 +277,8 @@ bool MyApp::OnInit()
   hSizer->Add(drawPane, 1, wxEXPAND);
 
 
-  btnMid = new wxCustomButton(frame, wxT("Mid"));
-  btnFire = new wxCustomButton(frame, wxT("Fire"));
+  btnMid = new wxCustomButton(frame, wxT("Mid"), Button::Mid);
+  btnFire = new wxCustomButton(frame, wxT("Fire"), Button::Fire);
   rightSizer->Add(btnMid, 0, wxALL, 5);
   rightSizer->Add(btnFire, 0, wxALL, 5);
 

@@ -62,7 +62,7 @@ void ContactStore::SettingsInfo::receiveSignal(MCUToMCU*, const MSGEvent<darknet
 	this->setHealth(infections);
 
 	//Uncomment this to infect other people
-	infections = DarkNet7::get().getContacts().getSettings().getHealth();
+	infections = DarkNet7::instance->getContacts().getSettings().getHealth();
 	infections &= 0x0004; // Only expose others to measels
 	flatbuffers::FlatBufferBuilder fbb;
 	auto r = darknet7::CreateBLESetInfectionData(fbb, infections);

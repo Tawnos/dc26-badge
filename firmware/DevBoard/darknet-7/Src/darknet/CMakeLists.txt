@@ -43,6 +43,7 @@ add_library(darknet7 STATIC
     art/tits.cpp
     art/stickers.cpp
     art/dc_zia_96-sized.cpp
+    art/wetriffs.cpp
 
     menus/AddressState.cpp           
     menus/badge_info_state.cpp       

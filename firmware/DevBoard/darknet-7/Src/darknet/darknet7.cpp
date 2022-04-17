@@ -244,7 +244,7 @@ ErrorType DarkNet7::onInit() {
 	//HAL_GPIO_WritePin(GPIO_APA106_DATA_GPIO_Port,GPIO_APA106_DATA_Pin,GPIO_PIN_SET);
 
 #if DEBUG_WHY_CANT_CHANGE_ROTATION
-	//Display.setRotation(cmdc0de::DisplayDevice::LANDSCAPE_TOP_LEFT,true);
+	//Display.setRotation(cmdc0de::DisplayDevice::LandscapeTopLeft,true);
 	Display.fillScreen(cmdc0de::RGBColor::BLACK);
 	Display.swap();
 	gui.drawList(&DrawList);

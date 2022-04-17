@@ -50,11 +50,11 @@ public:
 	#ifdef START_LANDSCAPE
 		static const uint32_t DISPLAY_WIDTH = 160;
 		static const uint32_t DISPLAY_HEIGHT = 128;
-		#define START_ROT DisplayST7735::LANDSCAPE_TOP_LEFT
+		#define START_ROT DisplayST7735::LandscapeTopLeft
 	#else
 		static const uint32_t DISPLAY_WIDTH = 128;
 		static const uint32_t DISPLAY_HEIGHT = 160;
-		#define START_ROT DisplayST7735::PORTAIT_TOP_LEFT
+		#define START_ROT DisplayST7735::PortraitTopLeft
 	#endif
 	static const uint16_t BROADCAST_ADDR = 0xFFFF;
 public:

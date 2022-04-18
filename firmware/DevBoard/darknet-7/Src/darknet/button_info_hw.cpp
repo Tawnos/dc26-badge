@@ -1,10 +1,5 @@
 #include "button_info.h"
 
-ButtonInfo::ButtonInfo() :
-	ButtonState(0), LastButtonState(0), LastTickButtonPushed(0) {
-	LastTickButtonPushed = HAL_GetTick();
-}
-
 void ButtonInfo::processButtons() {
 	LastButtonState = ButtonState;
 	ButtonState = 0;
@@ -29,8 +24,4 @@ void ButtonInfo::processButtons() {
 	if (ButtonState != 0) {
 		LastTickButtonPushed = HAL_GetTick();
 	}
-}
-
-uint32_t ButtonInfo::lastTickButtonPushed() {
-	return LastTickButtonPushed;
 }

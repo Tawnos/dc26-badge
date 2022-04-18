@@ -13,6 +13,7 @@
 #include <display/display_st7735.h>
 #include <app/display_message_state.h>
 #include <display/gui.h>
+#include <libstm32/error_type.h>
 #include "KeyStore.h"
 #include "button_info.h"
 #include "mcu_to_mcu.h"
@@ -77,8 +78,7 @@ public:
 #if !defined VIRTUAL_DEVICE
   DarkNet7(
     cmdc0de::WS2818 leds,
-    cmdc0de::DisplayDevice* displayDevice,
-    ButtonInfo buttons
+    cmdc0de::DisplayDevice* displayDevice
   ) : Apa106s(leds)
       //		       my Info, start setting address, start Contact address, end contact address
       MyContacts(MyAddressInfoSector, MyAddressInfoOffSet, SettingSector, SettingOffset, StartContactSector, EndContactSector),
@@ -86,19 +86,17 @@ public:
       DisplayBuffer(static_cast<uint8_t>(DISPLAY_WIDTH), static_cast<uint8_t>(DISPLAY_HEIGHT), &DrawBuffer[0], displayDevice),
       DMS(), 
       MyGUI(Display),
-      MyButtons(buttons),
+      MyButtons(),
       SequenceNum(0) {}
 #else
   DarkNet7(
-    cmdc0de::DisplayDevice* displayDevice,
-    ButtonInfo buttons
+    cmdc0de::DisplayDevice* displayDevice
   ) : //		       my Info, start setting address, start Contact address, end contact address
       MyContacts(MyAddressInfoSector, MyAddressInfoOffSet, SettingSector, SettingOffset, StartContactSector, EndContactSector),
       Display(displayDevice),
       DisplayBuffer(static_cast<uint8_t>(DISPLAY_WIDTH), static_cast<uint8_t>(DISPLAY_HEIGHT), &DrawBuffer[0], displayDevice),
       DMS(),
       MyGUI(Display),
-      MyButtons(buttons),
       SequenceNum(0) {}
 #endif
 

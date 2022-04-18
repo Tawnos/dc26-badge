@@ -76,7 +76,7 @@ public:
     return ButtonState != LastButtonState && LastButtonState != 0;
   }
 
-  uint32_t lastTickButtonPushed();
+  uint32_t lastTickButtonPushed() { return LastTickButtonPushed; }
 
 protected:
   void processButtons();

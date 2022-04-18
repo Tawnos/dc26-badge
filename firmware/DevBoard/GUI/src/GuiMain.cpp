@@ -107,7 +107,7 @@ void wxCustomButton::render(wxDC& dc)
 void wxCustomButton::mouseDown(wxMouseEvent& event)
 {
   pressedDown = true;
-  //ButtonState += button;
+  //ButtonState |= button;
   paintNow();
 }
 void wxCustomButton::mouseReleased(wxMouseEvent& event)
@@ -185,6 +185,11 @@ public:
   {
     return uint32_t();
   }
+
+  // Inherited via DisplayDevice
+  virtual void swap() override
+  {
+  }
 };
 
 class VirtualStateBase : public cmdc0de::StateBase {
@@ -203,10 +208,69 @@ class VirtualStateBase : public cmdc0de::StateBase {
   }
 };
 
+cmdc0de::StateBase::ReturnStateContext cmdc0de::StateBase::run() {
+  ++TimesRunCalledAllTime;
+  ReturnStateContext sr(this);
+  if (!hasBeenInitialized()) {
+    TimesRunCalledSinceLastReset = 0;
+    ErrorType et = init();
+    if (!et.ok()) {
+      sr.NextMenuToRun = 0;
+      sr.Err = et;
+    }
+  }
+  else {
+    ++TimesRunCalledSinceLastReset;
+    sr = onRun();
+    if (sr.NextMenuToRun != this) {
+      shutdown();
+    }
+  }
+  return sr;
+}
+
+cmdc0de::ErrorType cmdc0de::StateBase::init() {
+  ErrorType et = onInit();
+  if (et.ok()) {
+    setState(INIT_BIT);
+    StateStartTime = HAL_GetTick();
+  }
+  return et;
+}
+
+cmdc0de::ErrorType cmdc0de::StateBase::shutdown() {
+  ErrorType et = onShutdown();
+  clearState(INIT_BIT);
+  StateStartTime = 0;
+  return et;
+}
+
 cmdc0de::ErrorType DarkNet7::onInit() {
   return cmdc0de::ErrorType{};
 }
 cmdc0de::ErrorType DarkNet7::onRun() {
+  cmdc0de::StateBase::ReturnStateContext rsc = getCurrentState()->run();
+	Display->swap();
+	//handleLEDS();
+
+	if (rsc.Err.ok()) {
+		if (getCurrentState() != rsc.NextMenuToRun) {
+			//on state switches reset keyboard and give a 1 second pause on reading from keyboard.
+			MyButtons.reset();
+			setCurrentState(rsc.NextMenuToRun);
+		}
+		else {
+			/*if (getCurrentState() != DarkNet7::instance->getGameOfLifeState()
+				&& (HAL_GetTick() - MyButtons.lastTickButtonPushed()) > (DarkNet7::instance->getContacts().getSettings().getScreenSaverTime() * 1000 * 60)) {
+				setCurrentState(DarkNet7::instance->getGameOfLifeState());
+			}*/
+		}
+	}
+	else {
+		//setCurrentState(StateCollection::getDisplayMessageState(
+		//		StateCollection::getDisplayMenuState(), (const char *)"Run State Error....", uint16_t (2000)));
+	}
+
   return cmdc0de::ErrorType{};
 }
 class BasicDrawPane : public wxPanel
@@ -253,8 +317,13 @@ enum COLOR { // 2/2/2
   BITS_PER_PIXEL = 2
 };
 
+static auto darknet = DarkNet7{
+  new VirtualDisplayDevice(DISPLAY_WIDTH, DISPLAY_HEIGHT, START_ROT)
+};
+DarkNet7* DarkNet7::instance = &darknet;
 bool MyApp::OnInit()
 {
+  darknet.init();
   wxBoxSizer* hSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* leftSizer = new wxBoxSizer(wxVERTICAL);
   wxBoxSizer* rightSizer = new wxBoxSizer(wxVERTICAL);
@@ -374,8 +443,15 @@ void cmdc0de::FrameBuf::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uin
 bool cmdc0de::FrameBuf::writeNData(const uint8_t* data, int nbytes) { return false; }
 uint32_t cmdc0de::StateBase::timeInState() { return 0; }
 
-static auto darknet = DarkNet7{
-  new VirtualDisplayDevice(DISPLAY_WIDTH, DISPLAY_HEIGHT, START_ROT),
-  ButtonInfo{}
-};
-DarkNet7* DarkNet7::instance = &darknet;
+void ButtonInfo::processButtons() {}
+
+cmdc0de::ErrorType cmdc0de::App::init() {
+  return onInit();
+}
+
+cmdc0de::ErrorType cmdc0de::App::run() {
+  //LastRunTime = HAL_GetTick();
+  ErrorType et = onRun();
+  //LastRunPerformance = HAL_GetTick() - LastRunTime;
+  return et;
+}

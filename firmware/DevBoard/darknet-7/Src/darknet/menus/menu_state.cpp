@@ -83,7 +83,7 @@ cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
 					break;
 				case 1:
 					if (DarkNet7::instance->getContacts().getSettings().getAgentName()[0] != '\0') {
-						nextState = DarkNet7::instance->getPairingState();
+						//nextState = DarkNet7::instance->getPairingState();
 					} else {
 						nextState = DarkNet7::instance->getDisplayMessageState(DarkNet7::instance->getDisplayMenuState(),
 								(const char *) "You must set your agent name first", 3000);
@@ -92,23 +92,24 @@ cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
 				case 2:
 					nextState = DarkNet7::instance->getAddressBookState();
 					break;
-				case 3:
-					nextState = DarkNet7::instance->get3DState();
-					break;
-				case 4:
-					nextState = DarkNet7::instance->getGameOfLifeState();
-					break;
 				case 5:
 					nextState = DarkNet7::instance->getBadgeInfoState();
-					break;
-				case 6:
-					nextState = DarkNet7::instance->getMCUInfoState();
 					break;
 				case 7:
 					nextState = DarkNet7::instance->getCommunicationSettingState();
 					break;
 				case 8:
 					nextState = DarkNet7::instance->getHealthState();
+					break;
+#if !defined VIRTUAL_DEVICE
+				case 3:
+					nextState = DarkNet7::instance->get3DState();
+					break;
+				case 4:
+					nextState = DarkNet7::instance->getGameOfLifeState();
+					break;
+				case 6:
+					nextState = DarkNet7::instance->getMCUInfoState();
 					break;
 				case 9:
 					DarkNet7::instance->getScanState()->setNPCOnly(true);
@@ -120,7 +121,7 @@ cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
 				case 11:
 					nextState = DarkNet7::instance->getSAOMenuState();
 					break;
-
+#endif
 			}
 		}
 	}

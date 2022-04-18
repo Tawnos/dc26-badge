@@ -190,8 +190,7 @@ public:
 	MyInfo &getMyInfo();
 	SettingsInfo &getSettings();
 	bool init();
-	bool addContact(uint16_t uid, char agentName[AGENT_NAME_LENGTH], uint8_t key[PUBLIC_KEY_LENGTH],
-			uint8_t sig[SIGNATURE_LENGTH]);
+	bool addContact(uint16_t uid, char agentName[AGENT_NAME_LENGTH], uint8_t key[PUBLIC_KEY_LENGTH], uint8_t sig[SIGNATURE_LENGTH]);
 	uint8_t getNumContactsThatCanBeStored();
 	bool getContactAt(uint16_t numContact, Contact &c);
 	bool findContactByID(uint16_t uid, Contact &c);

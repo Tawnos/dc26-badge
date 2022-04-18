@@ -11,9 +11,7 @@
 using cmdc0de::DisplayST7735;
 
 DarkNet7::instance = new DarkNet7(
-	Apa106s(GPIO_APA106_DATA_Pin, GPIO_APA106_DATA_GPIO_Port, TIM1, DMA2_Stream0, DMA2_Stream2_IRQn),
-	Display(DISPLAY_WIDTH, DISPLAY_HEIGHT, START_ROT),
-	DisplayBuffer(static_cast<uint8_t>(DISPLAY_WIDTH), static_cast<uint8_t>(DISPLAY_HEIGHT), &DrawBuffer[0], &Display),
+	new Display(DISPLAY_WIDTH, DISPLAY_HEIGHT, START_ROT),
 	ButtonInfo()
 );
 
@@ -128,7 +126,7 @@ ErrorType DarkNet7::onInit() {
 #endif
 
 	//darknet7_led_init();
-	MCUToMCU::get().init(&huart1);
+	DarkNet7::instance->getMcuToMcu().init(&huart1);
 	return et;
 }
 
@@ -155,10 +153,10 @@ ErrorType DarkNet7::onRun() {
 			auto r = darknet7::CreateESPRequest(fbb, darknet7::ESPRequestType::ESPRequestType_SYSTEM_INFO);
 			auto e = darknet7::CreateSTMToESPRequest(fbb, DarkNet7::instance->nextSeq(), darknet7::STMToESPAny_ESPRequest, r.Union());
 			darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, e);
-			MCUToMCU::get().send(fbb);
+			DarkNet7::instance->getMcuToMcu().send(fbb);
 		}
 	}
-	MCUToMCU::get().process();
+	DarkNet7::instance->getMcuToMcu().process();
 
 	cmdc0de::StateBase::ReturnStateContext rsc = getCurrentState()->run();
 	Display.swap();

@@ -1,9 +1,11 @@
 #include "KeyStore.h"
 #include <string.h>
 #include <crypto/micro-ecc/uECC.h>
+#if !defined VIRTUAL_DEVICE
 #include "mcu_to_mcu.h"
 #include "messaging/stm_to_esp_generated.h"
 #include "messaging/esp_to_stm_generated.h"
+#endif
 #include "../darknet7.h"
 
 const uint8_t ContactStore::DaemonPublic[ContactStore::PUBLIC_KEY_LENGTH] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -68,7 +70,7 @@ void ContactStore::SettingsInfo::receiveSignal(MCUToMCU*, const MSGEvent<darknet
 	auto r = darknet7::CreateBLESetInfectionData(fbb, infections);
 	auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESetInfectionData, r.Union());
 	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
-	MCUToMCU::get().send(fbb);
+	DarkNet7::instance->getMcuToMcu().send(fbb);
 
 	return;
 }
@@ -76,7 +78,7 @@ void ContactStore::SettingsInfo::receiveSignal(MCUToMCU*, const MSGEvent<darknet
 bool ContactStore::SettingsInfo::init() {
 	const MSGEvent<darknet7::BLEInfectionData> *removebob=0;
 #if !defined VIRTUAL_DEVICE
-	MCUToMCU::get().getBus().addListener(this,removebob,&MCUToMCU::get());
+	DarkNet7::instance->getMcuToMcu().getBus().addListener(this,removebob,&DarkNet7::instance->getMcuToMcu());
 #endif
 
 	for (uint32_t addr = getStartAddress(); addr < getEndAddress(); addr += SettingsInfo::SIZE) {

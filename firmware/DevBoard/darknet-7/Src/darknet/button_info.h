@@ -44,7 +44,7 @@ inline Button& operator |= (Button& lhs, Button rhs)
 
 class ButtonInfo {
 public:
-  ButtonInfo();
+  ButtonInfo() = default;
 
   void reset() {
     ButtonState = LastButtonState = Button::None;

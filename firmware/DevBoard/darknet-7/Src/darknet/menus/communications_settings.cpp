@@ -36,7 +36,7 @@ protected:
 	virtual cmdc0de::ErrorType onInit() {
 		memset(&NewDeviceName[0],0,sizeof(NewDeviceName));
 		IHC.set(&NewDeviceName[0],sizeof(NewDeviceName));
-		VKB.init(VirtualKeyBoard::STDKBLowerCase,&IHC,5,DarkNet7::DISPLAY_WIDTH-5,80,RGBColor::WHITE, RGBColor::BLACK,
+		VKB.init(VirtualKeyBoard::STDKBLowerCase,&IHC,5,DISPLAY_WIDTH-5,80,RGBColor::WHITE, RGBColor::BLACK,
 				RGBColor::BLUE,'_');
 		return ErrorType();
 	}
@@ -58,7 +58,7 @@ protected:
 			auto r = darknet7::CreateBLESetDeviceNameDirect(fbb,&NewDeviceName[0]);
 			auto z = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::instance->nextSeq(),darknet7::STMToESPAny_BLESetDeviceName,r.Union());
 			darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,z);
-			MCUToMCU::get().send(fbb);
+			DarkNet7::instance->getMcuToMcu().send(fbb);
 			nextState = DarkNet7::instance->getCommunicationSettingState();
 		}
 		return ReturnStateContext(nextState);
@@ -81,7 +81,7 @@ private:
 	TYPE Type;
 public:
 	BLEBoolMenu(const char *name, TYPE t) : Darknet7BaseState(),
-		BLEList(name, Items, 0, 0, DarkNet7::DISPLAY_WIDTH, DarkNet7::DISPLAY_HEIGHT, 0, (sizeof(Items) / sizeof(Items[0])))
+		BLEList(name, Items, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, (sizeof(Items) / sizeof(Items[0])))
 		, YesOrNo(false), Type(t) {
 		strcpy(&ListBuffer[0][0],"Yes");
 		strcpy(&ListBuffer[1][0],"No");
@@ -116,7 +116,7 @@ protected:
 					auto z = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::instance->nextSeq(),darknet7::STMToESPAny_BLEAdvertise,r.Union());
 					darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,z);
 				}
-				MCUToMCU::get().send(fbb);
+				DarkNet7::instance->getMcuToMcu().send(fbb);
 #if !defined VIRTUAL_DEVICE
 				HAL_Delay(1000);
 #endif
@@ -149,7 +149,7 @@ private:
 	static const uint16_t NO_WORKING_TIME = 0xFFFF;
 public:
 	WiFi() : Darknet7BaseState(), VKB(), SSID(), Password(), SecurityType(darknet7::WifiMode_OPEN), IHC(0,0)
-		, WifiSettingList("WiFi Settings:", Items, 0, 0, DarkNet7::DISPLAY_WIDTH, 70, 0, (sizeof(Items) / sizeof(Items[0])))
+		, WifiSettingList("WiFi Settings:", Items, 0, 0, DISPLAY_WIDTH, 70, 0, (sizeof(Items) / sizeof(Items[0])))
 		, ListBuffer(), WorkingItem(NO_WORKING_TIME), CurrentWiFiStatus(darknet7::WiFiStatus_DOWN) {
 	}
 	void setWifiStatus(darknet7::WiFiStatus c) {CurrentWiFiStatus = c;}
@@ -201,11 +201,11 @@ protected:
 						break;
 					case 2:
 						IHC.set(&SSID[0],sizeof(SSID));
-						VKB.init(VirtualKeyBoard::STDKBLowerCase,&IHC,5,DarkNet7::DISPLAY_WIDTH-5,100,RGBColor::WHITE,	RGBColor::BLACK, RGBColor::BLUE,'_');
+						VKB.init(VirtualKeyBoard::STDKBLowerCase,&IHC,5,DISPLAY_WIDTH-5,100,RGBColor::WHITE,	RGBColor::BLACK, RGBColor::BLUE,'_');
 						break;
 					case 3:
 						IHC.set(&Password[0],sizeof(Password));
-						VKB.init(VirtualKeyBoard::STDKBLowerCase,&IHC,5,DarkNet7::DISPLAY_WIDTH-5,100,RGBColor::WHITE,	RGBColor::BLACK, RGBColor::BLUE,'_');
+						VKB.init(VirtualKeyBoard::STDKBLowerCase,&IHC,5,DISPLAY_WIDTH-5,100,RGBColor::WHITE,	RGBColor::BLACK, RGBColor::BLUE,'_');
 						break;
 					case 4: {
 							if(SSID[0]!='\0' || CurrentWiFiStatus==darknet7::WiFiStatus_DOWN) {
@@ -222,7 +222,7 @@ protected:
 								}
 								auto z = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::instance->nextSeq(),Msg_type,msgOffset);
 								darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,z);
-								MCUToMCU::get().send(fbb);
+								DarkNet7::instance->getMcuToMcu().send(fbb);
 								nextState = DarkNet7::instance->getDisplayMessageState(DarkNet7::instance->getCommunicationSettingState(),(const char *)"Updating ESP",5000);
 							} else {
 								DarkNet7::instance->getDisplay().drawString(0,80,(const char *)"SID Can't be blank");
@@ -291,7 +291,7 @@ static WiFi WiFiMenu;
 
 
 CommunicationSettingState::CommunicationSettingState() : Darknet7BaseState()
-	, CommSettingList("Comm Info:", Items, 0, 0, DarkNet7::DISPLAY_WIDTH, DarkNet7::DISPLAY_HEIGHT, 0, (sizeof(Items) / sizeof(Items[0])))
+	, CommSettingList("Comm Info:", Items, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, (sizeof(Items) / sizeof(Items[0])))
 	, Items(), ListBuffer(), CurrentDeviceName(), ESPRequestID(0), InternalState(NONE), CurrentWifiStatus(darknet7::WiFiStatus_DOWN) {
 
 }
@@ -313,7 +313,7 @@ void CommunicationSettingState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7:
 		DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
 		DarkNet7::instance->getGUI().drawList(&CommSettingList);
 #if !defined VIRTUAL_DEVICE
-		MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
+		DarkNet7::instance->getMcuToMcu().getBus().removeListener(this,mevt,&DarkNet7::instance->getMcuToMcu());
 #endif
 		InternalState = DISPLAY_DATA;
 	}
@@ -329,13 +329,13 @@ ErrorType CommunicationSettingState::onInit() {
 	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
 	const MSGEvent<darknet7::CommunicationStatusResponse> *si = 0;
 #if !defined VIRTUAL_DEVICE
-	MCUToMCU::get().getBus().addListener(this,si,&MCUToMCU::get());
+	DarkNet7::instance->getMcuToMcu().getBus().addListener(this,si,&DarkNet7::instance->getMcuToMcu());
 #endif
 	DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
 
 	DarkNet7::instance->getDisplay().drawString(5,10,(const char *)"Fetching data from ESP",RGBColor::BLUE);
 
-	MCUToMCU::get().send(fbb);
+	DarkNet7::instance->getMcuToMcu().send(fbb);
 
 	return ErrorType();
 }
@@ -347,7 +347,7 @@ StateBase::ReturnStateContext CommunicationSettingState::onRun() {
 		if(this->getTimesRunCalledSinceLastReset()>200) {
 			const MSGEvent<darknet7::CommunicationStatusResponse> *mevt=0;
 #if !defined VIRTUAL_DEVICE
-			MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
+			DarkNet7::instance->getMcuToMcu().getBus().removeListener(this,mevt,&DarkNet7::instance->getMcuToMcu());
 #endif
 			nextState = DarkNet7::instance->getDisplayMessageState(DarkNet7::instance->getDisplayMenuState(),DarkNet7::instance->NO_DATA_FROM_ESP,2000);
 		}

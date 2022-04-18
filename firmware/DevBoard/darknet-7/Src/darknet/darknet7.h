@@ -15,6 +15,7 @@
 #include <display/gui.h>
 #include "KeyStore.h"
 #include "button_info.h"
+#include "mcu_to_mcu.h"
 
 #if !defined VIRTUAL_DEVICE
 #include <leds/ws2812.h>
@@ -43,72 +44,99 @@ static const uint32_t SettingOffset = 0;
 static const uint8_t StartContactSector = 2;
 static const uint8_t EndContactSector = 3;
 
-class DarkNet7 : public cmdc0de::App {
-public:
-  static const char* sYES;
-  static const char* sNO;
-  static const char* NO_DATA_FROM_ESP;
-  static const char* BLE_CONNECT_FAILED;
-  static const char* BLE_DISCONNECTING;
-  static const char* BLE_PAIRING_SUCCESS;
-  static const char* BLE_PAIRING_FAILED;
 
 #define START_LANDSCAPE
 #ifdef START_LANDSCAPE
-  static const uint32_t DISPLAY_WIDTH = 160;
-  static const uint32_t DISPLAY_HEIGHT = 128;
-#define START_ROT Rotation::LandscapeTopLeft
+static const uint32_t DISPLAY_WIDTH = 160;
+static const uint32_t DISPLAY_HEIGHT = 128;
+static const cmdc0de::Rotation START_ROT = cmdc0de::Rotation::LandscapeTopLeft;
 #else
-  static const uint32_t DISPLAY_WIDTH = 128;
-  static const uint32_t DISPLAY_HEIGHT = 160;
-#define START_ROT Rotation::PortraitTopLeft
+static const uint32_t DISPLAY_WIDTH = 128;
+static const uint32_t DISPLAY_HEIGHT = 160;
+static const cmdc0de::Rotation START_ROT = cmdc0de::Rotation::PortraitTopLeft;
 #endif
+
+static const uint32_t DISPLAY_OPT_WRITE_ROWS = DISPLAY_HEIGHT;
+static uint16_t DrawBuffer[DISPLAY_WIDTH * DISPLAY_OPT_WRITE_ROWS]; //120 wide, 10 pixels high, 2 bytes per pixel (uint16_t)
+
+class DarkNet7 : public cmdc0de::App {
+public:
+  static constexpr const char* sYES = "Yes";
+  static constexpr const char* sNO = "No";
+  static constexpr const char* NO_DATA_FROM_ESP = "No data returned from ESP, try resetting ESP.";
+  static constexpr const char* BLE_CONNECT_FAILED = "BLE Connection failed.";
+  static constexpr const char* BLE_DISCONNECTING = "BLE Disconnecting.";
+  static constexpr const char* BLE_PAIRING_SUCCESS = "Paired.";
+  static constexpr const char* BLE_PAIRING_FAILED = "Failed to Pair.";
+
+
   static const uint16_t BROADCAST_ADDR = 0xFFFF;
 public:
   static DarkNet7* instance;
+
+#if !defined VIRTUAL_DEVICE
   DarkNet7(
-#if !defined VIRTUAL_DEVICE
     cmdc0de::WS2818 leds,
+    cmdc0de::DisplayDevice* displayDevice,
+    ButtonInfo buttons
+  ) : Apa106s(leds)
+      //		       my Info, start setting address, start Contact address, end contact address
+      MyContacts(MyAddressInfoSector, MyAddressInfoOffSet, SettingSector, SettingOffset, StartContactSector, EndContactSector),
+      Display(displayDevice),
+      DisplayBuffer(static_cast<uint8_t>(DISPLAY_WIDTH), static_cast<uint8_t>(DISPLAY_HEIGHT), &DrawBuffer[0], displayDevice),
+      DMS(), 
+      MyGUI(Display),
+      MyButtons(buttons),
+      SequenceNum(0) {}
+#else
+  DarkNet7(
+    cmdc0de::DisplayDevice* displayDevice,
+    ButtonInfo buttons
+  ) : //		       my Info, start setting address, start Contact address, end contact address
+      MyContacts(MyAddressInfoSector, MyAddressInfoOffSet, SettingSector, SettingOffset, StartContactSector, EndContactSector),
+      Display(displayDevice),
+      DisplayBuffer(static_cast<uint8_t>(DISPLAY_WIDTH), static_cast<uint8_t>(DISPLAY_HEIGHT), &DrawBuffer[0], displayDevice),
+      DMS(),
+      MyGUI(Display),
+      MyButtons(buttons),
+      SequenceNum(0) {}
 #endif
-  cmdc0de::DisplayDevice* displayDevice,
-  cmdc0de::DrawBuffer2D16BitColor16BitPerPixel1Buffer displayBuffer,
-  ButtonInfo buttons) :
-#if !defined VIRTUAL_DEVICE
-    Apa106s(leds)
-#endif
-    //		       my Info, start setting address, start Contact address, end contact address
-    MyContacts(MyAddressInfoSector, MyAddressInfoOffSet, SettingSector, SettingOffset, StartContactSector, EndContactSector),
-    Display(displayDevice),
-    DisplayBuffer(displayBuffer),
-    DMS(), 
-    MyGUI(Display),
-    MyButtons(buttons),
-    SequenceNum(0) {}
 
   cmdc0de::DisplayMessageState* getDisplayMessageState(cmdc0de::StateBase* bm, const char* message, uint16_t timeToDisplay);
   MenuState* getDisplayMenuState();
-  TestState* getTestState();
   SendMsgState* getSendMsgState();
   SettingState* getSettingState();
-  PairingState* getPairingState();
   AddressState* getAddressBookState();
-  Menu3D* get3DState();
-  GameOfLife* getGameOfLifeState();
   CommunicationSettingState* getCommunicationSettingState();
   BadgeInfoState* getBadgeInfoState();
-  MCUInfoState* getMCUInfoState();
-  //Tamagotchi *getTamagotchiState();
   Health* getHealthState();
+#if !defined VIRTUAL_DEVICE
+  MCUInfoState* getMCUInfoState();
+  TestState* getTestState();
+  Menu3D* get3DState();
+  GameOfLife* getGameOfLifeState();
+  //Tamagotchi *getTamagotchiState();
   Scan* getScanState();
+  PairingState* getPairingState();
   SAO* getSAOMenuState();
-  cmdc0de::DisplayDevice& getDisplay();
-  const cmdc0de::DisplayDevice& getDisplay() const;
+#endif
+
+  cmdc0de::DisplayDevice& getDisplay() {
+    return *Display;
+  }
+
+  const cmdc0de::DisplayDevice& getDisplay() const {
+    return *Display;
+  }
+
   ContactStore& getContacts();
   const ContactStore& getContacts() const;
   cmdc0de::GUI& getGUI();
   const cmdc0de::GUI& getGUI() const;
   ButtonInfo& getButtonInfo();
   const ButtonInfo& getButtonInfo() const;
+  MCUToMCU& getMcuToMcu();
+  const MCUToMCU& getMcuToMcu() const;
   uint32_t nextSeq();
   virtual ~DarkNet7() = default;
 protected:
@@ -127,15 +155,6 @@ private:
   ButtonInfo MyButtons;
   uint32_t SequenceNum;
 };
-
-
-const char* DarkNet7::sYES = "Yes";
-const char* DarkNet7::sNO = "No";
-const char* DarkNet7::NO_DATA_FROM_ESP = "No data returned from ESP, try resetting ESP.";
-const char* DarkNet7::BLE_CONNECT_FAILED = "BLE Connection failed.";
-const char* DarkNet7::BLE_DISCONNECTING = "BLE Disconnecting.";
-const char* DarkNet7::BLE_PAIRING_SUCCESS = "Paired.";
-const char* DarkNet7::BLE_PAIRING_FAILED = "Failed to Pair.";
 
 
 namespace cmdc0de {

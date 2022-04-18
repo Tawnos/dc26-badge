@@ -34,7 +34,7 @@ void VirtualKeyBoard::InputHandleContext::backspace() {
 
 ////////
 
-VirtualKeyBoard::VirtualKeyBoard(): VKB(0), SizeOfKeyboard(0), XDisplayPos(0), XEndDisplayPos(DarkNet7::DISPLAY_WIDTH), YDisplayPos(0),
+VirtualKeyBoard::VirtualKeyBoard(): VKB(0), SizeOfKeyboard(0), XDisplayPos(0), XEndDisplayPos(DISPLAY_WIDTH), YDisplayPos(0),
 	FontColor(RGBColor::WHITE), BackGround(RGBColor::BLACK), CursorColor(RGBColor::BLUE), CursorChar('_'), CursorPos(0), CharsPerRow(0), InputContext(0) {
 
 
@@ -52,7 +52,7 @@ void VirtualKeyBoard::init(const char *vkb, InputHandleContext *ic, int16_t xdis
 	CursorColor = cursorColor;
 	CursorChar = cursorChar;
 	CursorPos = 0;
-	uint8_t FontPixelWidth = DarkNet7::get().getDisplay().getFont()->FontWidth;
+	uint8_t FontPixelWidth = DarkNet7::instance->getDisplay().getFont()->FontWidth;
 	CharsPerRow = (XEndDisplayPos-XDisplayPos)/FontPixelWidth;
 	InputContext = ic;
 }
@@ -60,33 +60,34 @@ void VirtualKeyBoard::init(const char *vkb, InputHandleContext *ic, int16_t xdis
 
 
 void VirtualKeyBoard::process() {
-	if(DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_LEFT)) {
+	if(DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(Button::Left)) {
 		if(CursorPos>0)	--CursorPos;
-	} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_RIGHT)) {
+	} else if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(Button::Right)) {
 		if(CursorPos<SizeOfKeyboard) CursorPos++;
 		else CursorPos=0;
-	} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_UP)) {
+	} else if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(Button::Up)) {
 		if(CursorPos>=CharsPerRow) CursorPos-=CharsPerRow;
-	} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_DOWN)) {
+	} else if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(Button::Down)) {
 		CursorPos+=CharsPerRow;
 		if(CursorPos>SizeOfKeyboard) CursorPos = SizeOfKeyboard-1;
-	} else if(DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+	} else if(DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(Button::Fire)) {
 		if(InputContext) {
 			InputContext->addChar(getSelectedChar());
 		}
 	}
 	uint16_t y = 0;
 	const char *ptr = VKB;
-	uint8_t FontPixelHeight = DarkNet7::get().getDisplay().getFont()->FontHeight;
-	uint8_t FontPixelWidth = DarkNet7::get().getDisplay().getFont()->FontWidth;
+	uint8_t FontPixelHeight = DarkNet7::instance->getDisplay().getFont()->FontHeight;
+	uint8_t FontPixelWidth = DarkNet7::instance->getDisplay().getFont()->FontWidth;
 	uint8_t cursorRow = getCursorY();
 	uint8_t curosrColumn = getCursorX();
-	for(int i=0;i<SizeOfKeyboard && y < (DarkNet7::DISPLAY_HEIGHT-(y*FontPixelHeight));i+=CharsPerRow, ++y) {
-		DarkNet7::get().getDisplay().drawString(XDisplayPos, (YDisplayPos+(y*FontPixelHeight)), ptr, FontColor, BackGround, 1, false, CharsPerRow);
+	for(int i=0;i<SizeOfKeyboard && y < (DISPLAY_HEIGHT-(y*FontPixelHeight));i+=CharsPerRow, ++y) {
+		DarkNet7::instance->getDisplay().drawString(XDisplayPos, (YDisplayPos+(y*FontPixelHeight)), ptr, FontColor, BackGround, 1, false, CharsPerRow);
 		if(y==cursorRow) {
-			if((HAL_GetTick()%1000)<500) {
-				DarkNet7::get().getDisplay().drawString(XDisplayPos+(curosrColumn*FontPixelWidth), YDisplayPos+(y*FontPixelHeight), (const char *)"_", CursorColor, BackGround, 1, false);
-			}
+
+			/*if((HAL_GetTick()%1000)<500) {
+				DarkNet7::instance->getDisplay().drawString(XDisplayPos+(curosrColumn*FontPixelWidth), YDisplayPos+(y*FontPixelHeight), (const char *)"_", CursorColor, BackGround, 1, false);
+			}*/
 		}
 		ptr = ptr + CharsPerRow;
 	}

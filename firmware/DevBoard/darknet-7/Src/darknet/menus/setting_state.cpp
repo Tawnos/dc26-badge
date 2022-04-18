@@ -8,33 +8,17 @@
 #include "setting_state.h"
 #include "../darknet7.h"
 #include "../virtual_key_board.h"
-#include "../libstm32/display/display_device.h"
+#include <libstm32/display/display_device.h>
 #include "menu_state.h"
 #include "../darknet7.h"
+#if !defined VIRTUAL_DEVICE
 #include "../messaging/stm_to_esp_generated.h"
 #include "../messaging/esp_to_stm_generated.h"
+#endif
 
 using cmdc0de::ErrorType;
 using cmdc0de::StateBase;
 using cmdc0de::RGBColor;
-
-SettingState::SettingState() : Darknet7BaseState(), SettingList((const char*)"MENU", Items, 0, 0,
-  DarkNet7::DISPLAY_WIDTH, DarkNet7::DISPLAY_HEIGHT, 0, sizeof(Items) / sizeof(Items[0])), AgentName(), SubState(0), MiscCounter(0), VKB(), IHC(&AgentName[0], sizeof(AgentName)) {
-
-  memset(&AgentName[0], 0, sizeof(AgentName));
-  Items[0].id = 0;
-  Items[0].text = (const char*)"Set Agent Name";
-  Items[1].id = 1;
-  Items[1].text = (const char*)"Screen Saver Time";
-  Items[1].setShouldScroll();
-  Items[2].id = 2;
-  Items[2].text = (const char*)"Reset Badge Contacts";
-  Items[2].setShouldScroll();
-}
-
-SettingState::~SettingState() {
-
-}
 
 ErrorType SettingState::onInit() {
   SubState = 0;
@@ -78,7 +62,7 @@ StateBase::ReturnStateContext SettingState::onRun() {
       switch (SubState) {
       case 100:
         memset(&AgentName[0], 0, sizeof(AgentName));
-        VKB.init(VirtualKeyBoard::STDKBNames, &IHC, 5, DarkNet7::DISPLAY_WIDTH - 5, 80, cmdc0de::RGBColor::WHITE, RGBColor::BLACK, RGBColor::BLUE, '_');
+        VKB.init(VirtualKeyBoard::STDKBNames, &IHC, 5, DISPLAY_WIDTH - 5, 80, cmdc0de::RGBColor::WHITE, RGBColor::BLACK, RGBColor::BLUE, '_');
         DarkNet7::instance->getDisplay().drawString(0, 10, (const char*)"Current agent name:");
         if (*DarkNet7::instance->getContacts().getSettings().getAgentName() == '\0') {
           DarkNet7::instance->getDisplay().drawString(0, 20, (const char*)"NOT SET");
@@ -111,7 +95,7 @@ StateBase::ReturnStateContext SettingState::onRun() {
           auto r = darknet7::CreateBLESetDeviceNameDirect(fbb, DarkNet7::instance->getContacts().getSettings().getAgentName());
           auto z = darknet7::CreateSTMToESPRequest(fbb, DarkNet7::instance->nextSeq(), darknet7::STMToESPAny_BLESetDeviceName, r.Union());
           darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, z);
-          MCUToMCU::get().send(fbb);
+          DarkNet7::instance->getMcuToMcu().send(fbb);
           nextState = DarkNet7::instance->getDisplayMessageState(DarkNet7::instance->getDisplayMenuState(), (const char*)"Save Successful", 2000);
         }
         else {

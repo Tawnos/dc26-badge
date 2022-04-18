@@ -35,11 +35,21 @@ add_library(darknet7 STATIC
     init.cpp             
     KeyStore.cpp         
     #mcu_to_mcu.cpp       
-    #virtual_key_board.cpp
+    virtual_key_board.cpp
+
+    libstm32/rgbcolor.cpp
+
+    libstm32/app/display_message_state.cpp
 
     libstm32/display/display_device.cpp
     libstm32/display/fonts.cpp
     libstm32/display/gui.cpp
+
+    libstm32/crypto/crypto_helper.cpp
+    libstm32/crypto/sha256.cpp
+    libstm32/crypto/micro-ecc/uECC.c
+
+    libstm32/utility/bitarray.cpp
 
     art/tits.cpp
     art/stickers.cpp
@@ -58,9 +68,9 @@ add_library(darknet7 STATIC
     #menus/pairing_state.cpp          
     #menus/sao_menu.cpp               
     #menus/scan.cpp                   
-    #menus/SendMsgState.cpp           
+    menus/SendMsgState.cpp           
     menus/setting_state.cpp          
-    menus/tamagotchi.cpp             
+    #menus/tamagotchi.cpp             
     #menus/test_state.cpp         
 
     #menus/3d/renderer.cpp

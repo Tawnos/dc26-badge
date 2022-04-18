@@ -13,24 +13,28 @@
 #include <libstm32/logger.h>
 #include <libstm32/app/display_message_state.h>
 #include "KeyStore.h"
-#include "menus/test_state.h"
-#include "menus/SendMsgState.h"
+
 #include "menus/menu_state.h"
 #include "menus/setting_state.h"
 #include "menus/pairing_state.h"
 #include "menus/AddressState.h"
-#include "menus/menu3d.h"
-#include "menus/GameOfLife.h"
 #include "menus/badge_info_state.h"
-#include "menus/mcu_info.h"
-#include "menus/tamagotchi.h"
+#include "menus/SendMsgState.h"
 #include "menus/communications_settings.h"
+#include "menus/health.h"
+#include "art/images.h"
+
+#if !defined VIRTUAL_DEVICE
 #include "messaging/stm_to_esp_generated.h"
 #include "mcu_to_mcu.h"
-#include "menus/health.h"
-#include "menus/scan.h"
+#include "menus/mcu_info.h"
+#include "menus/menu3d.h"
+#include "menus/GameOfLife.h"
 #include "menus/sao_menu.h"
-#include "art/images.h"
+#include "menus/scan.h"
+#include "menus/tamagotchi.h"
+#include "menus/test_state.h"
+#endif
 
 using cmdc0de::ErrorType;
 using cmdc0de::DrawBufferNoBuffer;
@@ -39,32 +43,25 @@ using cmdc0de::GUIListItemData;
 using cmdc0de::GUI;
 using cmdc0de::RGBColor;
 
-static const uint32_t DISPLAY_OPT_WRITE_ROWS = DarkNet7::DISPLAY_HEIGHT;
-static uint16_t DrawBuffer[DarkNet7::DISPLAY_WIDTH * DISPLAY_OPT_WRITE_ROWS]; //120 wide, 10 pixels high, 2 bytes per pixel (uint16_t)
-
 static MenuState MyMenu;
-static TestState MyTestState;
 static SendMsgState MySendMsgState;
+
 static SettingState MySettingState;
-static PairingState MyPairingState;
 static AddressState MyAddressState;
-static Menu3D MyMenu3D;
-static GameOfLife MyGameOfLife;
 static CommunicationSettingState MyCommunicationSettings;
 static BadgeInfoState MyBadgeInfoState;
-static MCUInfoState MyMCUInfoState;
-//static Tamagotchi MyTamagotchi;
 static Health MyHealth;
+
+#if !defined VIRTUAL_DEVICE
+static MCUInfoState MyMCUInfoState;
+static TestState MyTestState;
+//static Tamagotchi MyTamagotchi;
+static Menu3D MyMenu3D;
+static GameOfLife MyGameOfLife;
 static Scan MyScan;
+static PairingState MyPairingState;
 static SAO MySAO;
-
-cmdc0de::DisplayDevice& DarkNet7::getDisplay() {
-  return *Display;
-}
-
-const cmdc0de::DisplayDevice& DarkNet7::getDisplay() const {
-  return *Display;
-}
+#endif
 
 ContactStore& DarkNet7::getContacts() {
   return MyContacts;
@@ -90,8 +87,7 @@ const ButtonInfo& DarkNet7::getButtonInfo() const {
   return MyButtons;
 }
 
-cmdc0de::DisplayMessageState* DarkNet7::getDisplayMessageState(cmdc0de::StateBase* bm, const char* message,
-  uint16_t timeToDisplay) {
+cmdc0de::DisplayMessageState* DarkNet7::getDisplayMessageState(cmdc0de::StateBase* bm, const char* message, uint16_t timeToDisplay) {
   DMS.setMessage(message);
   DMS.setNextState(bm);
   DMS.setTimeInState(timeToDisplay);
@@ -103,17 +99,8 @@ uint32_t DarkNet7::nextSeq() {
   return ++SequenceNum;
 }
 
-SAO* DarkNet7::getSAOMenuState() {
-  return &MySAO;
-}
-
-
 MenuState* DarkNet7::getDisplayMenuState() {
   return &MyMenu;
-}
-
-TestState* DarkNet7::getTestState() {
-  return &MyTestState;
 }
 
 SendMsgState* DarkNet7::getSendMsgState() {
@@ -124,22 +111,9 @@ SettingState* DarkNet7::getSettingState() {
   return &MySettingState;
 }
 
-PairingState* DarkNet7::getPairingState() {
-  return &MyPairingState;
-}
-
 AddressState* DarkNet7::getAddressBookState() {
   return &MyAddressState;
 }
-
-Menu3D* DarkNet7::get3DState() {
-  return &MyMenu3D;
-}
-
-GameOfLife* DarkNet7::getGameOfLifeState() {
-  return &MyGameOfLife;
-}
-
 CommunicationSettingState* DarkNet7::getCommunicationSettingState() {
   return &MyCommunicationSettings;
 }
@@ -147,6 +121,12 @@ CommunicationSettingState* DarkNet7::getCommunicationSettingState() {
 BadgeInfoState* DarkNet7::getBadgeInfoState() {
   return &MyBadgeInfoState;
 }
+
+Health* DarkNet7::getHealthState() {
+  return &MyHealth;
+}
+
+#if !defined VIRTUAL_DEVICE
 
 MCUInfoState* DarkNet7::getMCUInfoState() {
   return &MyMCUInfoState;
@@ -156,10 +136,28 @@ MCUInfoState* DarkNet7::getMCUInfoState() {
 //	return &MyTamagotchi;
 //}
 
-Health* DarkNet7::getHealthState() {
-  return &MyHealth;
+SAO* DarkNet7::getSAOMenuState() {
+  return &MySAO;
+}
+
+TestState* DarkNet7::getTestState() {
+  return &MyTestState;
+}
+
+PairingState* DarkNet7::getPairingState() {
+  return &MyPairingState;
+}
+
+
+Menu3D* DarkNet7::get3DState() {
+  return &MyMenu3D;
+}
+
+GameOfLife* DarkNet7::getGameOfLifeState() {
+  return &MyGameOfLife;
 }
 
 Scan* DarkNet7::getScanState() {
   return &MyScan;
 }
+#endif

@@ -7,11 +7,6 @@
 #include <libstm32/rgbcolor.h>
 #include <display_device.h>
 #include <darknet7.h>
-//
-//DarkNet7::instance = new DarkNet7(
-//  Display(DISPLAY_WIDTH, DISPLAY_HEIGHT, START_ROT),
-//  DisplayBuffer(static_cast<uint8_t>(DISPLAY_WIDTH), static_cast<uint8_t>(DISPLAY_HEIGHT), &DrawBuffer[0], &Display),
-//  MyButtons())
 
 class wxCustomButton : public wxWindow
 {
@@ -71,7 +66,7 @@ END_EVENT_TABLE()
  * calling Refresh()/Update().
  */
 
-void wxCustomButton::paintEvent(wxPaintEvent& evt)
+  void wxCustomButton::paintEvent(wxPaintEvent& evt)
 {
   // depending on your system you may need to look at double-buffered dcs
   wxPaintDC dc(this);
@@ -106,7 +101,7 @@ void wxCustomButton::render(wxDC& dc)
     dc.SetBrush(*wxGREY_BRUSH);
 
   dc.DrawRectangle(0, 0, buttonWidth, buttonHeight);
-  dc.DrawText(text,5,5);
+  dc.DrawText(text, 5, 5);
 }
 
 void wxCustomButton::mouseDown(wxMouseEvent& event)
@@ -139,6 +134,8 @@ void wxCustomButton::keyPressed(wxKeyEvent& event) {}
 void wxCustomButton::keyReleased(wxKeyEvent& event) {}
 
 class VirtualDisplayDevice : public cmdc0de::DisplayDevice {
+public:
+  VirtualDisplayDevice(uint16_t w, uint16_t h, cmdc0de::Rotation r) : DisplayDevice(w, h, r) {}
   // Inherited via DisplayDevice
   virtual bool drawPixel(uint16_t x0, uint16_t y0, const cmdc0de::RGBColor& color) override
   {
@@ -182,15 +179,43 @@ class VirtualDisplayDevice : public cmdc0de::DisplayDevice {
   virtual void drawHorizontalLine(int16_t x, int16_t y, int16_t w, cmdc0de::RGBColor color) override
   {
   }
+
+  // Inherited via DisplayDevice
+  virtual uint32_t drawString(uint16_t xPos, uint16_t yPos, const char* pt, const cmdc0de::RGBColor& textColor, const cmdc0de::RGBColor& bgColor, uint8_t size, bool lineWrap, uint8_t charsToRender)
+  {
+    return uint32_t();
+  }
 };
 
+class VirtualStateBase : public cmdc0de::StateBase {
+  // Inherited via StateBase
+  virtual cmdc0de::ErrorType onInit() override
+  {
+    return cmdc0de::ErrorType();
+  }
+  virtual ReturnStateContext onRun() override
+  {
+    return ReturnStateContext(this);
+  }
+  virtual cmdc0de::ErrorType onShutdown() override
+  {
+    return cmdc0de::ErrorType();
+  }
+};
+
+cmdc0de::ErrorType DarkNet7::onInit() {
+  return cmdc0de::ErrorType{};
+}
+cmdc0de::ErrorType DarkNet7::onRun() {
+  return cmdc0de::ErrorType{};
+}
 class BasicDrawPane : public wxPanel
 {
 private:
   wxBitmap bitmap;
 
 public:
-  BasicDrawPane(wxFrame* parent, wxBitmap bitmap) 
+  BasicDrawPane(wxFrame* parent, wxBitmap bitmap)
     : wxPanel(parent), bitmap(bitmap) {}
 
   void paintEvent(wxPaintEvent& evt);
@@ -251,7 +276,7 @@ bool MyApp::OnInit()
   auto logoBitmap = wxBitmap{ (int)titsLogo.width, (int)titsLogo.height, 24 };
   auto nativePixels = wxNativePixelData{ logoBitmap };
   auto pixelIterator = wxNativePixelData::Iterator{ nativePixels };
-  
+
   static const uint8_t colorValues[4] = { 0,85,170,255 };
   auto pixels = (uint16_t*)&titsLogo.pixel_data[0];
   int curPixelDataLoc = 0;
@@ -261,13 +286,13 @@ bool MyApp::OnInit()
     for (int x = 0; x < (int)titsLogo.height; ++x, ++pixelIterator)
     {
       auto packedColor = pixels[curPixelDataLoc++];
-      uint32_t rc = 8*((packedColor & 0b1111100000000000) >> 11);
-      uint32_t gc = 4*((packedColor & 0b0000011111100000) >> 5);
-      uint32_t bc = 8*(packedColor & 0b0000000000011111);
+      uint32_t rc = 8 * ((packedColor & 0b1111100000000000) >> 11);
+      uint32_t gc = 4 * ((packedColor & 0b0000011111100000) >> 5);
+      uint32_t bc = 8 * (packedColor & 0b0000000000011111);
 
-      pixelIterator.Red() =   rc;
+      pixelIterator.Red() = rc;
       pixelIterator.Green() = gc;
-      pixelIterator.Blue() =  bc;
+      pixelIterator.Blue() = bc;
     }
     pixelIterator = rowStart;
     pixelIterator.OffsetY(nativePixels, 1);
@@ -293,7 +318,7 @@ bool MyApp::OnInit()
 
 BEGIN_EVENT_TABLE(BasicDrawPane, wxPanel)
 
-  EVT_PAINT(BasicDrawPane::paintEvent)
+EVT_PAINT(BasicDrawPane::paintEvent)
 
 END_EVENT_TABLE()
 
@@ -304,7 +329,7 @@ END_EVENT_TABLE()
  * calling Refresh()/Update().
  */
 
-void BasicDrawPane::paintEvent(wxPaintEvent& evt)
+  void BasicDrawPane::paintEvent(wxPaintEvent& evt)
 {
   wxPaintDC dc(this);
   render(dc);
@@ -335,5 +360,22 @@ void BasicDrawPane::paintNow()
  */
 void BasicDrawPane::render(wxDC& dc)
 {
-  dc.DrawBitmap(bitmap,0,0);
+  dc.DrawBitmap(bitmap, 0, 0);
 }
+
+bool MCUToMCU::send(flatbuffers::FlatBufferBuilder const& fbb) { return false; }
+
+static MCUToMCU mcu{};
+
+MCUToMCU& DarkNet7::getMcuToMcu() { return mcu; }
+const MCUToMCU& DarkNet7::getMcuToMcu() const { return mcu; }
+
+void cmdc0de::FrameBuf::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {}
+bool cmdc0de::FrameBuf::writeNData(const uint8_t* data, int nbytes) { return false; }
+uint32_t cmdc0de::StateBase::timeInState() { return 0; }
+
+static auto darknet = DarkNet7{
+  new VirtualDisplayDevice(DISPLAY_WIDTH, DISPLAY_HEIGHT, START_ROT),
+  ButtonInfo{}
+};
+DarkNet7* DarkNet7::instance = &darknet;

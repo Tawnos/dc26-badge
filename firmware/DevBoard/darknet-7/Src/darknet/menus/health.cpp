@@ -61,7 +61,7 @@ protected:
 		memset(&FinalHexHash[0],0,sizeof(FinalHexHash));
 		memset(&CureSequence[0],0,sizeof(CureSequence));
 		IHC.set(&CureSequence[0],sizeof(CureSequence));
-		VKB.init(VirtualKeyBoard::STDCAPS,&IHC,5,DarkNet7::DISPLAY_WIDTH-5,100,RGBColor::WHITE, RGBColor::BLACK, RGBColor::BLUE,'_');
+		VKB.init(VirtualKeyBoard::STDCAPS,&IHC,5,DISPLAY_WIDTH-5,100,RGBColor::WHITE, RGBColor::BLACK, RGBColor::BLUE,'_');
 		InternalState = VIRUS_ENTRY;
 		return ErrorType();
 	}
@@ -115,7 +115,7 @@ protected:
 static CureEntry EnterCure;
 
 
-Health::Health() : Darknet7BaseState(), HealthList("Infections:", Items, 0, 0, DarkNet7::DISPLAY_WIDTH, DarkNet7::DISPLAY_HEIGHT, 0, (sizeof(Items) / sizeof(Items[0]))) {
+Health::Health() : Darknet7BaseState(), HealthList("Infections:", Items, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, (sizeof(Items) / sizeof(Items[0]))) {
 
 }
 

@@ -13,3 +13,6 @@
 [submodule "firmware/esp-wroom-32/dc26-esp/components/libcrc"]
 	path = firmware/esp-wroom-32/dc26-esp/components/libcrc
 	url = https://github.com/cmdc0de/libcrc
+[submodule "firmware/DevBoard/GUI"]
+	path = firmware/DevBoard/GUI
+	url = https://github.com/Tawnos/DarknetGUI

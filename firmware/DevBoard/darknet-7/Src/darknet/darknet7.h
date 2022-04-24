@@ -50,11 +50,11 @@ static const uint8_t EndContactSector = 3;
 #ifdef START_LANDSCAPE
 static const uint32_t DISPLAY_WIDTH = 160;
 static const uint32_t DISPLAY_HEIGHT = 128;
-static const cmdc0de::Rotation START_ROT = cmdc0de::Rotation::LandscapeTopLeft;
+static const cmdc0de::RotationType START_ROT = cmdc0de::RotationType::LandscapeTopLeft;
 #else
 static const uint32_t DISPLAY_WIDTH = 128;
 static const uint32_t DISPLAY_HEIGHT = 160;
-static const cmdc0de::Rotation START_ROT = cmdc0de::Rotation::PortraitTopLeft;
+static const cmdc0de::RotationType START_ROT = cmdc0de::RotationType::PortraitTopLeft;
 #endif
 
 static const uint32_t DISPLAY_OPT_WRITE_ROWS = DISPLAY_HEIGHT;
@@ -83,18 +83,17 @@ public:
       //		       my Info, start setting address, start Contact address, end contact address
       MyContacts(MyAddressInfoSector, MyAddressInfoOffSet, SettingSector, SettingOffset, StartContactSector, EndContactSector),
       Display(displayDevice),
-      DisplayBuffer(static_cast<uint8_t>(DISPLAY_WIDTH), static_cast<uint8_t>(DISPLAY_HEIGHT), &DrawBuffer[0], displayDevice),
+      DisplayBuffer(displayDevice, DrawBuffer),
       DMS(), 
       MyGUI(Display),
       MyButtons(),
       SequenceNum(0) {}
 #else
-  DarkNet7(
-    cmdc0de::DisplayDevice* displayDevice
-  ) : //		       my Info, start setting address, start Contact address, end contact address
+  DarkNet7(cmdc0de::DisplayDevice* displayDevice) 
+    : //		       my Info, start setting address, start Contact address, end contact address
       MyContacts(MyAddressInfoSector, MyAddressInfoOffSet, SettingSector, SettingOffset, StartContactSector, EndContactSector),
       Display(displayDevice),
-      DisplayBuffer(static_cast<uint8_t>(DISPLAY_WIDTH), static_cast<uint8_t>(DISPLAY_HEIGHT), &DrawBuffer[0], displayDevice),
+      DisplayBuffer{ displayDevice, DrawBuffer },
       DMS(),
       MyGUI(Display),
       SequenceNum(0) {}
@@ -150,7 +149,7 @@ private:
   cmdc0de::DrawBuffer2D16BitColor16BitPerPixel1Buffer DisplayBuffer;
   cmdc0de::DisplayMessageState DMS;
   cmdc0de::GUI MyGUI;
-  ButtonInfo MyButtons;
+  ButtonInfo MyButtons{};
   uint32_t SequenceNum;
 };
 

@@ -22,4 +22,5 @@ typedef struct
 
 uint32_t HAL_GetTick(void) { return 0; }
 uint32_t HAL_GetDEVID(void) { return 1234; }
+void HAL_Delay(uint32_t ms) { Sleep(ms); }
 void HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState) {}

@@ -7,6 +7,7 @@
 #include <libstm32/rgbcolor.h>
 #include <display_device.h>
 #include <darknet7.h>
+#include "VirtualDisplayDevice.h"
 
 class wxCustomButton : public wxWindow
 {
@@ -133,65 +134,6 @@ void wxCustomButton::rightClick(wxMouseEvent& event) {}
 void wxCustomButton::keyPressed(wxKeyEvent& event) {}
 void wxCustomButton::keyReleased(wxKeyEvent& event) {}
 
-class VirtualDisplayDevice : public cmdc0de::DisplayDevice {
-public:
-  VirtualDisplayDevice(uint16_t w, uint16_t h, cmdc0de::Rotation r) : DisplayDevice(w, h, r) {}
-  // Inherited via DisplayDevice
-  virtual bool drawPixel(uint16_t x0, uint16_t y0, const cmdc0de::RGBColor& color) override
-  {
-    return false;
-  }
-  virtual void fillRec(int16_t x, int16_t y, int16_t w, int16_t h, const cmdc0de::RGBColor& color) override
-  {
-  }
-  virtual void drawRec(int16_t x, int16_t y, int16_t w, int16_t h, const cmdc0de::RGBColor& color) override
-  {
-  }
-  virtual void fillScreen(const cmdc0de::RGBColor& color) override
-  {
-  }
-  virtual void drawImage(int16_t x, int16_t y, const cmdc0de::DCImage& dcImage) override
-  {
-  }
-  virtual uint32_t drawString(uint16_t xPos, uint16_t yPos, const char* pt) override
-  {
-    return uint32_t();
-  }
-  virtual uint32_t drawString(uint16_t xPos, uint16_t yPos, const char* pt, const cmdc0de::RGBColor& textColor) override
-  {
-    return uint32_t();
-  }
-  virtual uint32_t drawString(uint16_t xPos, uint16_t yPos, const char* pt, const cmdc0de::RGBColor& textColor, const cmdc0de::RGBColor& bgColor, uint8_t size, bool lineWrap) override
-  {
-    return uint32_t();
-  }
-  virtual uint32_t drawStringOnLine(uint8_t line, const char* msg) override
-  {
-    return uint32_t();
-  }
-  virtual const FontDef_t* getFont() override
-  {
-    return nullptr;
-  }
-  virtual void drawHorizontalLine(int16_t x, int16_t y, int16_t w) override
-  {
-  }
-  virtual void drawHorizontalLine(int16_t x, int16_t y, int16_t w, cmdc0de::RGBColor color) override
-  {
-  }
-
-  // Inherited via DisplayDevice
-  virtual uint32_t drawString(uint16_t xPos, uint16_t yPos, const char* pt, const cmdc0de::RGBColor& textColor, const cmdc0de::RGBColor& bgColor, uint8_t size, bool lineWrap, uint8_t charsToRender)
-  {
-    return uint32_t();
-  }
-
-  // Inherited via DisplayDevice
-  virtual void swap() override
-  {
-  }
-};
-
 class VirtualStateBase : public cmdc0de::StateBase {
   // Inherited via StateBase
   virtual cmdc0de::ErrorType onInit() override
@@ -246,49 +188,81 @@ cmdc0de::ErrorType cmdc0de::StateBase::shutdown() {
 }
 
 cmdc0de::ErrorType DarkNet7::onInit() {
+
+  cmdc0de::ErrorType et;
+
+  cmdc0de::GUIListItemData items[3];
+  cmdc0de::GUIListData DrawList((const char*)"Self Check", items, uint8_t(0),
+    uint8_t(0), uint8_t(DISPLAY_WIDTH), uint8_t(DISPLAY_HEIGHT / 2), uint8_t(0), uint8_t(0));
+  //DO SELF CHECK
+  if ((et = Display->init(&DisplayBuffer, &Font_6x10)).ok()) {
+    items[0].set(0, "OLED_INIT");
+    DrawList.ItemsCount++;
+    Display->setTextColor(cmdc0de::RGBColor::WHITE);
+  }
+  else {
+    /*while (1) {
+      HAL_GPIO_WritePin(SIMPLE_LED1_GPIO_Port, SIMPLE_LED1_Pin, GPIO_PIN_SET);
+      HAL_Delay(200);
+      HAL_GPIO_WritePin(SIMPLE_LED1_GPIO_Port, SIMPLE_LED1_Pin, GPIO_PIN_RESET);
+      HAL_Delay(400);
+    }*/
+  }
+  cmdc0de::GUI gui(Display);
+  gui.drawList(&DrawList);
+  Display->update();
+  HAL_Delay(500);
+  if (MyContacts.getMyInfo().init()) {
+    items[1].set(1, "Flash INIT");
+  }
+  else {
+    items[1].set(1, "Flash INIT FAILED!");
+  }
+  DrawList.ItemsCount++;
+  DrawList.selectedItem++;
+  gui.drawList(&DrawList);
+  Display->update();
+  HAL_Delay(500);
+  MyContacts.getSettings().init();
+  Display->fillScreen(cmdc0de::RGBColor::BLACK);
+  Display->update();
+  Display->drawImage(32, 16, getLogo1());
+  Display->update();
+  HAL_Delay(1000);
+  Display->drawImage(32, 16, getLogo2());
+  Display->update();
+  HAL_Delay(1000);
+  Display->drawImage(32, 16, getLogo3());
+  Display->update();
+  HAL_Delay(1000);
+
   return cmdc0de::ErrorType{};
 }
 cmdc0de::ErrorType DarkNet7::onRun() {
   cmdc0de::StateBase::ReturnStateContext rsc = getCurrentState()->run();
-	Display->swap();
-	//handleLEDS();
+  Display->update();
+  //handleLEDS();
 
-	if (rsc.Err.ok()) {
-		if (getCurrentState() != rsc.NextMenuToRun) {
-			//on state switches reset keyboard and give a 1 second pause on reading from keyboard.
-			MyButtons.reset();
-			setCurrentState(rsc.NextMenuToRun);
-		}
-		else {
-			/*if (getCurrentState() != DarkNet7::instance->getGameOfLifeState()
-				&& (HAL_GetTick() - MyButtons.lastTickButtonPushed()) > (DarkNet7::instance->getContacts().getSettings().getScreenSaverTime() * 1000 * 60)) {
-				setCurrentState(DarkNet7::instance->getGameOfLifeState());
-			}*/
-		}
-	}
-	else {
-		//setCurrentState(StateCollection::getDisplayMessageState(
-		//		StateCollection::getDisplayMenuState(), (const char *)"Run State Error....", uint16_t (2000)));
-	}
+  if (rsc.Err.ok()) {
+    if (getCurrentState() != rsc.NextMenuToRun) {
+      //on state switches reset keyboard and give a 1 second pause on reading from keyboard.
+      MyButtons.reset();
+      setCurrentState(rsc.NextMenuToRun);
+    }
+    else {
+      /*if (getCurrentState() != DarkNet7::instance->getGameOfLifeState()
+        && (HAL_GetTick() - MyButtons.lastTickButtonPushed()) > (DarkNet7::instance->getContacts().getSettings().getScreenSaverTime() * 1000 * 60)) {
+        setCurrentState(DarkNet7::instance->getGameOfLifeState());
+      }*/
+    }
+  }
+  else {
+    //setCurrentState(StateCollection::getDisplayMessageState(
+    //		StateCollection::getDisplayMenuState(), (const char *)"Run State Error....", uint16_t (2000)));
+  }
 
   return cmdc0de::ErrorType{};
 }
-class BasicDrawPane : public wxPanel
-{
-private:
-  wxBitmap bitmap;
-
-public:
-  BasicDrawPane(wxFrame* parent, wxBitmap bitmap)
-    : wxPanel(parent), bitmap(bitmap) {}
-
-  void paintEvent(wxPaintEvent& evt);
-  void paintNow();
-
-  void render(wxDC& dc);
-
-  DECLARE_EVENT_TABLE()
-};
 
 class MyApp : public wxApp
 {
@@ -317,12 +291,14 @@ enum COLOR { // 2/2/2
   BITS_PER_PIXEL = 2
 };
 
-static auto darknet = DarkNet7{
-  new VirtualDisplayDevice(DISPLAY_WIDTH, DISPLAY_HEIGHT, START_ROT)
-};
+static auto displayDevice = VirtualDisplayDevice(DISPLAY_WIDTH, DISPLAY_HEIGHT, START_ROT);
+static auto frameBuffer = cmdc0de::DrawBuffer2D16BitColor16BitPerPixel1Buffer(&displayDevice, new uint16_t[DISPLAY_WIDTH*DISPLAY_HEIGHT]);
+static auto darknet = DarkNet7(&displayDevice);
+
 DarkNet7* DarkNet7::instance = &darknet;
 bool MyApp::OnInit()
 {
+  displayDevice.init(&frameBuffer, &Font_6x10);
   darknet.init();
   wxBoxSizer* hSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* leftSizer = new wxBoxSizer(wxVERTICAL);
@@ -346,7 +322,6 @@ bool MyApp::OnInit()
   auto nativePixels = wxNativePixelData{ logoBitmap };
   auto pixelIterator = wxNativePixelData::Iterator{ nativePixels };
 
-  static const uint8_t colorValues[4] = { 0,85,170,255 };
   auto pixels = (uint16_t*)&titsLogo.pixel_data[0];
   int curPixelDataLoc = 0;
   for (int y = 0; y < (int)titsLogo.width; ++y)
@@ -382,54 +357,9 @@ bool MyApp::OnInit()
   frame->SetAutoLayout(true);
 
   frame->Show();
+
+  darknet.run();
   return true;
-}
-
-BEGIN_EVENT_TABLE(BasicDrawPane, wxPanel)
-
-EVT_PAINT(BasicDrawPane::paintEvent)
-
-END_EVENT_TABLE()
-
-
-/*
- * Called by the system of by wxWidgets when the panel needs
- * to be redrawn. You can also trigger this call by
- * calling Refresh()/Update().
- */
-
-  void BasicDrawPane::paintEvent(wxPaintEvent& evt)
-{
-  wxPaintDC dc(this);
-  render(dc);
-}
-
-/*
- * Alternatively, you can use a clientDC to paint on the panel
- * at any time. Using this generally does not free you from
- * catching paint events, since it is possible that e.g. the window
- * manager throws away your drawing when the window comes to the
- * background, and expects you will redraw it when the window comes
- * back (by sending a paint event).
- *
- * In most cases, this will not be needed at all; simply handling
- * paint events and calling Refresh() when a refresh is needed
- * will do the job.
- */
-void BasicDrawPane::paintNow()
-{
-  wxClientDC dc(this);
-  render(dc);
-}
-
-/*
- * Here we do the actual rendering. I put it in a separate
- * method so that it can work no matter what type of DC
- * (e.g. wxPaintDC or wxClientDC) is used.
- */
-void BasicDrawPane::render(wxDC& dc)
-{
-  dc.DrawBitmap(bitmap, 0, 0);
 }
 
 bool MCUToMCU::send(flatbuffers::FlatBufferBuilder const& fbb) { return false; }
@@ -439,8 +369,6 @@ static MCUToMCU mcu{};
 MCUToMCU& DarkNet7::getMcuToMcu() { return mcu; }
 const MCUToMCU& DarkNet7::getMcuToMcu() const { return mcu; }
 
-void cmdc0de::FrameBuf::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {}
-bool cmdc0de::FrameBuf::writeNData(const uint8_t* data, int nbytes) { return false; }
 uint32_t cmdc0de::StateBase::timeInState() { return 0; }
 
 void ButtonInfo::processButtons() {}

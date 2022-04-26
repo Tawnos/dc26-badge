@@ -11,6 +11,7 @@
 #include "darknet7_base_state.h"
 #include "../mcu_to_mcu.h"
 #include "../virtual_key_board.h"
+#include "setting_state.h"
 
 
 namespace darknet7 {

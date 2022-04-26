@@ -3,7 +3,7 @@
 
 #include "darknet7_base_state.h"
 #include "../mcu_to_mcu.h"
-#include "../KeyStore.h"
+#include "../contact_store.h"
 
 namespace darknet7 {
 	class ESPToSTM;
@@ -13,17 +13,17 @@ class PairingState: public Darknet7BaseState {
 public:
 	struct AliceInitConvo {
 		uint8_t irmsgid;
-		uint8_t AlicePublicKey[ContactStore::PUBLIC_KEY_COMPRESSED_LENGTH];
+		uint8_t AlicePublicKey[PUBLIC_KEY_COMPRESSED_LENGTH];
 		uint16_t AliceRadioID;
-		char AliceName[ContactStore::AGENT_NAME_LENGTH];
+		char AliceName[AGENT_NAME_LENGTH];
 	};
 
 	struct BobReplyToInit {
 		uint8_t irmsgid;
-		uint8_t BoBPublicKey[ContactStore::PUBLIC_KEY_COMPRESSED_LENGTH];
+		uint8_t BoBPublicKey[PUBLIC_KEY_COMPRESSED_LENGTH];
 		uint16_t BoBRadioID;
-		char BobAgentName[ContactStore::AGENT_NAME_LENGTH];
-		uint8_t SignatureOfAliceData[ContactStore::SIGNATURE_LENGTH];
+		char BobAgentName[AGENT_NAME_LENGTH];
+		uint8_t SignatureOfAliceData[SIGNATURE_LENGTH];
 	};
 
 	struct AliceToBobSignature {

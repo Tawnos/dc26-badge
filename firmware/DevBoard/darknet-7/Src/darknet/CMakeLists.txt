@@ -28,16 +28,20 @@ set ( COMPILEDEFS
 )
 
 set (SOURCEFILES
-    darknet7.cpp
+    #darknet7.cpp
+    common.h
+    contact.h
     darknet7.h
     #button_info.cpp
     button_info.h
     #hardware_config.cpp  
     init.cpp             
     init.h
-    KeyStore.cpp         
-    KeyStore.h         
-    #mcu_to_mcu.cpp       
+    contact_store.cpp         
+    contact_store.h         
+    #mcu_to_mcu.cpp      
+    my_info.h 
+    settings_info.h
     virtual_key_board.cpp
     virtual_key_board.h
 
@@ -48,6 +52,8 @@ set (SOURCEFILES
     libstm32/app/app.h
     libstm32/app/display_message_state.cpp
     libstm32/app/display_message_state.h
+    libstm32/app/state_base.cpp
+    libstm32/app/state_base.h
 
     libstm32/display/display_device.cpp
     libstm32/display/display_device.h

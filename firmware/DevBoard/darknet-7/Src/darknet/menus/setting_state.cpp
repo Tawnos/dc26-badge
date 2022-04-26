@@ -62,7 +62,7 @@ StateBase::ReturnStateContext SettingState::onRun() {
       switch (SubState) {
       case 100:
         memset(&AgentName[0], 0, sizeof(AgentName));
-        VKB.init(VirtualKeyBoard::STDKBNames, &IHC, 5, DISPLAY_WIDTH - 5, 80, cmdc0de::RGBColor::WHITE, RGBColor::BLACK, RGBColor::BLUE, '_');
+        VKB.init(VirtualKeyBoard::STDKBNames, &IHC, 5, cmdc0de::DISPLAY_WIDTH - 5, 80, cmdc0de::RGBColor::WHITE, RGBColor::BLACK, RGBColor::BLUE, '_');
         DarkNet7::instance->getDisplay().drawString(0, 10, (const char*)"Current agent name:");
         if (*DarkNet7::instance->getContacts().getSettings().getAgentName() == '\0') {
           DarkNet7::instance->getDisplay().drawString(0, 20, (const char*)"NOT SET");
@@ -89,7 +89,7 @@ StateBase::ReturnStateContext SettingState::onRun() {
     case 100:
       VKB.process();
       if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Mid) && AgentName[0] != '\0' && AgentName[0] != ' ' && AgentName[0] != '_') {
-        AgentName[ContactStore::AGENT_NAME_LENGTH - 1] = '\0';
+        AgentName[AGENT_NAME_LENGTH - 1] = '\0';
         if (DarkNet7::instance->getContacts().getSettings().setAgentname(&AgentName[0])) {
           flatbuffers::FlatBufferBuilder fbb;
           auto r = darknet7::CreateBLESetDeviceNameDirect(fbb, DarkNet7::instance->getContacts().getSettings().getAgentName());

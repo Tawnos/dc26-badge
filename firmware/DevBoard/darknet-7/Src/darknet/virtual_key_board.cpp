@@ -34,7 +34,7 @@ void VirtualKeyBoard::InputHandleContext::backspace() {
 
 ////////
 
-VirtualKeyBoard::VirtualKeyBoard(): VKB(0), SizeOfKeyboard(0), XDisplayPos(0), XEndDisplayPos(DISPLAY_WIDTH), YDisplayPos(0),
+VirtualKeyBoard::VirtualKeyBoard(): VKB(0), SizeOfKeyboard(0), XDisplayPos(0), XEndDisplayPos(cmdc0de::DISPLAY_WIDTH), YDisplayPos(0),
 	FontColor(RGBColor::WHITE), BackGround(RGBColor::BLACK), CursorColor(RGBColor::BLUE), CursorChar('_'), CursorPos(0), CharsPerRow(0), InputContext(0) {
 
 
@@ -81,7 +81,7 @@ void VirtualKeyBoard::process() {
 	uint8_t FontPixelWidth = DarkNet7::instance->getDisplay().getFont()->FontWidth;
 	uint8_t cursorRow = getCursorY();
 	uint8_t curosrColumn = getCursorX();
-	for(int i=0;i<SizeOfKeyboard && y < (DISPLAY_HEIGHT-(y*FontPixelHeight));i+=CharsPerRow, ++y) {
+	for(int i=0;i<SizeOfKeyboard && y < (cmdc0de::DISPLAY_HEIGHT-(y*FontPixelHeight));i+=CharsPerRow, ++y) {
 		DarkNet7::instance->getDisplay().drawString(XDisplayPos, (YDisplayPos+(y*FontPixelHeight)), ptr, FontColor, BackGround, 1, false, CharsPerRow);
 		if(y==cursorRow) {
 

@@ -61,7 +61,7 @@ protected:
 		memset(&FinalHexHash[0],0,sizeof(FinalHexHash));
 		memset(&CureSequence[0],0,sizeof(CureSequence));
 		IHC.set(&CureSequence[0],sizeof(CureSequence));
-		VKB.init(VirtualKeyBoard::STDCAPS,&IHC,5,DISPLAY_WIDTH-5,100,RGBColor::WHITE, RGBColor::BLACK, RGBColor::BLUE,'_');
+		VKB.init(VirtualKeyBoard::STDCAPS,&IHC,5, cmdc0de::DISPLAY_WIDTH-5,100,RGBColor::WHITE, RGBColor::BLACK, RGBColor::BLUE,'_');
 		InternalState = VIRUS_ENTRY;
 		return ErrorType();
 	}
@@ -84,7 +84,7 @@ protected:
 					uint8_t mhash[SHA256_HASH_SIZE] = { 0 };
 					ShaOBJ HCtx;
 					sha256_init(&HCtx);
-					sha256_add(&HCtx, DarkNet7::instance->getContacts().getMyInfo().getPublicKey(), ContactStore::PUBLIC_KEY_LENGTH);
+					sha256_add(&HCtx, DarkNet7::instance->getContacts().getMyInfo().getPublicKey(), PUBLIC_KEY_LENGTH);
 					sha256_add(&HCtx, (const unsigned char *) &CureCodes[CurrentVirus], strlen((const char *) &CureCodes[CurrentVirus]));
 					sha256_digest(&HCtx, &mhash[0]);
 					sprintf((char *) &FinalHexHash[0], "%02x%02x%02x%02x%02x%02x%02x%02x", mhash[0], mhash[1], mhash[2],mhash[3], mhash[4], mhash[5], mhash[6], mhash[7]);
@@ -115,7 +115,7 @@ protected:
 static CureEntry EnterCure;
 
 
-Health::Health() : Darknet7BaseState(), HealthList("Infections:", Items, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, (sizeof(Items) / sizeof(Items[0]))) {
+Health::Health() : Darknet7BaseState(), HealthList("Infections:", Items, 0, 0, cmdc0de::DISPLAY_WIDTH, cmdc0de::DISPLAY_HEIGHT, 0, (sizeof(Items) / sizeof(Items[0]))) {
 
 }
 
@@ -126,14 +126,14 @@ Health::~Health()
 
 ErrorType Health::onInit() {
 	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
-	sprintf(&ListBuffer[0][0], "Avian Flu    : %s", DarkNet7::instance->getContacts().getSettings().isInfectedWith(ContactStore::SettingsInfo::AVIAN_FLU)?DarkNet7::sYES:DarkNet7::sNO);
-	sprintf(&ListBuffer[1][0], "Measles      : %s", DarkNet7::instance->getContacts().getSettings().isInfectedWith(ContactStore::SettingsInfo::MEASLES)?DarkNet7::sYES:DarkNet7::sNO);
-	sprintf(&ListBuffer[2][0], "Tetanus      : %s", DarkNet7::instance->getContacts().getSettings().isInfectedWith(ContactStore::SettingsInfo::TETANUS)?DarkNet7::sYES:DarkNet7::sNO);
-	sprintf(&ListBuffer[3][0], "Polio        : %s", DarkNet7::instance->getContacts().getSettings().isInfectedWith(ContactStore::SettingsInfo::POLIO)?DarkNet7::sYES:DarkNet7::sNO);
-	sprintf(&ListBuffer[4][0], "Plague       : %s", DarkNet7::instance->getContacts().getSettings().isInfectedWith(ContactStore::SettingsInfo::PLAGUE)?DarkNet7::sYES:DarkNet7::sNO);
-	sprintf(&ListBuffer[5][0], "Toxoplasmosis: %s", DarkNet7::instance->getContacts().getSettings().isInfectedWith(ContactStore::SettingsInfo::TOXOPLASMOSIS)?DarkNet7::sYES:DarkNet7::sNO);
-	sprintf(&ListBuffer[6][0], "Chlamydia    : %s", DarkNet7::instance->getContacts().getSettings().isInfectedWith(ContactStore::SettingsInfo::CHLAMYDIA)?DarkNet7::sYES:DarkNet7::sNO);
-	sprintf(&ListBuffer[7][0], "Herpes       : %s", DarkNet7::instance->getContacts().getSettings().isInfectedWith(ContactStore::SettingsInfo::HERPES)?DarkNet7::sYES:DarkNet7::sNO);
+	sprintf(&ListBuffer[0][0], "Avian Flu    : %s", DarkNet7::instance->getContacts().getSettings().isInfectedWith(SettingsInfo::AVIAN_FLU)? cmdc0de::sYES : cmdc0de::sNO);
+	sprintf(&ListBuffer[1][0], "Measles      : %s", DarkNet7::instance->getContacts().getSettings().isInfectedWith(SettingsInfo::MEASLES) ? cmdc0de::sYES : cmdc0de::sNO);
+	sprintf(&ListBuffer[2][0], "Tetanus      : %s", DarkNet7::instance->getContacts().getSettings().isInfectedWith(SettingsInfo::TETANUS) ? cmdc0de::sYES : cmdc0de::sNO);
+	sprintf(&ListBuffer[3][0], "Polio        : %s", DarkNet7::instance->getContacts().getSettings().isInfectedWith(SettingsInfo::POLIO) ? cmdc0de::sYES : cmdc0de::sNO);
+	sprintf(&ListBuffer[4][0], "Plague       : %s", DarkNet7::instance->getContacts().getSettings().isInfectedWith(SettingsInfo::PLAGUE) ? cmdc0de::sYES : cmdc0de::sNO);
+	sprintf(&ListBuffer[5][0], "Toxoplasmosis: %s", DarkNet7::instance->getContacts().getSettings().isInfectedWith(SettingsInfo::TOXOPLASMOSIS) ? cmdc0de::sYES : cmdc0de::sNO);
+	sprintf(&ListBuffer[6][0], "Chlamydia    : %s", DarkNet7::instance->getContacts().getSettings().isInfectedWith(SettingsInfo::CHLAMYDIA) ? cmdc0de::sYES : cmdc0de::sNO);
+	sprintf(&ListBuffer[7][0], "Herpes       : %s", DarkNet7::instance->getContacts().getSettings().isInfectedWith(SettingsInfo::HERPES) ? cmdc0de::sYES : cmdc0de::sNO);
 
 	for (uint32_t i = 0; i < (sizeof(Items) / sizeof(Items[0])); i++) {
 		Items[i].text = &ListBuffer[i][0];

@@ -55,10 +55,13 @@ set (SOURCEFILES
     libstm32/app/state_base.cpp
     libstm32/app/state_base.h
 
+    libstm32/display/DrawBuffer2D16BitColor.cpp
+    libstm32/display/DrawBuffer2D16BitColor.h
     libstm32/display/display_device.cpp
     libstm32/display/display_device.h
     libstm32/display/fonts.cpp
     libstm32/display/fonts.h
+    libstm32/display/framebuf.h
     libstm32/display/gui.cpp
     libstm32/display/gui.h
 

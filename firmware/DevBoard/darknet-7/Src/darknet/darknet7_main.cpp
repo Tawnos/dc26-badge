@@ -10,11 +10,6 @@
 
 using cmdc0de::DisplayST7735;
 
-DarkNet7::instance = new DarkNet7(
-	new Display(DISPLAY_WIDTH, DISPLAY_HEIGHT, START_ROT),
-	ButtonInfo()
-);
-
 ErrorType DarkNet7::onInit() {
 
 	ErrorType et;

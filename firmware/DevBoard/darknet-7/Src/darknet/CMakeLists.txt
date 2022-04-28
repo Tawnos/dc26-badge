@@ -35,8 +35,8 @@ set (SOURCEFILES
     #button_info.cpp
     button_info.h
     #hardware_config.cpp  
-    init.cpp             
-    init.h
+    #init.cpp             
+    #init.h
     contact_store.cpp         
     contact_store.h         
     #mcu_to_mcu.cpp      

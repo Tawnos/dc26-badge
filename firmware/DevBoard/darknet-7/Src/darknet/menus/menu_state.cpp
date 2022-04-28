@@ -25,8 +25,8 @@ using cmdc0de::StateBase;
 using cmdc0de::RGBColor;
 
 MenuState::MenuState() :
-		Darknet7BaseState(), MenuList("Main Menu", Items, 0, 0, DarkNet7::instance->getDisplay().getWidth(),
-				DarkNet7::instance->getDisplay().getHeight()
+		Darknet7BaseState(), MenuList("Main Menu", Items, 0, 0, cmdc0de::DISPLAY_WIDTH,
+				cmdc0de::DISPLAY_HEIGHT
 				, 0, (sizeof(Items) / sizeof(Items[0])))
 {
 }

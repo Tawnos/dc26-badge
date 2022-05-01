@@ -27,6 +27,7 @@
 #include "menus/setting_state.h"
 #include "menus/pairing_state.h"
 #include "menus/AddressState.h"
+#include "menus/GameOfLife.h"
 #include "menus/badge_info_state.h"
 #include "menus/SendMsgState.h"
 #include "menus/communications_settings.h"
@@ -68,18 +69,18 @@ public:
     DMS.setDisplay(Display);
     return &DMS;
   }
-  MenuState* getDisplayMenuState() { return &MyMenu; }
-  SendMsgState* getSendMsgState() { return &MySendMsgState; }
-  SettingState* getSettingState() { return &MySettingState; }
-  AddressState* getAddressBookState() { return &MyAddressState; }
-  CommunicationSettingState* getCommunicationSettingState() { return &MyCommunicationSettings; }
-  BadgeInfoState* getBadgeInfoState() { return &MyBadgeInfoState; }
-  Health* getHealthState() { return &MyHealth; }
+  constexpr MenuState* getDisplayMenuState() { return &MyMenu; }
+  constexpr SendMsgState* getSendMsgState() { return &MySendMsgState; }
+  constexpr SettingState* getSettingState() { return &MySettingState; }
+  constexpr AddressState* getAddressBookState() { return &MyAddressState; }
+  constexpr CommunicationSettingState* getCommunicationSettingState() { return &MyCommunicationSettings; }
+  constexpr BadgeInfoState* getBadgeInfoState() { return &MyBadgeInfoState; }
+  constexpr Health* getHealthState() { return &MyHealth; }
+  GameOfLife* getGameOfLifeState() { return &MyGameOfLifeState; }
 #if !defined VIRTUAL_DEVICE
   MCUInfoState* getMCUInfoState();
   TestState* getTestState();
   Menu3D* get3DState();
-  GameOfLife* getGameOfLifeState();
   //Tamagotchi *getTamagotchiState();
   Scan* getScanState();
   PairingState* getPairingState();
@@ -125,7 +126,7 @@ private:
   CommunicationSettingState MyCommunicationSettings{};
   BadgeInfoState MyBadgeInfoState{};
   Health MyHealth{};
-
+  GameOfLife MyGameOfLifeState{};
 };
 
 

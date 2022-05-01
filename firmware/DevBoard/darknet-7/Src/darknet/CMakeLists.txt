@@ -35,8 +35,8 @@ set (SOURCEFILES
     #button_info.cpp
     button_info.h
     #hardware_config.cpp  
-    #init.cpp             
-    #init.h
+    init.cpp             
+    init.h
     contact_store.cpp         
     contact_store.h         
     #mcu_to_mcu.cpp      
@@ -50,6 +50,7 @@ set (SOURCEFILES
     libstm32/rgbcolor.h
 
     libstm32/app/app.h
+    libstm32/app/app.cpp
     libstm32/app/display_message_state.cpp
     libstm32/app/display_message_state.h
     libstm32/app/state_base.cpp
@@ -87,7 +88,8 @@ set (SOURCEFILES
     menus/badge_info_state.h       
     menus/communications_settings.cpp
     menus/communications_settings.h
-    #menus/GameOfLife.cpp             
+    menus/GameOfLife.h             
+    menus/GameOfLife.cpp             
     menus/gui_list_processor.cpp     
     menus/gui_list_processor.h     
     menus/health.cpp                 

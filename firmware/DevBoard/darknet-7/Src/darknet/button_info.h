@@ -44,7 +44,7 @@ inline Button& operator |= (Button& lhs, Button rhs)
 
 class ButtonInfo {
 public:
-  ButtonInfo() = default;
+   ButtonInfo() :LastTickButtonPushed(HAL_GetTick()) {}
 
   void reset() {
     ButtonState = LastButtonState = Button::None;
@@ -84,7 +84,7 @@ protected:
 private:
   Button ButtonState;
   Button LastButtonState;
-  uint32_t LastTickButtonPushed;
+  uint32_t LastTickButtonPushed{ 0 };
 };
 
 #endif

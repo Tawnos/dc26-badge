@@ -74,7 +74,7 @@ cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
 	StateBase *nextState = this;
 	if (!GUIListProcessor::process(&MenuList,(sizeof(Items) / sizeof(Items[0]))))
 	{
-		if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(Button::Fire))
+		if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(ButtonPress::Fire))
 		{
 			switch (MenuList.selectedItem)
 			{

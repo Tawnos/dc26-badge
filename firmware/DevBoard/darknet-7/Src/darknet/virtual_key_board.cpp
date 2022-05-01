@@ -60,17 +60,17 @@ void VirtualKeyBoard::init(const char *vkb, InputHandleContext *ic, int16_t xdis
 
 
 void VirtualKeyBoard::process() {
-	if(DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(Button::Left)) {
+	if(DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(ButtonPress::Left)) {
 		if(CursorPos>0)	--CursorPos;
-	} else if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(Button::Right)) {
+	} else if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(ButtonPress::Right)) {
 		if(CursorPos<SizeOfKeyboard) CursorPos++;
 		else CursorPos=0;
-	} else if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(Button::Up)) {
+	} else if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(ButtonPress::Up)) {
 		if(CursorPos>=CharsPerRow) CursorPos-=CharsPerRow;
-	} else if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(Button::Down)) {
+	} else if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(ButtonPress::Down)) {
 		CursorPos+=CharsPerRow;
 		if(CursorPos>SizeOfKeyboard) CursorPos = SizeOfKeyboard-1;
-	} else if(DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(Button::Fire)) {
+	} else if(DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(ButtonPress::Fire)) {
 		if(InputContext) {
 			InputContext->addChar(getSelectedChar());
 		}

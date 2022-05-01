@@ -101,8 +101,9 @@ public:
 
   uint32_t nextSeq() { return ++SequenceNum; }
 
-  MCUToMCU& getMcuToMcu();
-  const MCUToMCU& getMcuToMcu() const;
+  MCUToMCU& getMcuToMcu() { return mcu; }
+  const MCUToMCU& getMcuToMcu() const { return mcu; }
+
 protected:
   virtual cmdc0de::ErrorType onInit();
   virtual cmdc0de::ErrorType onRun();
@@ -127,6 +128,7 @@ private:
   BadgeInfoState MyBadgeInfoState{};
   Health MyHealth{};
   GameOfLife MyGameOfLifeState{};
+  MCUToMCU mcu{};
 };
 
 

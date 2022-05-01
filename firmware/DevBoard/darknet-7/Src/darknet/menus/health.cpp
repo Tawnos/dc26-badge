@@ -78,7 +78,7 @@ protected:
 			DarkNet7::instance->getDisplay().drawString(0,10,(const char *)"Enter Sequence press:");
 			DarkNet7::instance->getDisplay().drawString(0,20, &CureSequence[0]);
 			DarkNet7::instance->getDisplay().drawString(0,60, (const char *)"Press MID to commit cure");
-			if(DarkNet7::instance->getButtonInfo().wereTheseButtonsReleased(Button::Mid)) {
+			if(DarkNet7::instance->getButtonInfo().wereTheseButtonsReleased(ButtonPress::Mid)) {
 				if(validateCure()) {
 					InternalState = DISPLAY_QUEST_KEY;
 					uint8_t mhash[SHA256_HASH_SIZE] = { 0 };
@@ -101,7 +101,7 @@ protected:
 			DarkNet7::instance->getDisplay().drawString(0, 20, &buf[0]);
 			DarkNet7::instance->getDisplay().drawString(0, 40, "Send To Daemon: ");
 			DarkNet7::instance->getDisplay().drawString(0, 50, (const char *) &FinalHexHash[0]);
-			if(DarkNet7::instance->getButtonInfo().wereTheseButtonsReleased(Button::Mid)) {
+			if(DarkNet7::instance->getButtonInfo().wereTheseButtonsReleased(ButtonPress::Mid)) {
 				nextState = DarkNet7::instance->getHealthState();
 			}
 		}
@@ -149,9 +149,9 @@ ErrorType Health::onInit() {
 StateBase::ReturnStateContext Health::onRun() {
 	StateBase *nextState = this;
 	if (!GUIListProcessor::process(&HealthList,(sizeof(Items) / sizeof(Items[0])))) {
-		if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(Button::Mid)) {
+		if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(ButtonPress::Mid)) {
 			nextState = DarkNet7::instance->getDisplayMenuState();
-		} else if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(Button::Fire) &&
+		} else if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(ButtonPress::Fire) &&
 				DarkNet7::instance->getContacts().getSettings().isInfectedWith(HealthList.items[HealthList.selectedItem].id)) {
 			EnterCure.setVirus(HealthList.selectedItem);
 			nextState = &EnterCure;

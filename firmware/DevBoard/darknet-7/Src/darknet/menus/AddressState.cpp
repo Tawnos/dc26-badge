@@ -60,7 +60,7 @@ StateBase::ReturnStateContext AddressState::onRun() {
 	StateBase *nextState = this;
 	auto buttonInfo = DarkNet7::instance->getButtonInfo();
 	if (DetailItems[0].id == 0) {
-		if(buttonInfo.wereTheseButtonsReleased(Button::Up)) {
+		if(buttonInfo.wereTheseButtonsReleased(ButtonPress::Up)) {
 			if (AddressList.selectedItem == 0) {
 				//keep selection at 0 but load new values
 				int16_t startAt = Index - 4;
@@ -76,7 +76,7 @@ StateBase::ReturnStateContext AddressState::onRun() {
 				AddressList.selectedItem--;
 				Index--;
 			}
-		} else if (buttonInfo.wereTheseButtonsReleased(Button::Down)) {
+		} else if (buttonInfo.wereTheseButtonsReleased(ButtonPress::Down)) {
 			uint16_t num = DarkNet7::instance->getContacts().getSettings().getNumContacts();
 			if (Index < num) {
 				if (AddressList.selectedItem == (sizeof(Items) / sizeof(Items[0]) - 1)) {
@@ -92,9 +92,9 @@ StateBase::ReturnStateContext AddressState::onRun() {
 					Index++;
 				}
 			}
-		} else if(buttonInfo.wereTheseButtonsReleased(Button::Mid)) {
+		} else if(buttonInfo.wereTheseButtonsReleased(ButtonPress::Mid)) {
 			nextState = DarkNet7::instance->getDisplayMenuState();
-		} else if (buttonInfo.wereTheseButtonsReleased(Button::Fire)) {
+		} else if (buttonInfo.wereTheseButtonsReleased(ButtonPress::Fire)) {
 			if (Items[AddressList.selectedItem].id != 0) {
 				DisplayList = &ContactDetails;
 				DetailItems[0].id = 1;
@@ -128,7 +128,7 @@ StateBase::ReturnStateContext AddressState::onRun() {
 		}
 	} else {
 		if(!GUIListProcessor::process(DisplayList,DisplayList->ItemsCount)) {
-			if(buttonInfo.wereTheseButtonsReleased(Button::Mid)) {
+			if(buttonInfo.wereTheseButtonsReleased(ButtonPress::Mid)) {
 				DetailItems[0].id = 0;
 				DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
 				DisplayList = &AddressList;

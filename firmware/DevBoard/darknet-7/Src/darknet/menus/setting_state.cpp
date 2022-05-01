@@ -36,7 +36,7 @@ StateBase::ReturnStateContext SettingState::onRun() {
   StateBase* nextState = this;
   auto buttonInfo = DarkNet7::instance->getButtonInfo();
   if (0 == SubState) {
-    if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Up)) {
+    if (buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Up)) {
       if (SettingList.selectedItem == 0) {
         SettingList.selectedItem = sizeof(Items) / sizeof(Items[0]) - 1;
       }
@@ -44,7 +44,7 @@ StateBase::ReturnStateContext SettingState::onRun() {
         SettingList.selectedItem--;
       }
     }
-    else if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Down)) {
+    else if (buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Down)) {
       if (SettingList.selectedItem
         == (sizeof(Items) / sizeof(Items[0]) - 1)) {
         SettingList.selectedItem = 0;
@@ -53,10 +53,10 @@ StateBase::ReturnStateContext SettingState::onRun() {
         SettingList.selectedItem++;
       }
     }
-    else if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Left)) {
+    else if (buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Left)) {
       SettingList.selectedItem = 0;
     }
-    else if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Fire) || buttonInfo.wereAnyOfTheseButtonsReleased(Button::Mid)) {
+    else if (buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Fire) || buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Mid)) {
       SubState = SettingList.selectedItem + 100;
       DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
       switch (SubState) {
@@ -88,7 +88,7 @@ StateBase::ReturnStateContext SettingState::onRun() {
     switch (SubState) {
     case 100:
       VKB.process();
-      if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Mid) && AgentName[0] != '\0' && AgentName[0] != ' ' && AgentName[0] != '_') {
+      if (buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Mid) && AgentName[0] != '\0' && AgentName[0] != ' ' && AgentName[0] != '_') {
         AgentName[AGENT_NAME_LENGTH - 1] = '\0';
         if (DarkNet7::instance->getContacts().getSettings().setAgentname(&AgentName[0])) {
           flatbuffers::FlatBufferBuilder fbb;
@@ -114,13 +114,13 @@ StateBase::ReturnStateContext SettingState::onRun() {
       DarkNet7::instance->getDisplay().drawString(0, 30, (const char*)"Up to increase, down to decrease", RGBColor::WHITE, RGBColor::BLACK, 1, true);
       DarkNet7::instance->getDisplay().drawString(10, 60, &Misc[0], RGBColor::WHITE, RGBColor::BLACK, 1, true);
       DarkNet7::instance->getDisplay().drawString(0, 100, (const char*)"MID Button completes", RGBColor::WHITE, RGBColor::BLACK, 1, true);
-      if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Up)) {
+      if (buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Up)) {
         MiscCounter++;
       }
-      else if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Down)) {
+      else if (buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Down)) {
         MiscCounter--;
       }
-      else if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Mid)) {
+      else if (buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Mid)) {
         if (DarkNet7::instance->getContacts().getSettings().setScreenSaverTime(MiscCounter)) {
           nextState = DarkNet7::instance->getDisplayMessageState(DarkNet7::instance->getDisplayMenuState(), (const char*)"Setting saved", 2000);
         }
@@ -131,7 +131,7 @@ StateBase::ReturnStateContext SettingState::onRun() {
     }
             break;
     case 102:
-      if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Fire)) {
+      if (buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Fire)) {
         DarkNet7::instance->getContacts().resetToFactory();
         nextState = DarkNet7::instance->getDisplayMenuState();
       }

@@ -51,7 +51,7 @@ protected:
 		DarkNet7::instance->getDisplay().drawString(0,30, (const char *)"New Name:");
 		DarkNet7::instance->getDisplay().drawString(0,40, &NewDeviceName[0]);
 		DarkNet7::instance->getDisplay().drawString(0,60,(const char *)"Mid button finishes");
-		if(buttonInfo.wereTheseButtonsReleased(Button::Mid)) {
+		if(buttonInfo.wereTheseButtonsReleased(ButtonPress::Mid)) {
 			flatbuffers::FlatBufferBuilder fbb;
 			auto r = darknet7::CreateBLESetDeviceNameDirect(fbb,&NewDeviceName[0]);
 			auto z = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::instance->nextSeq(),darknet7::STMToESPAny_BLESetDeviceName,r.Union());
@@ -107,7 +107,7 @@ protected:
 		DarkNet7::instance->getGUI().drawList(&BLEList);
 
 		if (!GUIListProcessor::process(&BLEList,(sizeof(Items) / sizeof(Items[0])))) {
-			if(buttonInfo.wereTheseButtonsReleased(Button::Fire)) {
+			if(buttonInfo.wereTheseButtonsReleased(ButtonPress::Fire)) {
 				flatbuffers::FlatBufferBuilder fbb;
 				if(Type==AD) {
 					auto r = darknet7::CreateBLEAdvertise(fbb,!BLEList.selectedItem);
@@ -188,7 +188,7 @@ protected:
 
 		if(WorkingItem==NO_WORKING_TIME) {
 			if (!GUIListProcessor::process(&WifiSettingList,(sizeof(Items) / sizeof(Items[0])))) {
-				if(buttonInfo.wereTheseButtonsReleased(Button::Fire)) {
+				if(buttonInfo.wereTheseButtonsReleased(ButtonPress::Fire)) {
 					WorkingItem = WifiSettingList.selectedItem;
 
 					switch(WorkingItem) {
@@ -228,28 +228,28 @@ protected:
 						}
 						break;
 					}
-				} else if ( buttonInfo.wereTheseButtonsReleased(Button::Mid)) {
+				} else if ( buttonInfo.wereTheseButtonsReleased(ButtonPress::Mid)) {
 					nextState = DarkNet7::instance->getCommunicationSettingState();
 				}
 			}
 		} else {
 			switch(WorkingItem) {
 			case 0:
-				if(buttonInfo.wereAnyOfTheseButtonsReleased(Button::Up) || buttonInfo.wereAnyOfTheseButtonsReleased(Button::Down)) {
+				if(buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Up) || buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Down)) {
 					if(CurrentWiFiStatus==darknet7::WiFiStatus_DOWN) CurrentWiFiStatus = darknet7::WiFiStatus_AP_STA;
 					else CurrentWiFiStatus = darknet7::WiFiStatus_DOWN;
-				} else if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Mid) || buttonInfo.wereAnyOfTheseButtonsReleased(Button::Fire)) {
+				} else if (buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Mid) || buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Fire)) {
 					WorkingItem = NO_WORKING_TIME;
 				}
 				break;
 			case 1:
 			{
-				if(buttonInfo.wereTheseButtonsReleased(Button::Up)) {
+				if(buttonInfo.wereTheseButtonsReleased(ButtonPress::Up)) {
 					uint32_t s = (uint32_t)(SecurityType);
 					++s;
 					s = s%darknet7::WifiMode_MAX;
 					SecurityType = (darknet7::WifiMode)s;
-				} else if (buttonInfo.wereTheseButtonsReleased(Button::Down)) {
+				} else if (buttonInfo.wereTheseButtonsReleased(ButtonPress::Down)) {
 					if(SecurityType==darknet7::WifiMode_MIN) {
 						SecurityType = darknet7::WifiMode_MAX;
 					} else {
@@ -257,20 +257,20 @@ protected:
 						--s;
 						SecurityType = (darknet7::WifiMode)s;
 					}
-				} else if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Mid) || buttonInfo.wereAnyOfTheseButtonsReleased(Button::Fire)) {
+				} else if (buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Mid) || buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Fire)) {
 					WorkingItem = NO_WORKING_TIME;
 				}
 			}
 			break;
 			case 2:
 				VKB.process();
-				if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Mid)) {
+				if (buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Mid)) {
 					WorkingItem = NO_WORKING_TIME;
 				}
 				break;
 			case 3:
 				VKB.process();
-				if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Mid)) {
+				if (buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Mid)) {
 					WorkingItem = NO_WORKING_TIME;
 				}
 				break;
@@ -351,7 +351,7 @@ StateBase::ReturnStateContext CommunicationSettingState::onRun() {
 		}
 	} else {
 		if (!GUIListProcessor::process(&CommSettingList,(sizeof(Items) / sizeof(Items[0])))) {
-			if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Fire)) {
+			if (buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Fire)) {
 				DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
 				switch(CommSettingList.selectedItem) {
 				case 0:
@@ -366,7 +366,7 @@ StateBase::ReturnStateContext CommunicationSettingState::onRun() {
 					nextState = &BLESetName_Menu;
 					break;
 				}
-			} else if (buttonInfo.wereAnyOfTheseButtonsReleased(Button::Mid)) {
+			} else if (buttonInfo.wereAnyOfTheseButtonsReleased(ButtonPress::Mid)) {
 				nextState = DarkNet7::instance->getDisplayMenuState();
 			}
 		}

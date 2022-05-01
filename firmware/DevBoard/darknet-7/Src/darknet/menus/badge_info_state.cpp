@@ -81,7 +81,7 @@ StateBase::ReturnStateContext BadgeInfoState::onRun() {
 
 	StateBase *nextState = this;
 	if(!GUIListProcessor::process(&BadgeInfoList,BadgeInfoList.ItemsCount)) {
-		if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(Button::Mid)) {
+		if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(ButtonPress::Mid)) {
 			nextState = DarkNet7::instance->getDisplayMenuState();
 		}
 	}

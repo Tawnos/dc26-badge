@@ -29,6 +29,7 @@ set ( COMPILEDEFS
 
 set (SOURCEFILES
     #darknet7.cpp
+    darknet7.h
     common.h
     contact.h
     darknet7.h

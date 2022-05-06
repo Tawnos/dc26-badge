@@ -92,6 +92,9 @@ cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
 				case 2:
 					nextState = DarkNet7::instance->getAddressBookState();
 					break;
+				case 4:
+					nextState = DarkNet7::instance->getGameOfLifeState();
+					break;
 				case 5:
 					nextState = DarkNet7::instance->getBadgeInfoState();
 					break;
@@ -104,9 +107,6 @@ cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
 #if !defined VIRTUAL_DEVICE
 				case 3:
 					nextState = DarkNet7::instance->get3DState();
-					break;
-				case 4:
-					nextState = DarkNet7::instance->getGameOfLifeState();
 					break;
 				case 6:
 					nextState = DarkNet7::instance->getMCUInfoState();

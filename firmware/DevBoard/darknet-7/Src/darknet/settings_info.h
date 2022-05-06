@@ -66,7 +66,7 @@ public:
   bool cure(uint16_t v);
 protected:
   bool writeSettings(const DataStructure& ds);
-  DataStructure getSettings();
+  DataStructure* getSettings();
 
 private:
   uint8_t* StartAddress;

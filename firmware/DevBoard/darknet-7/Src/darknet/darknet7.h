@@ -9,7 +9,7 @@
 #ifndef DARKNET_DC26_H_
 #define DARKNET_DC26_H_
 #include "common.h"
-#include <app/app.h>
+#include <libstm32/app/app.h>
 #include <display/display_device.h>
 #include <display/display_st7735.h>
 #include <app/display_message_state.h>
@@ -44,7 +44,9 @@ public:
     cmdc0de::WS2818 leds,
     cmdc0de::DisplayDevice* displayDevice,
     ContactStore contactStore = ContactStore{  }
-  ) : Apa106s(leds)
+  ) : 
+     MyContacts(new ContactStore(cmdc0de::MyAddressInfoSector, cmdc0de::MyAddressInfoOffSet, cmdc0de::SettingSector, cmdc0de::SettingOffset, cmdc0de::StartContactSector, cmdc0de::EndContactSector)),
+     Apa106s(leds)
     //		       my Info, start setting address, start Contact address, end contact address
     MyContacts(contactStore),
     Display(displayDevice),
@@ -112,7 +114,7 @@ private:
 #if !defined VIRTUAL_DEVICE
   cmdc0de::WS2818 Apa106s;
 #endif
-  ContactStore* MyContacts = new ContactStore(cmdc0de::MyAddressInfoSector, cmdc0de::MyAddressInfoOffSet, cmdc0de::SettingSector, cmdc0de::SettingOffset, cmdc0de::StartContactSector, cmdc0de::EndContactSector);
+  ContactStore* MyContacts{ nullptr };
   cmdc0de::DisplayDevice* Display;
   cmdc0de::DrawBuffer2D16BitColor16BitPerPixel1Buffer DisplayBuffer;
   cmdc0de::GUI MyGUI;

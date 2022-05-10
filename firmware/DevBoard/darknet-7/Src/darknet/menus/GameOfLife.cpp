@@ -10,14 +10,6 @@ using cmdc0de::BitArray;
 
 uint8_t GameOfLife::Buffer[] = {0};
 
-GameOfLife::GameOfLife() : Darknet7BaseState(),
-		Generations(0), CurrentGeneration(0), Neighborhood(0), GOL(&Buffer[0],num_slots,1), UtilityBuf(), InternalState(GameOfLife::GAME), DisplayMessageUntil(0) {
-}
-
-GameOfLife::~GameOfLife() {
-
-}
-
 ErrorType GameOfLife::onInit() {
 	InternalState = INIT;
 	return ErrorType();
@@ -29,23 +21,23 @@ bool GameOfLife::shouldDisplayMessage() {
 
 static uint8_t noChange = 0;
 
-cmdc0de::StateBase::ReturnStateContext GameOfLife::onRun() {
+Darknet7BaseState*  GameOfLife::onRun() {
 	switch (InternalState) {
 	case INIT: {
-		DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
+		darknet->getDisplay()->fillScreen(RGBColor::BLACK);
 		DisplayMessageUntil = HAL_GetTick() + 3000;
 		initGame();
 		noChange = 0;
 	}
 		break;
 	case MESSAGE:
-		DarkNet7::instance->getDisplay().drawString(0, 10, &UtilityBuf[0], RGBColor::BLACK, RGBColor::WHITE, 1, true);
+		darknet->getDisplay()->drawString(0, 10, &UtilityBuf[0], RGBColor::BLACK, RGBColor::WHITE, 1, true);
 		InternalState = TIME_WAIT;
 		break;
 	case TIME_WAIT:
 		if (!shouldDisplayMessage()) {
 			InternalState = GAME;
-			DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
+			darknet->getDisplay()->fillScreen(RGBColor::BLACK);
 		}
 		break;
 	case GAME: {
@@ -53,17 +45,17 @@ cmdc0de::StateBase::ReturnStateContext GameOfLife::onRun() {
 			InternalState = INIT;
 		} else {
 			uint16_t count = 0;
-			int16_t xOffSet = DarkNet7::instance->getDisplay().getWidth()-width;
+			int16_t xOffSet = darknet->getDisplay()->getWidth()-width;
 			xOffSet = xOffSet>0? xOffSet/2 : 0;
 
 			//uint8_t bitToCheck = CurrentGeneration % 32;
 			for (uint16_t j = 0; j < height; j++) {
 				for (uint16_t k = 0; k < width; k++) {
 					if(GOL.getValueAsByte((j*width)+k)) {
-						DarkNet7::instance->getDisplay().drawPixel(k+xOffSet, j, RGBColor::WHITE);
+						darknet->getDisplay()->drawPixel(k+xOffSet, j, RGBColor::WHITE);
 						count++;
 					} else {
-						DarkNet7::instance->getDisplay().drawPixel(k+xOffSet, j, RGBColor::BLACK);
+						darknet->getDisplay()->drawPixel(k+xOffSet, j, RGBColor::BLACK);
 					}
 				}
 			}
@@ -72,7 +64,7 @@ cmdc0de::StateBase::ReturnStateContext GameOfLife::onRun() {
 				CurrentGeneration = Generations + 1;
 				InternalState = MESSAGE;
 				DisplayMessageUntil = HAL_GetTick() + 3000;
-				DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
+				darknet->getDisplay()->fillScreen(RGBColor::BLACK);
 			} else {
 				uint8_t tmpBuffer[sizeof(Buffer)];
 				BitArray tmp(&tmpBuffer[0],num_slots,1);
@@ -90,11 +82,11 @@ cmdc0de::StateBase::ReturnStateContext GameOfLife::onRun() {
 	case SLEEP:
 		break;
 	}
-	cmdc0de::StateBase *next = DarkNet7::instance->getDisplayMenuState();
-	if (!DarkNet7::instance->getButtonInfo().wasAnyButtonReleased()) {
-		return ReturnStateContext(this);
+	Darknet7BaseState* next = darknet->getDisplayMenuState();
+	if (!darknet->getButtonInfo()->wasAnyButtonReleased()) {
+		return this;
 	} else {
-		return ReturnStateContext(next);
+		return next;
 	}
 }
 

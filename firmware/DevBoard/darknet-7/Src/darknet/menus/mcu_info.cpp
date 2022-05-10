@@ -14,7 +14,7 @@
 
 using cmdc0de::RGBColor;
 using cmdc0de::ErrorType;
-using cmdc0de::StateBase;
+
 
 
 MCUInfoState::MCUInfoState() : Darknet7BaseState(),
@@ -46,8 +46,8 @@ void MCUInfoState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::ESPSystemInf
 			Items[i].setShouldScroll();
 		}
 
-		DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
-		DarkNet7::get().getGUI().drawList(&BadgeInfoList);
+		DarkNet7::get().getDisplay()->fillScreen(RGBColor::BLACK);
+		DarkNet7::get().getGUI()->drawList(&BadgeInfoList);
 	}
 }
 
@@ -61,17 +61,17 @@ ErrorType MCUInfoState::onInit() {
 	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
 	const MSGEvent<darknet7::ESPSystemInfo> *si = 0;
 	MCUToMCU::get().getBus().addListener(this,si,&MCUToMCU::get());
-	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+	DarkNet7::get().getDisplay()->fillScreen(RGBColor::BLACK);
 
-	DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Fetching data from ESP",RGBColor::BLUE);
+	DarkNet7::get().getDisplay()->drawString(5,10,(const char *)"Fetching data from ESP",RGBColor::BLUE);
 
 	MCUToMCU::get().send(fbb);
 	return ErrorType();
 
 }
 
-StateBase::ReturnStateContext MCUInfoState::onRun() {
-	StateBase *nextState = this;
+Darknet7BaseState*  MCUInfoState::onRun() {
+	Darknet7BaseState* nextState = this;
 	switch(InternalState) {
 	case FETCHING_DATA:
 		if(this->getTimesRunCalledSinceLastReset()>200) {
@@ -79,14 +79,14 @@ StateBase::ReturnStateContext MCUInfoState::onRun() {
 		}
 		break;
 	case DISPLAY_DATA:
-		if(DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+		if(DarkNet7::get().getButtonInfo()->wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
 			nextState = DarkNet7::get().getDisplayMenuState();
 		}
 		break;
 	case NONE:
 		break;
 	}
-	return ReturnStateContext(nextState);
+	return Darknet7BaseState* (nextState);
 }
 
 ErrorType MCUInfoState::onShutdown() {

@@ -13,26 +13,15 @@
 
 using cmdc0de::RGBColor;
 using cmdc0de::ErrorType;
-using cmdc0de::StateBase;
 
-BadgeInfoState::BadgeInfoState() :
-		Darknet7BaseState(), BadgeInfoList("Badge Info:", Items, 0, 0, cmdc0de::DISPLAY_WIDTH, cmdc0de::DISPLAY_HEIGHT,
-				0, (sizeof(Items) / sizeof(Items[0]))), RegCode() {
 
-	memset(&RegCode, 0, sizeof(RegCode));
-}
-
-BadgeInfoState::~BadgeInfoState() {
-
-}
-
-const char *BadgeInfoState::getRegCode(ContactStore &cs) {
+const char *BadgeInfoState::getRegCode(ContactStore *cs) {
 	if (RegCode[0] == 0) {
 		ShaOBJ hashObj;
 		sha256_init(&hashObj);
-		sha256_add(&hashObj, cs.getMyInfo().getPrivateKey(),
+		sha256_add(&hashObj, cs->getMyInfo().getPrivateKey(),
 				PRIVATE_KEY_LENGTH);
-		uint16_t id = cs.getMyInfo().getUniqueID();
+		uint16_t id = cs->getMyInfo().getUniqueID();
 		sha256_add(&hashObj, (uint8_t *) &id, sizeof(id));
 		uint8_t rH[SHA256_HASH_SIZE];
 		sha256_digest(&hashObj, &rH[0]);
@@ -47,14 +36,14 @@ static const char *VERSION = "dn7.dc26.1";
 ErrorType BadgeInfoState::onInit() {
 	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
 	sprintf(&ListBuffer[0][0], "Name: %s",
-			DarkNet7::instance->getContacts().getSettings().getAgentName());
+			darknet->getContacts()->getSettings().getAgentName());
 	sprintf(&ListBuffer[1][0], "Num contacts: %u",
-			DarkNet7::instance->getContacts().getSettings().getNumContacts());
+			darknet->getContacts()->getSettings().getNumContacts());
 	sprintf(&ListBuffer[2][0], "REG: %s",
-			getRegCode(DarkNet7::instance->getContacts()));
+			getRegCode(darknet->getContacts()));
 	sprintf(&ListBuffer[3][0], "UID: %u",
-			DarkNet7::instance->getContacts().getMyInfo().getUniqueID());
-	uint8_t *pCP =	DarkNet7::instance->getContacts().getMyInfo().getCompressedPublicKey();
+			darknet->getContacts()->getMyInfo().getUniqueID());
+	uint8_t *pCP =	darknet->getContacts()->getMyInfo().getCompressedPublicKey();
 	sprintf(&ListBuffer[4][0], "PK: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
 			pCP[0], pCP[1], pCP[2], pCP[3], pCP[4], pCP[5], pCP[6], pCP[7],
 			pCP[8], pCP[9], pCP[10], pCP[11], pCP[12], pCP[13], pCP[14],
@@ -72,20 +61,20 @@ ErrorType BadgeInfoState::onInit() {
 		Items[i].id = i;
 		Items[i].setShouldScroll();
 	}
-	DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
-	DarkNet7::instance->getGUI().drawList(&BadgeInfoList);
+	darknet->getDisplay()->fillScreen(RGBColor::BLACK);
+	darknet->getGUI()->drawList(&BadgeInfoList);
 	return ErrorType();
 }
 
-StateBase::ReturnStateContext BadgeInfoState::onRun() {
+Darknet7BaseState*  BadgeInfoState::onRun() {
 
-	StateBase *nextState = this;
-	if(!GUIListProcessor::process(&BadgeInfoList,BadgeInfoList.ItemsCount)) {
-		if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(ButtonPress::Mid)) {
-			nextState = DarkNet7::instance->getDisplayMenuState();
+	Darknet7BaseState *nextState = this;
+	if(!GUIListProcessor::process(darknet->getButtonInfo(), &BadgeInfoList,BadgeInfoList.ItemsCount)) {
+		if (darknet->getButtonInfo()->wereAnyOfTheseButtonsReleased(ButtonPress::Mid)) {
+			nextState = darknet->getDisplayMenuState();
 		}
 	}
-	return ReturnStateContext(nextState);
+	return nextState;
 }
 
 ErrorType BadgeInfoState::onShutdown() {

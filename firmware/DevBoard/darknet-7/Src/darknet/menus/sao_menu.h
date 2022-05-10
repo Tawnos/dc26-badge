@@ -18,11 +18,11 @@ class SAO: public Darknet7BaseState {
 public:
 	enum INTERNAL_STATE {NONE, DISPLAY_SCANNING, SCANNING, INTERACTING };
 	static const uint16_t NOADDRESS = 0xFFFF;
-	SAO();
+	SAO(DarkNet7* darknet);
 	virtual ~SAO();
 protected:
 	virtual cmdc0de::ErrorType onInit();
-	virtual cmdc0de::StateBase::ReturnStateContext onRun();
+	virtual Darknet7BaseState*  onRun();
 	virtual cmdc0de::ErrorType onShutdown();
 private:
 	INTERNAL_STATE InternalState;

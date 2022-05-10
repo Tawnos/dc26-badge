@@ -9,14 +9,13 @@
 #define DARKNET_MENUS_GUI_LIST_PROCESSOR_H_
 
 #include <stdint.h>
+#include <libstm32/display/gui.h> 
 
-namespace cmdc0de {
-	class GUIListData;
-}
+#include "../button_info.h"
 
 class GUIListProcessor {
 public:
-	static bool process(cmdc0de::GUIListData *pl, uint16_t itemCount);
+	static bool process(ButtonInfo* buttons, cmdc0de::GUIListData *pl, uint16_t itemCount);
 };
 
 

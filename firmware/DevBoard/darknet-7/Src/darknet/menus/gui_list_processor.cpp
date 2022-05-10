@@ -6,12 +6,10 @@
  */
 
 #include "gui_list_processor.h"
-#include "../libstm32/display/gui.h"
-#include "../darknet7.h"
 
-bool GUIListProcessor::process(cmdc0de::GUIListData *pl, uint16_t itemCount) {
+bool GUIListProcessor::process(ButtonInfo* buttons, cmdc0de::GUIListData *pl, uint16_t itemCount) {
 	bool bHandled = false;
-	if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(ButtonPress::Up)) {
+	if (buttons->wereAnyOfTheseButtonsReleased(ButtonPress::Up)) {
 		bHandled = true;
 		do {
 			if (pl->selectedItem == 0) {
@@ -20,7 +18,7 @@ bool GUIListProcessor::process(cmdc0de::GUIListData *pl, uint16_t itemCount) {
 				pl->selectedItem--;
 			}
 		} while(!pl->items[pl->selectedItem].text || pl->items[pl->selectedItem].text[0]=='\0');
-	} else if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(ButtonPress::Down)) {
+	} else if (buttons->wereAnyOfTheseButtonsReleased(ButtonPress::Down)) {
 		bHandled = true;
 		do {
 			if (pl->selectedItem == itemCount - 1) {
@@ -29,7 +27,7 @@ bool GUIListProcessor::process(cmdc0de::GUIListData *pl, uint16_t itemCount) {
 				pl->selectedItem++;
 			}
 		} while(!pl->items[pl->selectedItem].text || pl->items[pl->selectedItem].text[0]=='\0');
-	} else if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(ButtonPress::Left)) {
+	} else if (buttons->wereAnyOfTheseButtonsReleased(ButtonPress::Left)) {
 		bHandled = true;
 		pl->selectedItem = 0;
 	}

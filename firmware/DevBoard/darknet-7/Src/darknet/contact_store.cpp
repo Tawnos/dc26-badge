@@ -8,7 +8,7 @@
 #endif
 #include "../darknet7.h"
 
-void SettingsInfo::receiveSignal(MCUToMCU*, const MSGEvent<darknet7::BLEInfectionData>* mevt)
+void SettingsInfo::receiveSignal(MCUToMCU* mcu, const MSGEvent<darknet7::BLEInfectionData>* mevt)
 {
    uint16_t exposures = mevt->InnerMsg->exposures();
    uint16_t infections = 0x0;
@@ -19,13 +19,13 @@ void SettingsInfo::receiveSignal(MCUToMCU*, const MSGEvent<darknet7::BLEInfectio
    this->setHealth(infections);
 
    //Uncomment this to infect other people
-   infections = DarkNet7::instance->getContacts().getSettings().getHealth();
+   infections = getHealth();
    infections &= 0x0004; // Only expose others to measels
    flatbuffers::FlatBufferBuilder fbb;
    auto r = darknet7::CreateBLESetInfectionData(fbb, infections);
    auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESetInfectionData, r.Union());
    darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, e);
-   DarkNet7::instance->getMcuToMcu().send(fbb);
+   mcu->send(fbb);
 
    return;
 }
@@ -34,7 +34,7 @@ bool SettingsInfo::init()
 {
    const MSGEvent<darknet7::BLEInfectionData>* removebob = 0;
 #if !defined VIRTUAL_DEVICE
-   DarkNet7::instance->getMcuToMcu().getBus().addListener(this, removebob, &DarkNet7::instance->getMcuToMcu());
+   darknet->getMcuToMcu().getBus().addListener(this, removebob, &darknet->getMcuToMcu());
 #endif
 
    for (uint8_t* addr = StartAddress; addr < EndAddress; addr += SettingsInfo::SIZE)

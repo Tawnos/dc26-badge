@@ -19,14 +19,14 @@ namespace darknet7 {
 
 class MCUInfoState: public Darknet7BaseState {
 public:
-	MCUInfoState();
+	MCUInfoState(DarkNet7* darknet);
 	virtual ~MCUInfoState();
 	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::ESPSystemInfo> *);
 protected:
 	enum INTERNAL_STATE {NONE, FETCHING_DATA, DISPLAY_DATA};
 protected:
 	virtual cmdc0de::ErrorType onInit();
-	virtual cmdc0de::StateBase::ReturnStateContext onRun();
+	virtual Darknet7BaseState*  onRun();
 	virtual cmdc0de::ErrorType onShutdown();
 private:
 	cmdc0de::GUIListData BadgeInfoList;

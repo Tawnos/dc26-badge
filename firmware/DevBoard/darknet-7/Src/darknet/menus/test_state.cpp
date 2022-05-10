@@ -6,15 +6,6 @@ using cmdc0de::ErrorType;
 using cmdc0de::RGBColor;
 
 
-TestState::TestState() : Darknet7BaseState(), ButtonList("Button Info:", Items, 0, 0, DarkNet7::DISPLAY_WIDTH, DarkNet7::DISPLAY_HEIGHT, 0, (sizeof(Items) / sizeof(Items[0]))), TimesMidHasBeenHeld(0) {
-
-}
-
- TestState::~TestState() {
-
-}
-
-
 ErrorType TestState::onInit() {
 	TimesMidHasBeenHeld=0;
 	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
@@ -29,22 +20,22 @@ ErrorType TestState::onInit() {
 	return ErrorType();
 }
 
-cmdc0de::StateBase::ReturnStateContext TestState::onRun() {
-	StateBase *nextState = this;
+Darknet7BaseState*  TestState::onRun() {
+	Darknet7BaseState* nextState = this;
 
-	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
-	sprintf(&ListBuffer[0][0], "   UP: %s", DarkNet7::get().getButtonInfo().isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_UP)?DarkNet7::sYES:DarkNet7::sNO);
-	sprintf(&ListBuffer[1][0], " DOWN: %s", DarkNet7::get().getButtonInfo().isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_DOWN)?DarkNet7::sYES:DarkNet7::sNO);
-	sprintf(&ListBuffer[2][0], " LEFT: %s", DarkNet7::get().getButtonInfo().isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_LEFT)?DarkNet7::sYES:DarkNet7::sNO);
-	sprintf(&ListBuffer[3][0], "RIGHT: %s", DarkNet7::get().getButtonInfo().isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_RIGHT)?DarkNet7::sYES:DarkNet7::sNO);
-	sprintf(&ListBuffer[4][0], "  MID: %s", DarkNet7::get().getButtonInfo().isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_MID)?DarkNet7::sYES:DarkNet7::sNO);
-	sprintf(&ListBuffer[5][0], "FIRE1: %s", DarkNet7::get().getButtonInfo().isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_FIRE1)?DarkNet7::sYES:DarkNet7::sNO);
-	if(DarkNet7::get().getButtonInfo().areTheseButtonsDown(DarkNet7::ButtonInfo::BUTTON_LEFT | DarkNet7::ButtonInfo::BUTTON_DOWN)) {
+	DarkNet7::get().getDisplay()->fillScreen(RGBColor::BLACK);
+	sprintf(&ListBuffer[0][0], "   UP: %s", DarkNet7::get().getButtonInfo()->isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_UP)?DarkNet7::sYES:DarkNet7::sNO);
+	sprintf(&ListBuffer[1][0], " DOWN: %s", DarkNet7::get().getButtonInfo()->isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_DOWN)?DarkNet7::sYES:DarkNet7::sNO);
+	sprintf(&ListBuffer[2][0], " LEFT: %s", DarkNet7::get().getButtonInfo()->isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_LEFT)?DarkNet7::sYES:DarkNet7::sNO);
+	sprintf(&ListBuffer[3][0], "RIGHT: %s", DarkNet7::get().getButtonInfo()->isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_RIGHT)?DarkNet7::sYES:DarkNet7::sNO);
+	sprintf(&ListBuffer[4][0], "  MID: %s", DarkNet7::get().getButtonInfo()->isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_MID)?DarkNet7::sYES:DarkNet7::sNO);
+	sprintf(&ListBuffer[5][0], "FIRE1: %s", DarkNet7::get().getButtonInfo()->isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_FIRE1)?DarkNet7::sYES:DarkNet7::sNO);
+	if(DarkNet7::get().getButtonInfo()->areTheseButtonsDown(DarkNet7::ButtonInfo::BUTTON_LEFT | DarkNet7::ButtonInfo::BUTTON_DOWN)) {
 		HAL_GPIO_WritePin(SIMPLE_LED1_GPIO_Port, SIMPLE_LED1_Pin, GPIO_PIN_SET);
 	} else {
 		HAL_GPIO_WritePin(SIMPLE_LED1_GPIO_Port, SIMPLE_LED1_Pin, GPIO_PIN_RESET);
 	}
-	if(DarkNet7::get().getButtonInfo().isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_MID)) {
+	if(DarkNet7::get().getButtonInfo()->isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_MID)) {
 		TimesMidHasBeenHeld++;
 	} else {
 		TimesMidHasBeenHeld=0;
@@ -53,8 +44,8 @@ cmdc0de::StateBase::ReturnStateContext TestState::onRun() {
 		nextState = DarkNet7::get().getDisplayMenuState();
 	}
 
-	DarkNet7::get().getGUI().drawList(&ButtonList);
-	return cmdc0de::StateBase::ReturnStateContext(nextState);
+	DarkNet7::get().getGUI()->drawList(&ButtonList);
+	return Darknet7BaseState* (nextState);
 }
 
 ErrorType TestState::onShutdown() {

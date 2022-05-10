@@ -17,7 +17,7 @@
 
 using cmdc0de::RGBColor;
 using cmdc0de::ErrorType;
-using cmdc0de::StateBase;
+
 
 static const char *NPCINTERACTION = "NPC Interaction";
 static const char *NPCList = "NPC List";
@@ -69,10 +69,10 @@ public:
 					sprintf(&ListBuffer[7][0], "R: %s", mevt->InnerMsg->response()->c_str());
 				}
 				if(mevt->InnerMsg->infections()!=0) {
-					DarkNet7::get().getContacts().getSettings().setHealth(mevt->InnerMsg->infections());
+					DarkNet7::get().getContacts()->getSettings().setHealth(mevt->InnerMsg->infections());
 				}
-				DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
-				DarkNet7::get().getGUI().drawList(&DisplayList);
+				DarkNet7::get().getDisplay()->fillScreen(RGBColor::BLACK);
+				DarkNet7::get().getGUI()->drawList(&DisplayList);
 			}
 		}
 	}
@@ -96,8 +96,8 @@ public:
 					sprintf(&ListBuffer[i][0], "%s", mevt->InnerMsg->names()->GetAsString(i)->c_str());
 				}
 
-				DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
-				DarkNet7::get().getGUI().drawList(&DisplayList);
+				DarkNet7::get().getDisplay()->fillScreen(RGBColor::BLACK);
+				DarkNet7::get().getGUI()->drawList(&DisplayList);
 			}
 		}
 	}
@@ -116,16 +116,16 @@ protected:
 		memset(&ListBuffer[0], 0, sizeof(ListBuffer));
 		const MSGEvent<darknet7::NPCList> *si = 0;
 		MCUToMCU::get().getBus().addListener(this,si,&MCUToMCU::get());
-		DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+		DarkNet7::get().getDisplay()->fillScreen(RGBColor::BLACK);
 
-		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Getting NPCs at \nthis location",RGBColor::BLUE);
+		DarkNet7::get().getDisplay()->drawString(5,10,(const char *)"Getting NPCs at \nthis location",RGBColor::BLUE);
 
 		MCUToMCU::get().send(fbb);
 		return ErrorType();
 	}
 
-	virtual cmdc0de::StateBase::ReturnStateContext onRun() {
-		StateBase *nextState = this;
+	virtual Darknet7BaseState*  onRun() {
+		Darknet7BaseState* nextState = this;
 			switch(InternalState) {
 			case NPC_LIST_REQUEST:
 				if(this->getTimesRunCalledSinceLastReset()>500) {
@@ -139,9 +139,9 @@ protected:
 				break;
 			case NPC_LIST_DISPLAY:
 				if (!GUIListProcessor::process(&DisplayList,DisplayList.ItemsCount)) {
-					if(DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+					if(DarkNet7::get().getButtonInfo()->wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
 						nextState = DarkNet7::get().getDisplayMenuState();
-					} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+					} else if (DarkNet7::get().getButtonInfo()->wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
 						InternalState = NPC_INTERACT_REQUEST;
 						strcpy(&NPCName[0],DisplayList.items[DisplayList.selectedItem].text);
 						flatbuffers::FlatBufferBuilder fbb;
@@ -154,24 +154,24 @@ protected:
 						darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
 						const MSGEvent<darknet7::NPCInteractionResponse> *si = 0;
 						MCUToMCU::get().getBus().addListener(this,si,&MCUToMCU::get());
-						DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+						DarkNet7::get().getDisplay()->fillScreen(RGBColor::BLACK);
 
-						DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Sending Message...",RGBColor::BLUE);
+						DarkNet7::get().getDisplay()->drawString(5,10,(const char *)"Sending Message...",RGBColor::BLUE);
 
 						MCUToMCU::get().send(fbb);
 						Timer = HAL_GetTick();
 					} else {
-						DarkNet7::get().getGUI().drawList(&DisplayList);
+						DarkNet7::get().getGUI()->drawList(&DisplayList);
 					}
 				} else {
-					DarkNet7::get().getGUI().drawList(&DisplayList);
+					DarkNet7::get().getGUI()->drawList(&DisplayList);
 				}
 				break;
 			case NPC_INTERACT_DISPLAY:
 				if (!GUIListProcessor::process(&DisplayList,DisplayList.ItemsCount)) {
-					if(DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+					if(DarkNet7::get().getButtonInfo()->wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
 						nextState = DarkNet7::get().getDisplayMenuState();
-					} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)
+					} else if (DarkNet7::get().getButtonInfo()->wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)
 							&& DisplayList.selectedItem>2 && DisplayList.selectedItem<7) { //hacky hacky hacky
 						InternalState = NPC_INTERACT_REQUEST;
 						flatbuffers::FlatBufferBuilder fbb;
@@ -184,17 +184,17 @@ protected:
 						darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
 						const MSGEvent<darknet7::NPCInteractionResponse> *si = 0;
 						MCUToMCU::get().getBus().addListener(this,si,&MCUToMCU::get());
-						DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+						DarkNet7::get().getDisplay()->fillScreen(RGBColor::BLACK);
 
-						DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Sending Message...",RGBColor::BLUE);
+						DarkNet7::get().getDisplay()->drawString(5,10,(const char *)"Sending Message...",RGBColor::BLUE);
 
 						MCUToMCU::get().send(fbb);
 						Timer = HAL_GetTick();
 					} else {
-						DarkNet7::get().getGUI().drawList(&DisplayList);
+						DarkNet7::get().getGUI()->drawList(&DisplayList);
 					}
 				} else {
-					DarkNet7::get().getGUI().drawList(&DisplayList);
+					DarkNet7::get().getGUI()->drawList(&DisplayList);
 				}
 				break;
 			case NONE:
@@ -206,7 +206,7 @@ protected:
 			default:
 				break;
 			}
-			return ReturnStateContext(nextState);
+			return Darknet7BaseState* (nextState);
 	}
 
 	virtual cmdc0de::ErrorType onShutdown() {
@@ -247,8 +247,8 @@ void Scan::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::WiFiScanResults> *me
 			strcpy(&Wifis[i].Sid[0],mevt->InnerMsg->APs()->Get(i)->ssid()->c_str());
 		}
 
-		DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
-		DarkNet7::get().getGUI().drawList(&DisplayList);
+		DarkNet7::get().getDisplay()->fillScreen(RGBColor::BLACK);
+		DarkNet7::get().getGUI()->drawList(&DisplayList);
 	}
 }
 
@@ -265,12 +265,12 @@ ErrorType Scan::onInit() {
 	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
 	const MSGEvent<darknet7::WiFiScanResults> *si = 0;
 	MCUToMCU::get().getBus().addListener(this,si,&MCUToMCU::get());
-	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+	DarkNet7::get().getDisplay()->fillScreen(RGBColor::BLACK);
 
 	if(isNPCOnly()) {
-		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Scanning for DarkNet NPCs",RGBColor::BLUE);
+		DarkNet7::get().getDisplay()->drawString(5,10,(const char *)"Scanning for DarkNet NPCs",RGBColor::BLUE);
 	} else {
-		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Scanning for APs",RGBColor::BLUE);
+		DarkNet7::get().getDisplay()->drawString(5,10,(const char *)"Scanning for APs",RGBColor::BLUE);
 	}
 
 	MCUToMCU::get().send(fbb);
@@ -278,8 +278,8 @@ ErrorType Scan::onInit() {
 
 }
 
-StateBase::ReturnStateContext Scan::onRun() {
-	StateBase *nextState = this;
+Darknet7BaseState*  Scan::onRun() {
+	Darknet7BaseState* nextState = this;
 	switch(InternalState) {
 	case FETCHING_DATA:
 		if(this->getTimesRunCalledSinceLastReset()>200) {
@@ -288,19 +288,19 @@ StateBase::ReturnStateContext Scan::onRun() {
 		break;
 	case DISPLAY_DATA:
 		if (!GUIListProcessor::process(&DisplayList,(sizeof(Items) / sizeof(Items[0])))) {
-			if(DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+			if(DarkNet7::get().getButtonInfo()->wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
 				nextState = DarkNet7::get().getDisplayMenuState();
-			} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+			} else if (DarkNet7::get().getButtonInfo()->wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
 				NPCInteraction.setInteraction(&Wifis[DisplayList.selectedItem]);
 				nextState = &NPCInteraction;
 			}
 		}
-		DarkNet7::get().getGUI().drawList(&DisplayList);
+		DarkNet7::get().getGUI()->drawList(&DisplayList);
 		break;
 	case NONE:
 		break;
 	}
-	return ReturnStateContext(nextState);
+	return Darknet7BaseState* (nextState);
 }
 
 

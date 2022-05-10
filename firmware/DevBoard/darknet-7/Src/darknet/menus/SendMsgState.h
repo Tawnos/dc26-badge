@@ -9,17 +9,17 @@ public:
 	enum INTERNAL_STATE {
 		TYPE_MESSAGE, CONFIRM_SEND, SENDING
 	};
-	SendMsgState() = default;
+	using Darknet7BaseState::Darknet7BaseState;
 	virtual ~SendMsgState() = default;
 	void setContactToMessage(const uint16_t radioID, const char *agentName);
 protected:
-	virtual cmdc0de::ErrorType onInit();
-	virtual cmdc0de::StateBase::ReturnStateContext onRun();
-	virtual cmdc0de::ErrorType onShutdown();
+	virtual cmdc0de::ErrorType onInit() override;
+	virtual Darknet7BaseState*  onRun() override;
+	virtual cmdc0de::ErrorType onShutdown() override;
 private:
 	uint16_t RadioID{ 0 };
 	const char* AgentName{ 0 };
-	char MsgBuffer[60];
+	char MsgBuffer[60]{ 0 };
 	INTERNAL_STATE InternalState{ TYPE_MESSAGE };
 
 };

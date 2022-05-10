@@ -9,23 +9,24 @@
 #define DARKNET_MENUS_BADGE_INFO_STATE_H_
 
 #include "darknet7_base_state.h"
+#include <libstm32/display/gui.h>
 
 class ContactStore;
 
 class BadgeInfoState: public Darknet7BaseState {
 public:
-	BadgeInfoState();
-	virtual ~BadgeInfoState();
+	using Darknet7BaseState::Darknet7BaseState;
+	virtual ~BadgeInfoState() = default;
 protected:
-	virtual cmdc0de::ErrorType onInit();
-	virtual cmdc0de::StateBase::ReturnStateContext onRun();
-	virtual cmdc0de::ErrorType onShutdown();
-	const char *getRegCode(ContactStore &cs);
+	virtual cmdc0de::ErrorType onInit() override;
+	virtual Darknet7BaseState*  onRun() override;
+	virtual cmdc0de::ErrorType onShutdown() override;
+	const char *getRegCode(ContactStore *cs);
 private:
-	cmdc0de::GUIListData BadgeInfoList;
-	cmdc0de::GUIListItemData Items[9];
-	char ListBuffer[9][32]; //height then width
-	char RegCode[18];
+	cmdc0de::GUIListItemData Items[9]{};
+	cmdc0de::GUIListData BadgeInfoList{ "Badge Info:", Items, 0, 0, cmdc0de::DISPLAY_WIDTH, cmdc0de::DISPLAY_HEIGHT, 0, sizeof(Items) / sizeof(Items[0]) };
+	char ListBuffer[9][32]{ 0 }; //height then width
+	char RegCode[18]{ 0 };
 };
 
 

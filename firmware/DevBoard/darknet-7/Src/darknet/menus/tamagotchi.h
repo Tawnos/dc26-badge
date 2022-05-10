@@ -14,11 +14,11 @@
 
 class Tamagotchi: public Darknet7BaseState {
 public:
-	Tamagotchi();
+	Tamagotchi(DarkNet7* darknet);
 	virtual ~Tamagotchi();
 protected:
 	virtual cmdc0de::ErrorType onInit();
-	virtual cmdc0de::StateBase::ReturnStateContext onRun();
+	virtual Darknet7BaseState*  onRun();
 	virtual cmdc0de::ErrorType onShutdown();
 private:
 

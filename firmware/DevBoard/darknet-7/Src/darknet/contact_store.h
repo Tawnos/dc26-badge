@@ -85,7 +85,7 @@ public:
     uint8_t startContactSector,
     uint8_t endContactSector
   ) : ContactStore(
-        SettingsInfo{ SectorToAddress(settingSector) + settingOffset, SectorToAddress(settingSector + 1) },
+        SettingsInfo{SectorToAddress(settingSector) + settingOffset, SectorToAddress(settingSector + 1) },
         MyInfo{SectorToAddress(myAddressInfoSector) + myAddressInfoOffset},
         startContactSector, 
         endContactSector

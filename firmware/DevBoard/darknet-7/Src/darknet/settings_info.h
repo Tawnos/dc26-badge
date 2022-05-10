@@ -1,4 +1,5 @@
 #pragma once
+#include "darknet7.h"
 #include "contact.h"
 #include "mcu_to_mcu.h"
 #include "messaging/stm_to_esp_generated.h"

@@ -30,7 +30,7 @@ struct WiFiInfo {
 
 class Scan: public Darknet7BaseState {
 public:
-	Scan();
+	Scan(DarkNet7* darknet);
 	virtual ~Scan();
 	void setNPCOnly(bool b) {NPCOnly = b;}
 	bool isNPCOnly() {return NPCOnly;}
@@ -38,7 +38,7 @@ public:
 	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::WiFiScanResults> *mevt);
 protected:
 	virtual cmdc0de::ErrorType onInit();
-	virtual cmdc0de::StateBase::ReturnStateContext onRun();
+	virtual Darknet7BaseState*  onRun();
 	virtual cmdc0de::ErrorType onShutdown();
 private:
 	bool NPCOnly;

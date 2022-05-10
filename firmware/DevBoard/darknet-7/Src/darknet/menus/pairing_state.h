@@ -4,6 +4,7 @@
 #include "darknet7_base_state.h"
 #include "../mcu_to_mcu.h"
 #include "../contact_store.h"
+#include <libstm32/display/gui.h>
 
 namespace darknet7 {
 	class ESPToSTM;
@@ -31,7 +32,7 @@ public:
 		uint8_t signature[48];
 	};
 public:
-	PairingState();
+	PairingState(DarkNet7* darknet);
 	virtual ~PairingState();
 	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BadgesInArea>* mevt);
 	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLESecurityConfirm>* mevt);
@@ -45,9 +46,9 @@ protected:
 							BOB_SEND_ONE, BOB_SEND_TWO,
 							RECEIVE_DATA,
 							PAIRING_SUCCESS, PAIRING_COMPLETE, PAIRING_FAILED };
-	virtual cmdc0de::ErrorType onInit();
-	virtual cmdc0de::StateBase::ReturnStateContext onRun();
-	virtual cmdc0de::ErrorType onShutdown();
+	virtual cmdc0de::ErrorType onInit() override;
+	virtual Darknet7BaseState*  onRun() override;
+	virtual cmdc0de::ErrorType onShutdown() override;
 	void CleanUp();
 private:
 	// Badge:Address list

@@ -9,17 +9,17 @@ public:
 public:
 
 public:
-	TestState();
-	virtual ~TestState();
+	using Darknet7BaseState::Darknet7BaseState;
+	virtual ~TestState() = default;
 protected:
 	virtual cmdc0de::ErrorType onInit();
-	virtual cmdc0de::StateBase::ReturnStateContext onRun();
+	virtual Darknet7BaseState*  onRun();
 	virtual cmdc0de::ErrorType onShutdown();
 private:
 	static const uint32_t EXIT_COUNT = 20;
-	cmdc0de::GUIListData ButtonList;
 	cmdc0de::GUIListItemData Items[8];
-	char ListBuffer[8][24]; //height then width
-	uint32_t TimesMidHasBeenHeld;
+	cmdc0de::GUIListData ButtonList{ "Button Info:", Items, 0, 0, cmdc0de::DISPLAY_WIDTH, cmdc0de::DISPLAY_HEIGHT, 0, sizeof(Items) / sizeof(Items[0])};
+	char ListBuffer[8][24]{ 0 }; //height then width
+	uint32_t TimesMidHasBeenHeld{ 0 };
 };
 #endif

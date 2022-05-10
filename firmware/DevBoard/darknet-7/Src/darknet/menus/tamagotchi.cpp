@@ -12,7 +12,7 @@
 
 using cmdc0de::RGBColor;
 using cmdc0de::ErrorType;
-using cmdc0de::StateBase;
+
 
 
 Tamagotchi::Tamagotchi() : Darknet7BaseState()  {
@@ -28,11 +28,11 @@ ErrorType Tamagotchi::onInit()
 		{
 	/*
 	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
-	sprintf(&ListBuffer[0][0], "Name: %s", DarkNet7::instance->getContacts().getSettings().getAgentName());
-	sprintf(&ListBuffer[1][0], "Num contacts: %u", DarkNet7::instance->getContacts().getSettings().getNumContacts());
+	sprintf(&ListBuffer[0][0], "Name: %s", DarkNet7::instance->getContacts()->getSettings().getAgentName());
+	sprintf(&ListBuffer[1][0], "Num contacts: %u", DarkNet7::instance->getContacts()->getSettings().getNumContacts());
 	sprintf(&ListBuffer[2][0], "REG: %s", getRegCode(DarkNet7::instance->getContacts()));
-	sprintf(&ListBuffer[3][0], "UID: %u", DarkNet7::instance->getContacts().getMyInfo().getUniqueID());
-	uint8_t *pCP = DarkNet7::instance->getContacts().getMyInfo().getCompressedPublicKey();
+	sprintf(&ListBuffer[3][0], "UID: %u", DarkNet7::instance->getContacts()->getMyInfo().getUniqueID());
+	uint8_t *pCP = DarkNet7::instance->getContacts()->getMyInfo().getCompressedPublicKey();
 	sprintf(&ListBuffer[4][0],
 			"PK: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
 			pCP[0], pCP[1], pCP[2], pCP[3], pCP[4], pCP[5], pCP[6], pCP[7], pCP[8], pCP[9], pCP[10], pCP[11],
@@ -49,16 +49,16 @@ ErrorType Tamagotchi::onInit()
 		Items[i].id = i;
 		Items[i].setShouldScroll();
 	}
-	DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
-	DarkNet7::instance->getGUI().drawList(&BadgeInfoList);
+	DarkNet7::instance->getDisplay()->fillScreen(RGBColor::BLACK);
+	DarkNet7::instance->getGUI()->drawList(&BadgeInfoList);
 	*/
 	return ErrorType();
 
 }
 
-StateBase::ReturnStateContext Tamagotchi::onRun() {
+Darknet7BaseState*  Tamagotchi::onRun() {
 
-	StateBase *nextState = this;
+	Darknet7BaseState* nextState = this;
 	/*
 	uint8_t key = rc.getKB().getLastKeyReleased();
 	switch (key) {
@@ -85,10 +85,10 @@ StateBase::ReturnStateContext Tamagotchi::onRun() {
 	}
 	if (rc.getKB().wasKeyReleased()
 			|| (Items[BadgeInfoList.selectedItem].shouldScroll() && getTimesRunCalledSinceLastReset() % 5 == 0)) {
-		rc.getGUI().drawList(&BadgeInfoList);
+		rc.getGUI()->drawList(&BadgeInfoList);
 	}
 	*/
-	return ReturnStateContext(nextState);
+	return Darknet7BaseState* (nextState);
 }
 
 ErrorType Tamagotchi::onShutdown()

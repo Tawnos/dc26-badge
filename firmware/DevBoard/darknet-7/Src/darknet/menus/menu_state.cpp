@@ -19,26 +19,15 @@
 #include "../mcu_to_mcu.h"
 #include "../messaging/stm_to_esp_generated.h"
 #include "../messaging/esp_to_stm_generated.h"
+#include <libstm32/rgbcolor.h>
 
 using cmdc0de::ErrorType;
-using cmdc0de::StateBase;
+
 using cmdc0de::RGBColor;
-
-MenuState::MenuState() :
-		Darknet7BaseState(), MenuList("Main Menu", Items, 0, 0, cmdc0de::DISPLAY_WIDTH,
-				cmdc0de::DISPLAY_HEIGHT
-				, 0, (sizeof(Items) / sizeof(Items[0])))
-{
-}
-
-MenuState::~MenuState() {
-
-}
-
 
 ErrorType MenuState::onInit() {
 	Items[0].id = 0;
-	if (DarkNet7::instance->getContacts().getSettings().isNameSet()) {
+	if (darknet->getContacts()->getSettings().isNameSet()) {
 		Items[0].text = (const char *) "Settings";
 	} else {
 		Items[0].text = (const char *) "Settings *";
@@ -65,72 +54,73 @@ ErrorType MenuState::onInit() {
 	Items[10].text = (const char *) "Test Badge";
 	Items[11].id = 11;
 	Items[11].text = (const char *) "Scan: Shitty Addon Badge";
-	DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
-	DarkNet7::instance->getGUI().drawList(&this->MenuList);
+	darknet->getDisplay()->fillScreen(RGBColor::BLACK);
+	darknet->getGUI()->drawList(&this->MenuList);
 	return ErrorType();
 }
 
-cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
-	StateBase *nextState = this;
-	if (!GUIListProcessor::process(&MenuList,(sizeof(Items) / sizeof(Items[0]))))
+Darknet7BaseState*  MenuState::onRun() {
+	Darknet7BaseState *nextState = this;
+	auto buttonInfo = darknet->getButtonInfo();
+	if (!GUIListProcessor::process(buttonInfo, &MenuList,(sizeof(Items) / sizeof(Items[0]))))
 	{
-		if (DarkNet7::instance->getButtonInfo().wereAnyOfTheseButtonsReleased(ButtonPress::Fire))
+		if (buttonInfo->wereAnyOfTheseButtonsReleased(ButtonPress::Fire))
 		{
 			switch (MenuList.selectedItem)
 			{
 				case 0:
-					nextState = DarkNet7::instance->getSettingState();
+					nextState = darknet->getSettingState();
 					break;
 				case 1:
-					if (DarkNet7::instance->getContacts().getSettings().getAgentName()[0] != '\0') {
-						//nextState = DarkNet7::instance->getPairingState();
+					if (darknet->getContacts()->getSettings().getAgentName()[0] != '\0') {
+						//nextState = darknet->getPairingState();
 					} else {
-						nextState = DarkNet7::instance->getDisplayMessageState(DarkNet7::instance->getDisplayMenuState(),
+						nextState = darknet->getDisplayMessageState(darknet->getDisplayMenuState(),
 								(const char *) "You must set your agent name first", 3000);
 					}
 					break;
 				case 2:
-					nextState = DarkNet7::instance->getAddressBookState();
+					nextState = darknet->getAddressBookState();
 					break;
 				case 4:
-					nextState = DarkNet7::instance->getGameOfLifeState();
+					nextState = darknet->getGameOfLifeState();
 					break;
 				case 5:
-					nextState = DarkNet7::instance->getBadgeInfoState();
+					nextState = darknet->getBadgeInfoState();
 					break;
 				case 7:
-					nextState = DarkNet7::instance->getCommunicationSettingState();
+					nextState = darknet->getCommunicationSettingState();
 					break;
 				case 8:
-					nextState = DarkNet7::instance->getHealthState();
+					nextState = darknet->getHealthState();
 					break;
 #if !defined VIRTUAL_DEVICE
 				case 3:
-					nextState = DarkNet7::instance->get3DState();
+					nextState = darknet->get3DState();
 					break;
 				case 6:
-					nextState = DarkNet7::instance->getMCUInfoState();
+					nextState = darknet->getMCUInfoState();
 					break;
 				case 9:
-					DarkNet7::instance->getScanState()->setNPCOnly(true);
-					nextState = DarkNet7::instance->getScanState();
+					darknet->getScanState()->setNPCOnly(true);
+					nextState = darknet->getScanState();
 					break;
 				case 10:
-					nextState = DarkNet7::instance->getTestState();
+					nextState = darknet->getTestState();
 					break;
 				case 11:
-					nextState = DarkNet7::instance->getSAOMenuState();
+					nextState = darknet->getSAOMenuState();
 					break;
 #endif
 			}
 		}
 	}
 
-	if (DarkNet7::instance->getButtonInfo().wasAnyButtonReleased()) {
-		DarkNet7::instance->getGUI().drawList(&this->MenuList);
+	if (buttonInfo->wasAnyButtonReleased()) {
+		darknet->getGUI()->drawList(&this->MenuList);
 	}
 
-	return StateBase::ReturnStateContext(nextState);
+	return nextState;
 }
 
 ErrorType MenuState::onShutdown() {

@@ -6,21 +6,8 @@
 
 using cmdc0de::ErrorType;
 using cmdc0de::RGBColor;
-using cmdc0de::StateBase;
 
 ////////////////////////////////////////////////
-AddressState::AddressState() :
-		Darknet7BaseState(), AddressList((const char *) "Address Book", Items, 0, 0, cmdc0de::DISPLAY_WIDTH, cmdc0de::DISPLAY_HEIGHT, 0,
-				sizeof(Items) / sizeof(Items[0])), CurrentContactList(), ContactDetails(
-				(const char *) "Contact Details: ", DetailItems, 0, 0, cmdc0de::DISPLAY_WIDTH, cmdc0de::DISPLAY_HEIGHT/2, 0,
-				sizeof(DetailItems) / sizeof(DetailItems[0])), Index(0), DisplayList(0) {
-
-}
-
-AddressState::~AddressState() {
-
-}
-
 ErrorType AddressState::onInit() {
 	setNext4Items(0);
 	for (uint16_t i = 0; i < sizeof(DetailItems) / sizeof(DetailItems[0]); ++i) {
@@ -30,9 +17,9 @@ ErrorType AddressState::onInit() {
 	memset(&RadioIDBuf[0], 0, sizeof(RadioIDBuf));
 	memset(&PublicKey[0], 0, sizeof(PublicKey));
 	memset(&SignatureKey[0], 0, sizeof(SignatureKey));
-	DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
+	darknet->getDisplay()->fillScreen(RGBColor::BLACK);
 	DisplayList = &AddressList;
-	DarkNet7::instance->getGUI().drawList(DisplayList);
+	darknet->getGUI()->drawList(DisplayList);
 	Index = 0;
 	return ErrorType();
 }
@@ -42,10 +29,10 @@ void AddressState::resetSelection() {
 }
 
 void AddressState::setNext4Items(uint16_t startAt) {
-	uint8_t num = DarkNet7::instance->getContacts().getSettings().getNumContacts();
+	uint8_t num = darknet->getContacts()->getSettings().getNumContacts();
 	for (uint16_t i = startAt, j = 0; j < (4); i++, j++) {
 		if (i < num) {
-			if (DarkNet7::instance->getContacts().getContactAt(i, CurrentContactList[j])) {
+			if (darknet->getContacts()->getContactAt(i, CurrentContactList[j])) {
 				Items[j].id = CurrentContactList[j].getUniqueID();
 				Items[j].text = CurrentContactList[j].getAgentName();
 			}
@@ -56,11 +43,11 @@ void AddressState::setNext4Items(uint16_t startAt) {
 	}
 }
 
-StateBase::ReturnStateContext AddressState::onRun() {
-	StateBase *nextState = this;
-	auto buttonInfo = DarkNet7::instance->getButtonInfo();
+Darknet7BaseState*  AddressState::onRun() {
+	Darknet7BaseState *nextState = this;
+	auto buttonInfo = darknet->getButtonInfo();
 	if (DetailItems[0].id == 0) {
-		if(buttonInfo.wereTheseButtonsReleased(ButtonPress::Up)) {
+		if(buttonInfo->wereTheseButtonsReleased(ButtonPress::Up)) {
 			if (AddressList.selectedItem == 0) {
 				//keep selection at 0 but load new values
 				int16_t startAt = Index - 4;
@@ -76,8 +63,8 @@ StateBase::ReturnStateContext AddressState::onRun() {
 				AddressList.selectedItem--;
 				Index--;
 			}
-		} else if (buttonInfo.wereTheseButtonsReleased(ButtonPress::Down)) {
-			uint16_t num = DarkNet7::instance->getContacts().getSettings().getNumContacts();
+		} else if (buttonInfo->wereTheseButtonsReleased(ButtonPress::Down)) {
+			uint16_t num = darknet->getContacts()->getSettings().getNumContacts();
 			if (Index < num) {
 				if (AddressList.selectedItem == (sizeof(Items) / sizeof(Items[0]) - 1)) {
 					if (num > Index + 4) {
@@ -92,9 +79,9 @@ StateBase::ReturnStateContext AddressState::onRun() {
 					Index++;
 				}
 			}
-		} else if(buttonInfo.wereTheseButtonsReleased(ButtonPress::Mid)) {
-			nextState = DarkNet7::instance->getDisplayMenuState();
-		} else if (buttonInfo.wereTheseButtonsReleased(ButtonPress::Fire)) {
+		} else if(buttonInfo->wereTheseButtonsReleased(ButtonPress::Mid)) {
+			nextState = darknet->getDisplayMenuState();
+		} else if (buttonInfo->wereTheseButtonsReleased(ButtonPress::Fire)) {
 			if (Items[AddressList.selectedItem].id != 0) {
 				DisplayList = &ContactDetails;
 				DetailItems[0].id = 1;
@@ -127,16 +114,16 @@ StateBase::ReturnStateContext AddressState::onRun() {
 			}
 		}
 	} else {
-		if(!GUIListProcessor::process(DisplayList,DisplayList->ItemsCount)) {
-			if(buttonInfo.wereTheseButtonsReleased(ButtonPress::Mid)) {
+		if(!GUIListProcessor::process(buttonInfo, DisplayList,DisplayList->ItemsCount)) {
+			if(buttonInfo->wereTheseButtonsReleased(ButtonPress::Mid)) {
 				DetailItems[0].id = 0;
-				DarkNet7::instance->getDisplay().fillScreen(RGBColor::BLACK);
+				darknet->getDisplay()->fillScreen(RGBColor::BLACK);
 				DisplayList = &AddressList;
 			}
 		}
 	}
-	DarkNet7::instance->getGUI().drawList(DisplayList);
-	return ReturnStateContext(nextState);
+	darknet->getGUI()->drawList(DisplayList);
+	return nextState;
 }
 
 ErrorType AddressState::onShutdown() {

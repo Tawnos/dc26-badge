@@ -76,11 +76,11 @@ ErrorType DarkNet7::onInit() {
 
 #if 0
 	Display.fillScreen(cmdc0de::RGBColor::BLACK);
-	getDisplay().drawImage(getLogo1());
+	getDisplay()->drawImage(getLogo1());
 	Display.swap();
 	HAL_Delay(1000);
 	Display.fillScreen(cmdc0de::RGBColor::BLACK);
-	getDisplay().drawImage(getLogo2());
+	getDisplay()->drawImage(getLogo2());
 	Display.swap();
 	HAL_Delay(2000);
 #endif
@@ -153,7 +153,7 @@ ErrorType DarkNet7::onRun() {
 	}
 	DarkNet7::instance->getMcuToMcu().process();
 
-	cmdc0de::StateBase::ReturnStateContext rsc = getCurrentState()->run();
+	Darknet7BaseState*  rsc = getCurrentState()->run();
 	Display.swap();
 	//handleLEDS();
 
@@ -165,7 +165,7 @@ ErrorType DarkNet7::onRun() {
 		}
 		else {
 			if (getCurrentState() != DarkNet7::instance->getGameOfLifeState()
-				&& (HAL_GetTick() - MyButtons.lastTickButtonPushed()) > (DarkNet7::instance->getContacts().getSettings().getScreenSaverTime() * 1000 * 60)) {
+				&& (HAL_GetTick() - MyButtons.lastTickButtonPushed()) > (DarkNet7::instance->getContacts()->getSettings().getScreenSaverTime() * 1000 * 60)) {
 				setCurrentState(DarkNet7::instance->getGameOfLifeState());
 			}
 		}

@@ -54,8 +54,8 @@ set (SOURCEFILES
     libstm32/app/app.cpp
     libstm32/app/display_message_state.cpp
     libstm32/app/display_message_state.h
-    libstm32/app/state_base.cpp
-    libstm32/app/state_base.h
+    #libstm32/app/state_base.cpp
+    #libstm32/app/state_base.h
 
     libstm32/display/DrawBuffer2D16BitColor.cpp
     libstm32/display/DrawBuffer2D16BitColor.h
@@ -89,6 +89,8 @@ set (SOURCEFILES
     menus/badge_info_state.h       
     menus/communications_settings.cpp
     menus/communications_settings.h
+    menus/darknet7_base_state.h
+    menus/darknet7_base_state.cpp
     menus/GameOfLife.h             
     menus/GameOfLife.cpp             
     menus/gui_list_processor.cpp     

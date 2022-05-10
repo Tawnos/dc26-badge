@@ -16,7 +16,7 @@
 
 using cmdc0de::RGBColor;
 using cmdc0de::ErrorType;
-using cmdc0de::StateBase;
+
 
 
 class EggPlant: public Darknet7BaseState {
@@ -130,7 +130,7 @@ protected:
 				value<<=1; //fix off by one bug in eggplant
 				if(((value&ContactStore::SettingsInfo::CHLAMYDIA)==ContactStore::SettingsInfo::CHLAMYDIA) || ((value&ContactStore::SettingsInfo::HERPES)==ContactStore::SettingsInfo::HERPES)
 						|| ((value&BOTH)==BOTH)) {
-					DarkNet7::get().getContacts().getSettings().setHealth(value);
+					DarkNet7::get().getContacts()->getSettings().setHealth(value);
 				}
 			}
 			//HAL_I2C_Master_Receive(&hi2c3,getAddress(),&crap[0],sizeof(crap),500);
@@ -155,9 +155,9 @@ protected:
 		return ErrorType();
 	}
 
-	virtual cmdc0de::StateBase::ReturnStateContext onRun() {
-		StateBase *nextState = this;
-		DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+	virtual Darknet7BaseState*  onRun() {
+		Darknet7BaseState* nextState = this;
+		DarkNet7::get().getDisplay()->fillScreen(RGBColor::BLACK);
 		switch(InternalState) {
 		case INITIAL:
 			memset(&NewEggPlantName[0],0,sizeof(NewEggPlantName));
@@ -178,9 +178,9 @@ protected:
 			break;
 		case DISPLAY_DATA:
 			if(!GUIListProcessor::process(&EggList,EggList.ItemsCount)) {
-				if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+				if (DarkNet7::get().getButtonInfo()->wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
 					nextState = DarkNet7::get().getDisplayMenuState();
-				} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+				} else if (DarkNet7::get().getButtonInfo()->wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
 					switch(EggList.selectedItem) {
 					case 4:
 						InternalState = INTERACT_SET_NAME;
@@ -197,12 +197,12 @@ protected:
 			break;
 		case INTERACT_SET_LED: {
 				sprintf(&ListBuffer[5][0], "LED Mode : %d", (int)LedMode);
-				if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_UP)) {
+				if (DarkNet7::get().getButtonInfo()->wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_UP)) {
 					LedMode = ++LedMode%7;
-				} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_DOWN)) {
+				} else if (DarkNet7::get().getButtonInfo()->wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_DOWN)) {
 					if(LedMode==0) {LedMode=6;}
 					else {--LedMode;}
-				} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+				} else if (DarkNet7::get().getButtonInfo()->wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
 					uint8_t command[3] = {0x0, 0x3, 0x0};
 					command[2] = LedMode;
 					uint8_t readBuf[33] = {0};
@@ -222,7 +222,7 @@ protected:
 		case INTERACT_SET_NAME:
 			sprintf(&ListBuffer[4][0], "Name     : %s", &NewEggPlantName[0]);
 			VKB.process();
-			if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+			if (DarkNet7::get().getButtonInfo()->wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
 				uint8_t command[sizeof(NewEggPlantName)+3] = {0x0, 0x1, 0x3};
 				memcpy(&command[3], &NewEggPlantName[0],sizeof(NewEggPlantName)-1);
 				uint8_t readBuf[33] = {0};
@@ -241,9 +241,9 @@ protected:
 		default:
 			break;
 		}
-		DarkNet7::get().getGUI().drawList(&EggList);
+		DarkNet7::get().getGUI()->drawList(&EggList);
 
-		return ReturnStateContext(nextState);
+		return Darknet7BaseState* (nextState);
 	}
 
 	virtual cmdc0de::ErrorType onShutdown() {
@@ -263,16 +263,16 @@ SAO::~SAO()
 }
 
 ErrorType SAO::onInit() {
-	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+	DarkNet7::get().getDisplay()->fillScreen(RGBColor::BLACK);
 	InternalState = DISPLAY_SCANNING;
 	Address = NOADDRESS;
 	return ErrorType();
 }
 
-StateBase::ReturnStateContext SAO::onRun() {
-	StateBase *nextState = this;
+Darknet7BaseState*  SAO::onRun() {
+	Darknet7BaseState* nextState = this;
 	if(InternalState==DISPLAY_SCANNING) {
-		DarkNet7::get().getDisplay().drawString(0,20,(const char *)"Starting I2C scan");
+		DarkNet7::get().getDisplay()->drawString(0,20,(const char *)"Starting I2C scan");
 		InternalState = SCANNING;
 	} else if(InternalState==SCANNING) {
 		HAL_StatusTypeDef result;
@@ -291,26 +291,26 @@ StateBase::ReturnStateContext SAO::onRun() {
 		}
 		InternalState = INTERACTING;
 	} else {
-		DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+		DarkNet7::get().getDisplay()->fillScreen(RGBColor::BLACK);
 		if(Address==NOADDRESS) {
-			DarkNet7::get().getDisplay().drawString(0,20,(const char *)"No Shitty Add on\nBadge found!",RGBColor::RED, RGBColor::BLACK, 1, true);
+			DarkNet7::get().getDisplay()->drawString(0,20,(const char *)"No Shitty Add on\nBadge found!",RGBColor::RED, RGBColor::BLACK, 1, true);
 		} else {
 			char buf[24];
-			DarkNet7::get().getDisplay().drawString(0,20,(const char *)"Shitty Add on Badge found!", RGBColor::BLUE, RGBColor::BLACK, 1, true);
+			DarkNet7::get().getDisplay()->drawString(0,20,(const char *)"Shitty Add on Badge found!", RGBColor::BLUE, RGBColor::BLACK, 1, true);
 			sprintf(&buf[0],"Address: 0x%.2x", (int)Address);
-			DarkNet7::get().getDisplay().drawString(0,30,&buf[0]);
+			DarkNet7::get().getDisplay()->drawString(0,30,&buf[0]);
 			if(Address==0x36) { //its an egg plant!
 				EggPlantSAO.setAddress(Address);
 				nextState = &EggPlantSAO;
 			} else {
-				DarkNet7::get().getDisplay().drawString(0,50,(const char *)"But not sure what\nelse I can do...", RGBColor::BLUE, RGBColor::BLACK, 1, true);
+				DarkNet7::get().getDisplay()->drawString(0,50,(const char *)"But not sure what\nelse I can do...", RGBColor::BLUE, RGBColor::BLACK, 1, true);
 			}
 		}
-		if(DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+		if(DarkNet7::get().getButtonInfo()->wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
 			nextState =DarkNet7::get().getDisplayMenuState();
 		}
 	}
-	return ReturnStateContext(nextState);
+	return Darknet7BaseState* (nextState);
 }
 
 ErrorType SAO::onShutdown()

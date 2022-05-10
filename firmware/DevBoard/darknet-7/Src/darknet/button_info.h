@@ -4,7 +4,7 @@
 #define BUTTON_INFO_H_
 
 #include <type_traits>
-#include <libstm32/app/app.h>
+extern uint32_t HAL_GetTick();
 
 enum class ButtonPress : uint8_t
 {

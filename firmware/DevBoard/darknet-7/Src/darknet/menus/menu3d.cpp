@@ -170,20 +170,20 @@ cmdc0de::ErrorType Menu3D::onInit() {
 }
 
 void Menu3D::initMenu3d() {
-	CanvasHeight = DarkNet7::get().getDisplay().getHeight()-20;
-	CanvasWidth = DarkNet7::get().getDisplay().getWidth()-60;
+	CanvasHeight = DarkNet7::get().getDisplay()->getHeight()-20;
+	CanvasWidth = DarkNet7::get().getDisplay()->getWidth()-60;
 	lookat(eye, center, up);
 	viewport((CanvasWidth / 8)+10, (CanvasHeight / 8), CanvasWidth * 0.75, CanvasHeight * 0.75);
 	//viewport(18, 13, 82, 90);
 	projection(-1.f / (eye - center).norm());
 	light_dir.normalize();
 	//model.scale(.5);
-	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+	DarkNet7::get().getDisplay()->fillScreen(RGBColor::BLACK);
 }
 
-cmdc0de::StateBase::ReturnStateContext Menu3D::onRun() {
-	cmdc0de::StateBase::ReturnStateContext sr(this);
-	if(DarkNet7::get().getButtonInfo().wasAnyButtonReleased()) {
+Darknet7BaseState*  Menu3D::onRun() {
+	Darknet7BaseState*  sr(this);
+	if(DarkNet7::get().getButtonInfo()->wasAnyButtonReleased()) {
 		sr.NextMenuToRun = DarkNet7::get().getDisplayMenuState();
 	}
 
@@ -234,17 +234,17 @@ void Menu3D::line(int x0, int y0, int x1, int y1, RGBColor& color) {
 		int y = y0 * (1. - t) + y1 * t;
 		if (x >= 0 && x < CanvasWidth && y >= 0 && y < CanvasHeight) {
 			if (steep) {
-				DarkNet7::get().getDisplay().drawPixel(y, x, color);
+				DarkNet7::get().getDisplay()->drawPixel(y, x, color);
 			} else {
-				DarkNet7::get().getDisplay().drawPixel(x, y, color);
+				DarkNet7::get().getDisplay()->drawPixel(x, y, color);
 			}
 		}
 	}
 }
 
 void Menu3D::render() {
-	DarkNet7::get().getDisplay().fillRec(0, 0, 128, CanvasHeight, RGBColor::BLACK);
-	//rc.getDisplay().fillRec(0, 0, rc.getDisplay().getWidth(), rc.getDisplay().getHeight(), RGBColor::BLACK);
+	DarkNet7::get().getDisplay()->fillRec(0, 0, 128, CanvasHeight, RGBColor::BLACK);
+	//rc.getDisplay()->fillRec(0, 0, rc.getDisplay()->getWidth(), rc.getDisplay()->getHeight(), RGBColor::BLACK);
 
 	RGBColor c = RGBColor::WHITE;
 	FlatShader shader;
@@ -261,7 +261,7 @@ void Menu3D::render() {
 	if (HAL_GetTick() - renderTime > 1000) {
 		char buf[24];
 		sprintf(&buf[0], "FPS: %lu:%lu", count, total_frames);
-		DarkNet7::get().getDisplay().drawString(0, 110, &buf[0]);
+		DarkNet7::get().getDisplay()->drawString(0, 110, &buf[0]);
 		count = 0;
 		renderTime = HAL_GetTick();
 	}

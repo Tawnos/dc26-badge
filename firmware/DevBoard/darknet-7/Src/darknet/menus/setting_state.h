@@ -9,37 +9,27 @@
 #define DARKNET_MENUS_SETTING_STATE_H_
 
 #include "darknet7_base_state.h"
-#include "../contact_store.h"
-#include "../virtual_key_board.h"
+#include "contact.h"
+#include <libstm32/display/gui.h>
+#include <error_type.h>
+#include <stdint.h>
 
-class SettingState : public Darknet7BaseState {
+class SettingState : public Darknet7BaseState
+{
 public:
-
-  SettingState() : Darknet7BaseState()
-  {
-    memset(&AgentName[0], 0, sizeof(AgentName));
-    Items[0].id = 0;
-    Items[0].text = (const char*)"Set Agent Name";
-    Items[1].id = 1;
-    Items[1].text = (const char*)"Screen Saver Time";
-    Items[1].setShouldScroll();
-    Items[2].id = 2;
-    Items[2].text = (const char*)"Reset Badge Contacts";
-    Items[2].setShouldScroll();
-  }
-  virtual ~SettingState() = default;
+   using Darknet7BaseState::Darknet7BaseState;
+   virtual ~SettingState() = default;
 protected:
-  virtual cmdc0de::ErrorType onInit();
-  virtual cmdc0de::StateBase::ReturnStateContext onRun();
-  virtual cmdc0de::ErrorType onShutdown();
+   virtual cmdc0de::ErrorType onInit() override;
+   virtual Darknet7BaseState* onRun() override;
+   virtual cmdc0de::ErrorType onShutdown() override;
 private:
-  cmdc0de::GUIListData SettingList{ (const char*)"MENU", Items, 0, 0, cmdc0de::DISPLAY_WIDTH, cmdc0de::DISPLAY_HEIGHT, 0, sizeof(Items) / sizeof(Items[0]) };
-  cmdc0de::GUIListItemData Items[3];
-  char AgentName[AGENT_NAME_LENGTH];
-  uint8_t SubState{ 0 };
-  uint8_t MiscCounter{ 0 };
-  VirtualKeyBoard VKB{};
-  VirtualKeyBoard::InputHandleContext IHC{ &AgentName[0], sizeof(AgentName) };
+   cmdc0de::GUIListItemData Items[3]{ {0,"Set Agent Name"},{1, "Screen Saver Time"},{2, "Reset Badge Contacts"} };
+   cmdc0de::GUIListData SettingList{ "MENU", Items, 0, 0, cmdc0de::DISPLAY_WIDTH, cmdc0de::DISPLAY_HEIGHT, 0, sizeof(Items) / sizeof(Items[0]) };
+   char AgentName[AGENT_NAME_LENGTH]{ 0 };
+   uint8_t SubState{ 0 };
+   uint8_t MiscCounter{ 0 };
+   VirtualKeyBoard::InputHandleContext IHC{ &AgentName[0], sizeof(AgentName) };
 };
 
 

@@ -15,12 +15,12 @@ namespace cmdc0de {
 
 class Menu3D : public Darknet7BaseState {
 public:
-	Menu3D();
+	Menu3D(DarkNet7* darknet);
 	virtual ~Menu3D();
 public:
 protected:
 	virtual cmdc0de::ErrorType onInit();
-	virtual cmdc0de::StateBase::ReturnStateContext onRun();
+	virtual Darknet7BaseState*  onRun();
 	virtual cmdc0de::ErrorType onShutdown();
 	void initMenu3d();
 	void update();

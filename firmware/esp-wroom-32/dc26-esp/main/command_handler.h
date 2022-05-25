@@ -16,13 +16,13 @@ public:
 public:
 	CmdHandlerTask(const std::string &tName, uint16_t stackSize=4196, uint8_t p=5);
 	bool init();
-	QueueHandle_t getQueueHandle() {return InCommingQueueHandle;}
+	QueueHandle_t getQueueHandle() {return IncomingQueueHandle;}
 public:
 	virtual void run(void *data);
 	virtual ~CmdHandlerTask();
 	virtual void onStop();
 protected:
-	QueueHandle_t InCommingQueueHandle = nullptr;
+	QueueHandle_t IncomingQueueHandle = nullptr;
 	WiFi wifi;
 private:
 };

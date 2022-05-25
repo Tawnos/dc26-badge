@@ -1,21 +1,24 @@
 
-#include "esp_system.h"
-#include "esp_log.h"
-#include "driver/uart.h"
-#include "driver/gpio.h"
-#include "soc/uart_struct.h"
-#include "string.h"
-#include "lib/System.h"
+#include <esp_system.h>
+#include <esp_log.h>
+#include <driver/uart.h>
+#include <driver/gpio.h>
+#include <soc/uart_struct.h>
+#include <nvs_flash.h>
+#include <string>
 #include "stm_to_esp_generated.h"
 #include "esp_to_stm_generated.h"
-#include "lib/FATFS_VFS.h"
+#include "lib/System.h"
+#include "lib/ssd1306.h"
 #include "mcu_to_mcu.h"
 #include "command_handler.h"
 #include "display_handler.h"
-#include "lib/ssd1306.h"
-#include <nvs_flash.h>
 
 #include "dc26_ble/ble.h"
+
+#if defined USE_FATFS
+#include "lib/FATFS_VFS.h"
+#endif
 
 static const int RX_BUF_SIZE = 1024;
 #define TXD_PIN (GPIO_NUM_4)
@@ -26,7 +29,9 @@ extern "C" {
 		static void generalCmdTask(void *);
 }
 
+#if defined USE_FATFS
 FATFS_VFS *FatFS = new FATFS_VFS("/spiflash", "storage");
+#endif
 static xQueueHandle gpio_evt_queue = NULL;
 CmdHandlerTask CmdTask("CmdTask");
 BluetoothTask BTTask("BluetoothTask");

@@ -58,7 +58,7 @@ bool NPCInteractionTask::init() {
 	InQueueHandle = xQueueCreateStatic(NPCMSG_QUEUE_SIZE, NPCMSG_ITEM_SIZE, 
 						 &CommandBuffer[0], &InQueue);
 	if (InQueueHandle == nullptr) {
-		ESP_LOGI(LOGTAG, "Failed creating incomming queue");
+		ESP_LOGI(LOGTAG, "Failed creating incoming queue");
 	}
 	return true;
 }

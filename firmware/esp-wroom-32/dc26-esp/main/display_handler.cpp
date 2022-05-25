@@ -6,14 +6,14 @@
 #include "dc26.h"
 
 const char *DisplayTask::LOGTAG = "DisplayTask";
-static StaticQueue_t InCommingQueue;
+static StaticQueue_t IncomingQueue;
 static uint8_t CommandBuffer[DisplayTask::DISPLAY_QUEUE_SIZE 
 	* DisplayTask::DISPLAY_MSG_ITEM_SIZE] = { 0 };
 
 ESP32_I2CMaster I2cDisplay(GPIO_NUM_19,GPIO_NUM_18,1000000, I2C_NUM_0, 0, 32);
 
 DisplayTask::DisplayTask(const std::string &tName, uint16_t stackSize, uint8_t p) :
-		Task(tName, stackSize, p), InCommingQueueHandle(nullptr) {
+		Task(tName, stackSize, p), IncomingQueueHandle(nullptr) {
 
 }
 
@@ -26,10 +26,10 @@ bool DisplayTask::init() {
 	} else {
 		ESP_LOGI(LOGTAG,"display init UN-successful");
 	}
-	InCommingQueueHandle = xQueueCreateStatic(DISPLAY_QUEUE_SIZE,
-			DISPLAY_MSG_ITEM_SIZE, &CommandBuffer[0], &InCommingQueue);
-	if (InCommingQueueHandle == nullptr) {
-		ESP_LOGI(LOGTAG, "Failed creating incomming queue");
+	IncomingQueueHandle = xQueueCreateStatic(DISPLAY_QUEUE_SIZE,
+			DISPLAY_MSG_ITEM_SIZE, &CommandBuffer[0], &IncomingQueue);
+	if (IncomingQueueHandle == nullptr) {
+		ESP_LOGI(LOGTAG, "Failed creating incoming queue");
 	}
 	return true;
 }

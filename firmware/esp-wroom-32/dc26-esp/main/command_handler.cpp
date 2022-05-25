@@ -131,22 +131,22 @@ private:
 
 
 const char *CmdHandlerTask::LOGTAG = "CmdHandlerTask";
-static StaticQueue_t InCommingQueue;
+static StaticQueue_t IncomingQueue;
 static uint8_t CommandBuffer[CmdHandlerTask::STM_TO_ESP_MSG_QUEUE_SIZE
 		* CmdHandlerTask::STM_TO_ESP_MSG_ITEM_SIZE] = { 0 };
 
 CmdHandlerTask::CmdHandlerTask(const std::string &tName, uint16_t stackSize,
 		uint8_t p) :
-		Task(tName, stackSize, p), InCommingQueueHandle(nullptr) {
+		Task(tName, stackSize, p), IncomingQueueHandle(nullptr) {
 
 }
 
 bool CmdHandlerTask::init() {
 	ESP_LOGI(LOGTAG, "INIT");
-	InCommingQueueHandle = xQueueCreateStatic(STM_TO_ESP_MSG_QUEUE_SIZE,
-			STM_TO_ESP_MSG_ITEM_SIZE, &CommandBuffer[0], &InCommingQueue);
-	if (InCommingQueueHandle == nullptr) {
-		ESP_LOGI(LOGTAG, "Failed creating incomming queue");
+	IncomingQueueHandle = xQueueCreateStatic(STM_TO_ESP_MSG_QUEUE_SIZE,
+			STM_TO_ESP_MSG_ITEM_SIZE, &CommandBuffer[0], &IncomingQueue);
+	if (IncomingQueueHandle == nullptr) {
+		ESP_LOGI(LOGTAG, "Failed creating incoming queue");
 	}
 	if(NPCITask.init()) {
 		NPCITask.start();

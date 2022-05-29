@@ -1,11 +1,12 @@
 #ifndef MCU_TO_MCU_H
 #define MCU_TO_MCU_H
 
-#include "esp_system.h"
-#include "esp_log.h"
-#include "driver/uart.h"
-#include "lib/Task.h"
-
+//#include "esp_system.h"
+//#include "esp_log.h"
+//#include "driver/uart.h"
+//#include "lib/Task.h"
+#include <stdint.h>
+#include <string>
 
 namespace darknet7 {
 	class STMToESPRequest;
@@ -17,7 +18,7 @@ namespace flatbuffers {
 }
 
 class CmdHandlerTask;
-
+class Task {};
 
 class MCUToMCUTask : public Task {
 public:
@@ -57,7 +58,7 @@ public:
 	static const char *LOGTAG;
 public:
 	MCUToMCUTask(CmdHandlerTask *pch, const std::string &tName, uint16_t stackSize=6000, uint8_t p=5);
-	bool init(gpio_num_t tx, gpio_num_t rx, uint16_t rxBufSize);
+	bool init(uint8_t tx, uint8_t rx, uint16_t rxBufSize);
 	int32_t processMessage(const uint8_t *data, uint32_t size);
 	//uint16_t getBufferSize() {return BufSize;}
 	void send(const flatbuffers::FlatBufferBuilder &fbb);

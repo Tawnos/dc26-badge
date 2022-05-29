@@ -1,47 +1,60 @@
 #ifndef DARKNET7_NPC_INTERACT
 #define DARKNET7_NPC_INTERACT
 
-#include "esp_system.h"
-#include "esp_log.h"
-#include "lib/Task.h"
-#include "freertos/queue.h"
+//#include "esp_system.h"
+//#include "esp_log.h"
+//#include "lib/Task.h"
+//#include "freertos/queue.h"
 #include "mcu_to_mcu.h"
-#include <string.h>
+#include <stdint.h>
+#include <string>
+#include <queue>
+
+typedef void* QueueHandle_t;
+
+struct NPCMsg
+{
+	enum class NPCRequestType { None, Hello, Interact };
+	NPCRequestType RType{ NPCRequestType::None };
+	uint32_t MsgID{ 0 };
+	char NpcName[32]{ 0 };
+	char Action[32]{ 0 };
+
+	NPCMsg(const NPCRequestType& r, uint32_t msgID) : RType(r), MsgID(msgID) {}
+	NPCMsg(const NPCRequestType& r, uint32_t msgID, const char* name, const char* action)
+		: RType(r), MsgID(msgID)
+	{
+		if (name)
+		{
+			strcpy(&NpcName[0], name);
+		}
+		else
+		{
+			memset(&NpcName[0], 0, sizeof(NpcName));
+		}
+		if (action)
+		{
+			strcpy(&Action[0], action);
+		}
+		else
+		{
+			memset(&Action[0], 0, sizeof(Action));
+		}
+	}
+};
 
 class NPCInteractionTask : public Task {
 public:
-	struct NPCMsg {
-		enum REQUEST_TYPE { NONE, HELO, INTERACT };
-		REQUEST_TYPE RType;
-		uint32_t MsgID;
-		char NpcName[32];
-		char Action[32];
-		NPCMsg(const REQUEST_TYPE &r, uint32_t msgID) : RType(r), MsgID(msgID), NpcName(), Action() {}
-		NPCMsg(const REQUEST_TYPE &r, uint32_t msgID, const char *name, const char *action) 
-				  : RType(r), MsgID(msgID), NpcName(), Action() {
-			if(name) {
-				strcpy(&NpcName[0],name);
-			} else {
-				memset(&NpcName[0],0,sizeof(NpcName));
-			}
-			if(action) {
-				strcpy(&Action[0],action);
-			} else {
-				memset(&Action[0],0,sizeof(Action));
-			}
-		}
-	};
 	static const int NPCMSG_QUEUE_SIZE = 10;
-	static const int NPCMSG_ITEM_SIZE = sizeof(NPCInteractionTask::NPCMsg*);
+	static const int NPCMSG_ITEM_SIZE = sizeof(NPCMsg);
 	static const char *LOGTAG;
 public:
-	NPCInteractionTask(const std::string &tName, uint16_t stackSize=4196, uint8_t p=5);
 	bool init();
 	virtual void run(void *data);
-	virtual ~NPCInteractionTask();
-	QueueHandle_t getQueueHandle() { return InQueueHandle;}
+	virtual ~NPCInteractionTask() = default;
 private:
-	QueueHandle_t InQueueHandle;
-};
+	uint8_t CommandBuffer[NPCMSG_QUEUE_SIZE * NPCMSG_ITEM_SIZE]{ 0 };
+	std::queue<NPCMsg> npcMessageQueue;// { CommandBuffer };
+}; 
 
 #endif

@@ -42,7 +42,7 @@ typedef int32_t esp_err_t;
 
 #define ESP_ERR_WIFI_BASE       0x3000 /*!< Starting number of WiFi error codes */
 
-void _esp_error_check_failed(esp_err_t rc, const char *file, int line, const char *function, const char *expression) __attribute__((noreturn));
+void _esp_error_check_failed(esp_err_t rc, const char *file, int line, const char *function, const char *expression) ;
 
 #ifndef __ASSERT_FUNC
 /* This won't happen on IDF, which defines __ASSERT_FUNC in assert.h, but it does happen when building on the host which

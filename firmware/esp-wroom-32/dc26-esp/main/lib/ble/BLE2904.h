@@ -19,7 +19,7 @@ struct BLE2904_Data {
 	uint8_t  m_namespace;
 	uint16_t m_description;
 
-} __attribute__((packed));
+} ;
 
 /**
  * @brief Descriptor for Characteristic Presentation Format.

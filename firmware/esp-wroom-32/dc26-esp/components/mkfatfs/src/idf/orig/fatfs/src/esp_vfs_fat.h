@@ -63,7 +63,7 @@ esp_err_t esp_vfs_fat_register(const char* base_path, const char* fat_drive,
  *      - ESP_OK on success
  *      - ESP_ERR_INVALID_STATE if FATFS is not registered in VFS
  */
-esp_err_t esp_vfs_fat_unregister() __attribute__((deprecated));
+esp_err_t esp_vfs_fat_unregister() ;
 
 /**
  * @brief Un-register FATFS from VFS

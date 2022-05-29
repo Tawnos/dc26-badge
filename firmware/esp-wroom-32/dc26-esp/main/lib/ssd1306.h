@@ -43,6 +43,7 @@ SDA        |PB7          |Serial data line
 
 #include <esp_types.h>
 #include <esp_err.h>
+#include <stdint.h>
 #include "fonts.h"
 
 #include "stdlib.h"

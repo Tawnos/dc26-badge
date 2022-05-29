@@ -34,7 +34,7 @@ void gui_text(const char* txt, uint8_t x, uint8_t y, uint8_t col);
  * @param  border: width of border. border's color is !bg
  * @retval None
  */
-void gui_lable(const char* txt, uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t bg, uint8_t border);
+void gui_label(const char* txt, uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t bg, uint8_t border);
 
 /**
  * @brief  Draw multiline text with params
@@ -47,7 +47,7 @@ void gui_lable(const char* txt, uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint
  * @param  border: width of border. border's color is !bg
  * @retval None
  */
-void gui_lable_multiline(const char* txt, uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t bg, uint8_t border);
+void gui_label_multiline(const char* txt, uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t bg, uint8_t border);
 
 
 //running line

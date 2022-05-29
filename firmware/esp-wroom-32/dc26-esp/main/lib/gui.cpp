@@ -1,7 +1,5 @@
 #include "gui.h"
-#include <time.h>
-#include <sys/time.h>
-
+#include <chrono>
 
 //current list element
 GUI_ListData *gui_CurList;
@@ -27,7 +25,7 @@ void gui_text(const char* txt, uint8_t x, uint8_t y, uint8_t col)
 	SSD1306_Puts(txt, &GUI_DefFont, col);
 }
 
-void gui_lable(const char* txt, uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t bg, uint8_t border)
+void gui_label(const char* txt, uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t bg, uint8_t border)
 {
 	SSD1306_DrawFilledRectangle(x, y, w, h, bg);
 	if(border)
@@ -42,7 +40,7 @@ void gui_lable(const char* txt, uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint
 	}
 }
 
-void gui_lable_multiline(const char* txt, uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t bg, uint8_t border)
+void gui_label_multiline(const char* txt, uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t bg, uint8_t border)
 {
 	SSD1306_DrawFilledRectangle(x, y, w, h, bg);
 	uint8_t max_x = x + border, cy = y + border;
@@ -73,16 +71,17 @@ void gui_lable_multiline(const char* txt, uint8_t x, uint8_t y, uint8_t w, uint8
 void gui_ticker(GUI_TickerData *dt)
 {
 	uint8_t maxlen = (dt->w - dt->border*2)/GUI_DefFont.FontWidth, len = 0;
-	int	shift = 0;
+	auto	shift = 0;
 	while(*(dt->text + len) != 0)
 		len++;
 	if(dt->startTick == 0)
 	{
 		//dt->startTick = HAL_GetTick();
-		dt->startTick = time(0);
+		dt->startTick = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+
 	}
 	//shift = ((HAL_GetTick() - dt->startTick) / GUI_TickerSpeed) - maxlen/2; //start delay
-	shift = ((time(0) - dt->startTick) / GUI_TickerSpeed) - maxlen/2; //start delay
+	shift = ((std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - dt->startTick) / GUI_TickerSpeed) - maxlen/2; //start delay
 	
 	if(shift > len-maxlen)
 	{
@@ -99,7 +98,7 @@ void gui_ticker(GUI_TickerData *dt)
 	{
 		shift = 0;
 	}
-	gui_lable(dt->text + shift, dt->x, dt->y, dt->w, dt->h, dt->bg, dt->border);
+	gui_label(dt->text + shift, dt->x, dt->y, dt->w, dt->h, dt->bg, dt->border);
 }
 
 void gui_set_curList(GUI_ListData* list)
@@ -119,7 +118,7 @@ const char *GUI_ListItemData::getScrollOffset() {
 			//LastScrollTime = HAL_GetTick();
 			LastScrollTime = time(0);
 			LastScrollPosition++;
-			uint32_t l = strlen(text);
+			auto l = strlen(text);
 			//char b[10];
 			//sprintf(&b[0],"%d",l);
 			if(LastScrollPosition>=l) {
@@ -153,9 +152,9 @@ uint8_t gui_draw_list()
 		for(i = 0; i < gui_CurList->ItemsCount; i++)
 		{
 			if(i != gui_CurList->selectedItem)
-				gui_lable(gui_CurList->items[i].text, gui_CurList->x + 1, ry + i*GUI_DefFont.FontHeight, gui_CurList->w - 3, GUI_DefFont.FontHeight, 0, 0);
+				gui_label(gui_CurList->items[i].text, gui_CurList->x + 1, ry + i*GUI_DefFont.FontHeight, gui_CurList->w - 3, GUI_DefFont.FontHeight, 0, 0);
 			else {
-				gui_lable(gui_CurList->items[i].getScrollOffset(), gui_CurList->x +1 , ry + i*GUI_DefFont.FontHeight, gui_CurList->w - 3, GUI_DefFont.FontHeight, 1, 0);
+				gui_label(gui_CurList->items[i].getScrollOffset(), gui_CurList->x +1 , ry + i*GUI_DefFont.FontHeight, gui_CurList->w - 3, GUI_DefFont.FontHeight, 1, 0);
 			}
 		}
 	}
@@ -166,9 +165,9 @@ uint8_t gui_draw_list()
 			for(i = gui_CurList->ItemsCount - maxC; i < gui_CurList->ItemsCount; i++)
 			{
 				if(i != gui_CurList->selectedItem)
-					gui_lable(gui_CurList->items[i].text, gui_CurList->x + 1, ry + (i - gui_CurList->ItemsCount + maxC)*GUI_DefFont.FontHeight, gui_CurList->w - 3, GUI_DefFont.FontHeight, 0, 0);
+					gui_label(gui_CurList->items[i].text, gui_CurList->x + 1, ry + (i - gui_CurList->ItemsCount + maxC)*GUI_DefFont.FontHeight, gui_CurList->w - 3, GUI_DefFont.FontHeight, 0, 0);
 				else
-					gui_lable(gui_CurList->items[i].getScrollOffset(), gui_CurList->x + 1, ry + (i - gui_CurList->ItemsCount + maxC)*GUI_DefFont.FontHeight, gui_CurList->w - 3, GUI_DefFont.FontHeight, 1, 0);
+					gui_label(gui_CurList->items[i].getScrollOffset(), gui_CurList->x + 1, ry + (i - gui_CurList->ItemsCount + maxC)*GUI_DefFont.FontHeight, gui_CurList->w - 3, GUI_DefFont.FontHeight, 1, 0);
 			}
 		}
 		else if(gui_CurList->selectedItem < maxC / 2)
@@ -176,9 +175,9 @@ uint8_t gui_draw_list()
 			for(i = 0; i < maxC; i++)
 			{
 				if(i != gui_CurList->selectedItem)
-					gui_lable(gui_CurList->items[i].text, gui_CurList->x + 1, ry + i*GUI_DefFont.FontHeight, gui_CurList->w - 3, GUI_DefFont.FontHeight, 0, 0);
+					gui_label(gui_CurList->items[i].text, gui_CurList->x + 1, ry + i*GUI_DefFont.FontHeight, gui_CurList->w - 3, GUI_DefFont.FontHeight, 0, 0);
 				else
-					gui_lable(gui_CurList->items[i].getScrollOffset(), gui_CurList->x + 1, ry + i*GUI_DefFont.FontHeight, gui_CurList->w - 3, GUI_DefFont.FontHeight, 1, 0);
+					gui_label(gui_CurList->items[i].getScrollOffset(), gui_CurList->x + 1, ry + i*GUI_DefFont.FontHeight, gui_CurList->w - 3, GUI_DefFont.FontHeight, 1, 0);
 			}
 		}
 		else
@@ -186,9 +185,9 @@ uint8_t gui_draw_list()
 			for(i = gui_CurList->selectedItem - maxC/2; i < gui_CurList->selectedItem - maxC/2 + maxC; i++)
 			{
 				if(i != gui_CurList->selectedItem)
-					gui_lable(gui_CurList->items[i].text, gui_CurList->x + 1, ry + (i - gui_CurList->selectedItem + maxC/2)*GUI_DefFont.FontHeight, gui_CurList->w - 3, GUI_DefFont.FontHeight, 0, 0);
+					gui_label(gui_CurList->items[i].text, gui_CurList->x + 1, ry + (i - gui_CurList->selectedItem + maxC/2)*GUI_DefFont.FontHeight, gui_CurList->w - 3, GUI_DefFont.FontHeight, 0, 0);
 				else
-					gui_lable(gui_CurList->items[i].getScrollOffset(), gui_CurList->x + 1, ry + (i - gui_CurList->selectedItem + maxC/2)*GUI_DefFont.FontHeight, gui_CurList->w - 3, GUI_DefFont.FontHeight, 1, 0);
+					gui_label(gui_CurList->items[i].getScrollOffset(), gui_CurList->x + 1, ry + (i - gui_CurList->selectedItem + maxC/2)*GUI_DefFont.FontHeight, gui_CurList->w - 3, GUI_DefFont.FontHeight, 1, 0);
 			}
 		}
 	}

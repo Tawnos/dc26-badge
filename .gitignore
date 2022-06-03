@@ -45,3 +45,4 @@
 build
 CMakeFiles
 CMakeCache.txt
+firmware/esp-wroom-32/buildmain

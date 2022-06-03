@@ -24,20 +24,20 @@ static uint8_t noChange = 0;
 Darknet7BaseState*  GameOfLife::onRun() {
 	switch (InternalState) {
 	case INIT: {
-		darknet->getDisplay()->fillScreen(RGBColor::BLACK);
+		darknet->getGUI()->fillScreen(RGBColor::BLACK);
 		DisplayMessageUntil = HAL_GetTick() + 3000;
 		initGame();
 		noChange = 0;
 	}
 		break;
 	case MESSAGE:
-		darknet->getDisplay()->drawString(0, 10, &UtilityBuf[0], RGBColor::BLACK, RGBColor::WHITE, 1, true);
+		darknet->getGUI()->drawString(0, 10, &UtilityBuf[0], RGBColor::BLACK, RGBColor::WHITE, 1, true);
 		InternalState = TIME_WAIT;
 		break;
 	case TIME_WAIT:
 		if (!shouldDisplayMessage()) {
 			InternalState = GAME;
-			darknet->getDisplay()->fillScreen(RGBColor::BLACK);
+			darknet->getGUI()->fillScreen(RGBColor::BLACK);
 		}
 		break;
 	case GAME: {
@@ -52,10 +52,10 @@ Darknet7BaseState*  GameOfLife::onRun() {
 			for (uint16_t j = 0; j < height; j++) {
 				for (uint16_t k = 0; k < width; k++) {
 					if(GOL.getValueAsByte((j*width)+k)) {
-						darknet->getDisplay()->drawPixel(k+xOffSet, j, RGBColor::WHITE);
+						darknet->getDisplay()->getFrameBuffer()->drawPixel(k+xOffSet, j, RGBColor::WHITE);
 						count++;
 					} else {
-						darknet->getDisplay()->drawPixel(k+xOffSet, j, RGBColor::BLACK);
+						darknet->getDisplay()->getFrameBuffer()->drawPixel(k+xOffSet, j, RGBColor::BLACK);
 					}
 				}
 			}
@@ -64,7 +64,7 @@ Darknet7BaseState*  GameOfLife::onRun() {
 				CurrentGeneration = Generations + 1;
 				InternalState = MESSAGE;
 				DisplayMessageUntil = HAL_GetTick() + 3000;
-				darknet->getDisplay()->fillScreen(RGBColor::BLACK);
+				darknet->getGUI()->fillScreen(RGBColor::BLACK);
 			} else {
 				uint8_t tmpBuffer[sizeof(Buffer)];
 				BitArray tmp(&tmpBuffer[0],num_slots,1);

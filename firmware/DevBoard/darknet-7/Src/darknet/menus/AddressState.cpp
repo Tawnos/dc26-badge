@@ -17,7 +17,7 @@ ErrorType AddressState::onInit() {
 	memset(&RadioIDBuf[0], 0, sizeof(RadioIDBuf));
 	memset(&PublicKey[0], 0, sizeof(PublicKey));
 	memset(&SignatureKey[0], 0, sizeof(SignatureKey));
-	darknet->getDisplay()->fillScreen(RGBColor::BLACK);
+	darknet->getGUI()->fillScreen(RGBColor::BLACK);
 	DisplayList = &AddressList;
 	darknet->getGUI()->drawList(DisplayList);
 	Index = 0;
@@ -117,7 +117,7 @@ Darknet7BaseState*  AddressState::onRun() {
 		if(!GUIListProcessor::process(buttonInfo, DisplayList,DisplayList->ItemsCount)) {
 			if(buttonInfo->wereTheseButtonsReleased(ButtonPress::Mid)) {
 				DetailItems[0].id = 0;
-				darknet->getDisplay()->fillScreen(RGBColor::BLACK);
+				darknet->getGUI()->fillScreen(RGBColor::BLACK);
 				DisplayList = &AddressList;
 			}
 		}

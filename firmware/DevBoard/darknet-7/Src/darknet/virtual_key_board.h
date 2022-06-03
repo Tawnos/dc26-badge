@@ -8,6 +8,7 @@
 #ifndef DARKNET_MENUS_VIRTUAL_KEY_BOARD_H_
 #define DARKNET_MENUS_VIRTUAL_KEY_BOARD_H_
 
+#include "gui.h"
 #include "button_info.h"
 #include <libstm32/display/display_device.h>
 #include <libstm32/observer/event_bus.h>
@@ -35,7 +36,7 @@ public:
    static const char* STDKBNames;
    static const char* STDCAPS;
 public:
-   VirtualKeyBoard(DarkNet7* darknet);
+   VirtualKeyBoard(cmdc0de::GUI* gui, ButtonInfo* buttons) :gui(gui), buttons(buttons) {}
 
    void init(const char* vkb, InputHandleContext* ic, int16_t xdisplayPos, int16_t xEndDisplay, int16_t yDisplayPos, const cmdc0de::RGBColor& fontColor,
       const cmdc0de::RGBColor& backgroundColor, const cmdc0de::RGBColor& cursorColor, const char cursorChar = '_');
@@ -78,6 +79,7 @@ private:
    int16_t CursorPos{ 0 };
    int16_t CharsPerRow{ 0 };
    InputHandleContext* InputContext{ nullptr };
+   cmdc0de::GUI* gui{ nullptr };
    ButtonInfo* buttons{ nullptr };
    cmdc0de::DisplayDevice* displayDevice{ nullptr };
 };

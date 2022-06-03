@@ -40,5 +40,5 @@ namespace cmdc0de {
 
   static constexpr const uint16_t BROADCAST_ADDR = 0xFFFF;
 
-  static uint16_t DrawBuffer[DISPLAY_WIDTH * DISPLAY_OPT_WRITE_ROWS]; //120 wide, 10 pixels high, 2 bytes per pixel (uint16_t)
+  //static uint16_t DrawBuffer[DISPLAY_WIDTH * DISPLAY_OPT_WRITE_ROWS]; //120 wide, 10 pixels high, 2 bytes per pixel (uint16_t)
 }

@@ -15,10 +15,6 @@ const char* VirtualKeyBoard::STDKBLowerCase = "abcdefghijklmnopqrstuvwxyz1234567
 const char* VirtualKeyBoard::STDKBNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()-_";
 const char* VirtualKeyBoard::STDCAPS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-VirtualKeyBoard::VirtualKeyBoard(DarkNet7* darknet)
-   : displayDevice(darknet->getDisplay()), buttons(darknet->getButtonInfo())
-{}
-
 void VirtualKeyBoard::InputHandleContext::addChar(char b)
 {
    if (Buf != 0)
@@ -62,7 +58,7 @@ void VirtualKeyBoard::init(const char* vkb,
    CursorColor = cursorColor;
    CursorChar = cursorChar;
    CursorPos = 0;
-   uint8_t FontPixelWidth = displayDevice->getFont()->FontWidth;
+   uint8_t FontPixelWidth = gui->getFont()->FontWidth;
    CharsPerRow = (XEndDisplayPos - XDisplayPos) / FontPixelWidth;
    InputContext = ic;
 }
@@ -98,17 +94,17 @@ void VirtualKeyBoard::process()
    }
    uint16_t y = 0;
    const char* ptr = VKB;
-   uint8_t FontPixelHeight = displayDevice->getFont()->FontHeight;
-   uint8_t FontPixelWidth = displayDevice->getFont()->FontWidth;
+   uint8_t FontPixelHeight = gui->getFont()->FontHeight;
+   uint8_t FontPixelWidth = gui->getFont()->FontWidth;
    uint8_t cursorRow = getCursorY();
    uint8_t curosrColumn = getCursorX();
    for (int i = 0; i < SizeOfKeyboard && y < (cmdc0de::DISPLAY_HEIGHT - (y * FontPixelHeight)); i += CharsPerRow, ++y)
    {
-      displayDevice->drawString(XDisplayPos, (YDisplayPos + (y * FontPixelHeight)), ptr, FontColor, BackGround, 1, false, CharsPerRow);
+      gui->drawString(XDisplayPos, (YDisplayPos + (y * FontPixelHeight)), ptr, FontColor, BackGround, 1, false, CharsPerRow);
       if (y == cursorRow)
       {
          if((HAL_GetTick()%1000)<500) {
-            displayDevice->drawString(XDisplayPos+(curosrColumn*FontPixelWidth), YDisplayPos+(y*FontPixelHeight), "_", CursorColor, BackGround, 1, false);
+            gui->drawString(XDisplayPos+(curosrColumn*FontPixelWidth), YDisplayPos+(y*FontPixelHeight), "_", CursorColor, BackGround, 1, false);
          }
       }
       ptr = ptr + CharsPerRow;

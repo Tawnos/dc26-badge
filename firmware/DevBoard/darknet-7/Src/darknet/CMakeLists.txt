@@ -61,6 +61,8 @@ set (SOURCEFILES
 
     libstm32/display/DrawBuffer2D16BitColor.cpp
     libstm32/display/DrawBuffer2D16BitColor.h
+    libstm32/display/DrawBuffer2D16BitPerPixel1Buffer.cpp
+    libstm32/display/DrawBuffer2D16BitPerPixel1Buffer.h
     libstm32/display/display_device.cpp
     libstm32/display/display_device.h
     libstm32/display/fonts.cpp

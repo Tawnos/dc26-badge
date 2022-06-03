@@ -35,15 +35,15 @@ protected:
 	virtual Darknet7BaseState*  onRun() {
 		Darknet7BaseState* nextState = this;
 		auto buttonInfo = darknet->getButtonInfo();
-		darknet->getDisplay()->fillScreen(RGBColor::BLACK);
+		darknet->getGUI()->fillScreen(RGBColor::BLACK);
 
 		VKB->process();
 
-		darknet->getDisplay()->drawString(0,10,(const char *)"Current Name: ");
-		darknet->getDisplay()->drawString(0,20, CurrentDeviceName);
-		darknet->getDisplay()->drawString(0,30, (const char *)"New Name:");
-		darknet->getDisplay()->drawString(0,40, &NewDeviceName[0]);
-		darknet->getDisplay()->drawString(0,60,(const char *)"Mid button finishes");
+		darknet->getGUI()->drawString(0,10,(const char *)"Current Name: ");
+		darknet->getGUI()->drawString(0,20, CurrentDeviceName);
+		darknet->getGUI()->drawString(0,30, (const char *)"New Name:");
+		darknet->getGUI()->drawString(0,40, &NewDeviceName[0]);
+		darknet->getGUI()->drawString(0,60,(const char *)"Mid button finishes");
 		if(buttonInfo->wereTheseButtonsReleased(ButtonPress::Mid)) {
 			flatbuffers::FlatBufferBuilder fbb;
 			auto r = darknet7::CreateBLESetDeviceNameDirect(fbb,&NewDeviceName[0]);
@@ -93,7 +93,7 @@ protected:
 	virtual Darknet7BaseState*  onRun() {
 		Darknet7BaseState* nextState = this;
 		auto buttonInfo = darknet->getButtonInfo();
-		darknet->getDisplay()->fillScreen(RGBColor::BLACK);
+		darknet->getGUI()->fillScreen(RGBColor::BLACK);
 		darknet->getGUI()->drawList(&BLEList);
 
 		if (!GUIListProcessor::process(buttonInfo, &BLEList,(sizeof(Items) / sizeof(Items[0])))) {
@@ -154,7 +154,7 @@ protected:
 	virtual Darknet7BaseState*  onRun() {
 		Darknet7BaseState* nextState = this;
 		auto buttonInfo = darknet->getButtonInfo();
-		darknet->getDisplay()->fillScreen(RGBColor::BLACK);
+		darknet->getGUI()->fillScreen(RGBColor::BLACK);
 		sprintf(&ListBuffer[0][0],"AP Status: %s", darknet7::EnumNameWiFiStatus(CurrentWiFiStatus));
 		if(CurrentWiFiStatus==darknet7::WiFiStatus_DOWN) {
 			ListBuffer[1][0] = '\0';
@@ -208,7 +208,7 @@ protected:
 								darknet->getMcuToMcu().send(fbb);
 								nextState = darknet->getDisplayMessageState(darknet->getCommunicationSettingState(),(const char *)"Updating ESP",5000);
 							} else {
-								darknet->getDisplay()->drawString(0,80,(const char *)"SID Can't be blank");
+								darknet->getGUI()->drawString(0,80,(const char *)"SID Can't be blank");
 							}
 						}
 						break;
@@ -287,7 +287,7 @@ void CommunicationSettingState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7:
 		sprintf(&ListBuffer[1][0], "BLE Advertise: %s", mevt->InnerMsg->BLEAdvertise()?cmdc0de::sYES: cmdc0de::sNO);
 		sprintf(&ListBuffer[2][0], "BLE DeviceName: %s", mevt->InnerMsg->BLEDeviceName()->c_str());
 		strcpy(&CurrentDeviceName[0],mevt->InnerMsg->BLEDeviceName()->c_str());
-		darknet->getDisplay()->fillScreen(RGBColor::BLACK);
+		darknet->getGUI()->fillScreen(RGBColor::BLACK);
 		darknet->getGUI()->drawList(&CommSettingList);
 #if !defined VIRTUAL_DEVICE
 		darknet->getMcuToMcu().getBus().removeListener(this,mevt,&darknet->getMcuToMcu());
@@ -308,9 +308,9 @@ ErrorType CommunicationSettingState::onInit() {
 #if !defined VIRTUAL_DEVICE
 	darknet->getMcuToMcu().getBus().addListener(this,si,&darknet->getMcuToMcu());
 #endif
-	darknet->getDisplay()->fillScreen(RGBColor::BLACK);
+	darknet->getGUI()->fillScreen(RGBColor::BLACK);
 
-	darknet->getDisplay()->drawString(5,10,(const char *)"Fetching data from ESP",RGBColor::BLUE);
+	darknet->getGUI()->drawString(5,10,(const char *)"Fetching data from ESP",RGBColor::BLUE);
 
 	darknet->getMcuToMcu().send(fbb);
 
@@ -331,7 +331,7 @@ Darknet7BaseState*  CommunicationSettingState::onRun() {
 	} else {
 		if (!GUIListProcessor::process(buttonInfo, &CommSettingList,(sizeof(Items) / sizeof(Items[0])))) {
 			if (buttonInfo->wereAnyOfTheseButtonsReleased(ButtonPress::Fire)) {
-				darknet->getDisplay()->fillScreen(RGBColor::BLACK);
+				darknet->getGUI()->fillScreen(RGBColor::BLACK);
 #if !defined VIRTUAL_DEVICE
 				switch(CommSettingList.selectedItem) {
 				case 0:
@@ -347,7 +347,7 @@ Darknet7BaseState*  CommunicationSettingState::onRun() {
 					break;
 				}
 #else
-				darknet->getDisplay()->drawString(0, 0, "PROCESS MENU");
+				darknet->getGUI()->drawString(0, 0, "PROCESS MENU");
 #endif
 			} else if (buttonInfo->wereAnyOfTheseButtonsReleased(ButtonPress::Mid)) {
 				nextState = darknet->getDisplayMenuState();

@@ -21,7 +21,7 @@ ErrorType SettingState::onInit()
    SubState = 0;
    MiscCounter = 0;
    memset(&AgentName[0], 0, sizeof(AgentName));
-   darknet->getDisplay()->fillScreen(RGBColor::BLACK);
+   darknet->getGUI()->fillScreen(RGBColor::BLACK);
    darknet->getGUI()->drawList(&SettingList);
    IHC.set(&AgentName[0], sizeof(AgentName));
    return ErrorType();
@@ -65,31 +65,31 @@ Darknet7BaseState*  SettingState::onRun()
       else if (buttonInfo->wereAnyOfTheseButtonsReleased(ButtonPress::Fire) || buttonInfo->wereAnyOfTheseButtonsReleased(ButtonPress::Mid))
       {
          SubState = SettingList.selectedItem + 100;
-         darknet->getDisplay()->fillScreen(RGBColor::BLACK);
+         darknet->getGUI()->fillScreen(RGBColor::BLACK);
          switch (SubState)
          {
          case 100:
             memset(&AgentName[0], 0, sizeof(AgentName));
             VKB->init(VirtualKeyBoard::STDKBNames, &IHC, 5, cmdc0de::DISPLAY_WIDTH - 5, 80, cmdc0de::RGBColor::WHITE, RGBColor::BLACK, RGBColor::BLUE, '_');
-            darknet->getDisplay()->drawString(0, 10, (const char*)"Current agent name:");
+            darknet->getGUI()->drawString(0, 10, (const char*)"Current agent name:");
             if (*darknet->getContacts()->getSettings().getAgentName() == '\0')
             {
-               darknet->getDisplay()->drawString(0, 20, (const char*)"NOT SET");
+               darknet->getGUI()->drawString(0, 20, (const char*)"NOT SET");
             }
             else
             {
-               darknet->getDisplay()->drawString(0, 20, darknet->getContacts()->getSettings().getAgentName());
+               darknet->getGUI()->drawString(0, 20, darknet->getContacts()->getSettings().getAgentName());
             }
-            darknet->getDisplay()->drawString(0, 40, (const char*)"MID button completes entry");
-            darknet->getDisplay()->drawString(0, 50, (const char*)"Set agent name:");
-            darknet->getDisplay()->drawString(0, 60, &AgentName[0]);
+            darknet->getGUI()->drawString(0, 40, (const char*)"MID button completes entry");
+            darknet->getGUI()->drawString(0, 50, (const char*)"Set agent name:");
+            darknet->getGUI()->drawString(0, 60, &AgentName[0]);
             break;
          case 101:
             MiscCounter = darknet->getContacts()->getSettings().getScreenSaverTime();
             break;
          case 102:
-            darknet->getDisplay()->drawString(0, 10, (const char*)"ERASE ALL\nCONTACTS?");
-            darknet->getDisplay()->drawString(0, 30, (const char*)"Fire1 = YES");
+            darknet->getGUI()->drawString(0, 10, (const char*)"ERASE ALL\nCONTACTS?");
+            darknet->getGUI()->drawString(0, 30, (const char*)"Fire1 = YES");
             break;
          }
       }
@@ -119,17 +119,17 @@ Darknet7BaseState*  SettingState::onRun()
          }
          else
          {
-            darknet->getDisplay()->drawString(0, 60, &AgentName[0]);
+            darknet->getGUI()->drawString(0, 60, &AgentName[0]);
          }
          break;
       case 101: {
          if (MiscCounter > 9) MiscCounter = 9;
          else if (MiscCounter < 1) MiscCounter = 1;
          sprintf(&Misc[0], "%d", (int)MiscCounter);
-         darknet->getDisplay()->drawString(0, 10, (const char*)"Badge Sleep Time:", RGBColor::WHITE, RGBColor::BLACK, 1, true);
-         darknet->getDisplay()->drawString(0, 30, (const char*)"Up to increase, down to decrease", RGBColor::WHITE, RGBColor::BLACK, 1, true);
-         darknet->getDisplay()->drawString(10, 60, &Misc[0], RGBColor::WHITE, RGBColor::BLACK, 1, true);
-         darknet->getDisplay()->drawString(0, 100, (const char*)"MID Button completes", RGBColor::WHITE, RGBColor::BLACK, 1, true);
+         darknet->getGUI()->drawString(0, 10, (const char*)"Badge Sleep Time:", RGBColor::WHITE, RGBColor::BLACK, 1, true);
+         darknet->getGUI()->drawString(0, 30, (const char*)"Up to increase, down to decrease", RGBColor::WHITE, RGBColor::BLACK, 1, true);
+         darknet->getGUI()->drawString(10, 60, &Misc[0], RGBColor::WHITE, RGBColor::BLACK, 1, true);
+         darknet->getGUI()->drawString(0, 100, (const char*)"MID Button completes", RGBColor::WHITE, RGBColor::BLACK, 1, true);
          if (buttonInfo->wereAnyOfTheseButtonsReleased(ButtonPress::Up))
          {
             MiscCounter++;

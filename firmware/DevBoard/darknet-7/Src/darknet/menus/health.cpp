@@ -29,7 +29,7 @@ ErrorType Health::onInit()
       Items[i].id = 1 << (i + 1);
       Items[i].setShouldScroll();
    }
-   darknet->getDisplay()->fillScreen(RGBColor::BLACK);
+   darknet->getGUI()->fillScreen(RGBColor::BLACK);
    darknet->getGUI()->drawList(&HealthList);
    return ErrorType();
 
@@ -75,15 +75,15 @@ Darknet7BaseState*  CureEntry::onRun()
 {
    Darknet7BaseState* nextState = this;
    auto buttonInfo = darknet->getButtonInfo();
-   auto display = darknet->getDisplay();
-   display->fillScreen(RGBColor::BLACK);
+   auto gui = darknet->getGUI();
+   gui->fillScreen(RGBColor::BLACK);
    if (InternalState == VIRUS_ENTRY)
    {
       VKB->process();
 
-      display->drawString(0, 10, (const char*)"Enter Sequence press:");
-      display->drawString(0, 20, &CureSequence[0]);
-      display->drawString(0, 60, (const char*)"Press MID to commit cure");
+      gui->drawString(0, 10, (const char*)"Enter Sequence press:");
+      gui->drawString(0, 20, &CureSequence[0]);
+      gui->drawString(0, 60, (const char*)"Press MID to commit cure");
       if (buttonInfo->wereTheseButtonsReleased(ButtonPress::Mid))
       {
          if (validateCure())
@@ -109,10 +109,10 @@ Darknet7BaseState*  CureEntry::onRun()
    {
       char buf[24];
       sprintf(&buf[0], "of %s", VirusNames[CurrentVirus]);
-      display->drawString(0, 10, "Your badge has been cured");
-      display->drawString(0, 20, &buf[0]);
-      display->drawString(0, 40, "Send To Daemon: ");
-      display->drawString(0, 50, (const char*)&FinalHexHash[0]);
+      gui->drawString(0, 10, "Your badge has been cured");
+      gui->drawString(0, 20, &buf[0]);
+      gui->drawString(0, 40, "Send To Daemon: ");
+      gui->drawString(0, 50, (const char*)&FinalHexHash[0]);
       if (buttonInfo->wereTheseButtonsReleased(ButtonPress::Mid))
       {
          nextState = darknet->getHealthState();

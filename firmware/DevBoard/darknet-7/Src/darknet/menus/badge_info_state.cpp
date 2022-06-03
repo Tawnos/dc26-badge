@@ -61,7 +61,7 @@ ErrorType BadgeInfoState::onInit() {
 		Items[i].id = i;
 		Items[i].setShouldScroll();
 	}
-	darknet->getDisplay()->fillScreen(RGBColor::BLACK);
+	darknet->getGUI()->fillScreen(RGBColor::BLACK);
 	darknet->getGUI()->drawList(&BadgeInfoList);
 	return ErrorType();
 }

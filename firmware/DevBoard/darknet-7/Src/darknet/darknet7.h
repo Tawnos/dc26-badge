@@ -11,13 +11,15 @@
 #include "common.h"
 #if !defined VIRTUAL_DEVICE
 #include <leds/ws2812.h>
+#include <display/display_st7735.h>
 #endif
 
 #include <libstm32/rgbcolor.h>
 #include <libstm32/app/app.h>
 #include <libstm32/app/display_message_state.h>
+#include <display/framebuf.h>
+#include <display/DrawBuffer2D16BitPerPixel1Buffer.h>
 #include <display/display_device.h>
-#include <display/display_st7735.h>
 #include <display/gui.h>
 #include <libstm32/error_type.h>
 #include "contact_store.h"
@@ -56,8 +58,8 @@ public:
       cmdc0de::DisplayDevice* displayDevice,
       ContactStore* contactStore) 
       : Display(displayDevice),
-      DisplayBuffer{ displayDevice, cmdc0de::DrawBuffer },
-      MyGUI(Display),
+         DisplayBuffer(displayDevice->getFrameBuffer()),
+         gui{ DisplayBuffer, &Font_6x10 },
       MyContacts(contactStore){ }
 #endif
    virtual ~DarkNet7() = default;
@@ -93,8 +95,8 @@ public:
    ContactStore* getContacts() { return MyContacts; }
    const ContactStore* getContacts() const { return MyContacts; }
 
-   cmdc0de::GUI* getGUI() { return &MyGUI; }
-   const cmdc0de::GUI* getGUI() const { return &MyGUI; }
+   cmdc0de::GUI* getGUI() { return &gui; }
+   const cmdc0de::GUI* getGUI() const { return &gui; }
 
    ButtonInfo* getButtonInfo() { return &MyButtons; }
    const ButtonInfo* getButtonInfo() const { return &MyButtons; }
@@ -114,9 +116,9 @@ private:
 #endif
    ContactStore* MyContacts{ nullptr };
    cmdc0de::DisplayDevice* Display;
-   cmdc0de::DrawBuffer2D16BitColor16BitPerPixel1Buffer DisplayBuffer;
-   cmdc0de::GUI MyGUI;
-   ButtonInfo MyButtons{};
+   cmdc0de::FrameBuf* DisplayBuffer;
+   cmdc0de::GUI gui;
+   ButtonInfo MyButtons{ };
    uint32_t SequenceNum{ 0 };
 
    cmdc0de::DisplayMessageState* DMS = new cmdc0de::DisplayMessageState(this);

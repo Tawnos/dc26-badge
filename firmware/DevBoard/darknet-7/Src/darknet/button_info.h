@@ -66,30 +66,38 @@ class ButtonInfo
 public:
    ButtonInfo() :LastTickButtonPushed(HAL_GetTick()) {}
 
+   void onButtonDown(ButtonPress b) {
+      LastTickButtonPushed = HAL_GetTick();
+      buttonState |= b;
+   }
+   void onButtonUp(ButtonPress b) {
+      buttonState = buttonState & ~b;
+   }
+
    void reset()
    {
-      ButtonState = LastButtonState = ButtonPress::None;
+      buttonState = LastButtonState = ButtonPress::None;
    }
 
    bool areTheseButtonsDown(const ButtonPress& b)
    {
-      return (ButtonState & b) == b;
+      return (buttonState & b) == b;
    }
 
    bool isAnyOfTheseButtonDown(const ButtonPress& b)
    {
-      return (ButtonState & b) != 0;
+      return (buttonState & b) != 0;
    }
 
    bool isAnyButtonDown()
    {
-      return ButtonState != 0;
+      return buttonState != 0;
    }
 
    bool wereTheseButtonsReleased(const ButtonPress& b)
    {
       //last state must match these buttons and current state must have none of these buttons
-      return (LastButtonState & b) == b && (ButtonState & b) == 0;
+      return (LastButtonState & b) == b && (buttonState & b) == 0;
    }
 
    bool wereAnyOfTheseButtonsReleased(const ButtonPress& b)
@@ -100,7 +108,7 @@ public:
 
    bool wasAnyButtonReleased()
    {
-      return ButtonState != LastButtonState && LastButtonState != 0;
+      return buttonState != LastButtonState && LastButtonState != 0;
    }
 
    uint32_t& lastTickButtonPushed() { return LastTickButtonPushed; }
@@ -109,7 +117,7 @@ protected:
    void processButtons();
    friend class DarkNet7;
 private:
-   ButtonPress ButtonState{ ButtonPress::None };
+   ButtonPress buttonState{ ButtonPress::None };
    ButtonPress LastButtonState{ ButtonPress::None };
    uint32_t LastTickButtonPushed{ 0 };
 };

@@ -6,24 +6,17 @@
 #include <cJSON.h>
 #include "dc26.h"
 #include <queue>
+#include <mutex>
+#include <chrono>
+using namespace std::chrono_literals;
 
+#define LOGTAG "NPCITTask"
 #define ESP_LOGI(tag, string) printf("%s %s", tag, string);
 const char* TAG = "httpclient";
 std::string HttpResponseStr;
 
 //static StaticQueue_t npcMessageQueue;
-const char* NPCInteractionTask::LOGTAG = "NPCITTask";
-
-bool NPCInteractionTask::init()
-{
-   //npcMessageQueue.
-   //InQueueHandle = xQueueCreateStatic(NPCMSG_QUEUE_SIZE, NPCMSG_ITEM_SIZE, &CommandBuffer[0], &npcMessageQueue);
-   //if (InQueueHandle == nullptr)
-   //{
-   //   ESP_LOGI(LOGTAG, "Failed creating incoming queue");
-   //}
-   return true;
-}
+//const char* NPCInteractionTask::LOGTAG = "NPCITTask";
 
 void helo(uint32_t msgId)
 {
@@ -72,8 +65,7 @@ void helo(uint32_t msgId)
       wasError = 1;
    }
    auto s = darknet7::CreateNPCListDirect(fbb, &npcnames, wasError);
-   flatbuffers::Offset<darknet7::ESPToSTM> of =
-      darknet7::CreateESPToSTM(fbb, msgId, darknet7::ESPToSTMAny_NPCList, s.Union());
+   auto of = darknet7::CreateESPToSTM(fbb, msgId, darknet7::ESPToSTMAny_NPCList, s.Union());
    darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
    getMCUToMCU().send(fbb);
 
@@ -168,23 +160,21 @@ void interact(NPCMsg* m)
 #endif
 }
 
-
-void NPCInteractionTask::run(void* data)
+void NPCInteractionTask::run(std::stop_token stoken)
 {
    ESP_LOGI(LOGTAG, "NPCInteractionTask started");
-   while (1)
+   while (!stoken.stop_requested())
    {
-      NPCMsg* m = 0;
+      auto m = npcMessageQueue.pop(stoken);
       //if (xQueueReceive(getQueueHandle(), &m, 1000 / portTICK_PERIOD_MS))
-      if (!npcMessageQueue.empty())
+      if (m)
       {
-         auto message = npcMessageQueue.front();
-         if (m->RType == NPCMsg::NPCRequestType::Hello)
+         if (m->RequestType == NPCMsg::NPCRequestType::Hello)
          {
             ESP_LOGI(LOGTAG, "got HELO");
             helo(m->MsgID);
          }
-         else if (m->RType == NPCMsg::NPCRequestType::Interact)
+         else if (m->RequestType == NPCMsg::NPCRequestType::Interact)
          {
             ESP_LOGI(LOGTAG, "got Interact");
             interact(m);

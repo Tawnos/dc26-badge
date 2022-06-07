@@ -5,85 +5,88 @@
 #include <etl/vector.h>
 #include <etl/queue.h>
 #include <observer/event_bus.h>
+#include "../../../GUI/include/virtualHAL.h"
 
 template<typename T>
-struct MSGEvent {
-  const T* InnerMsg;
-  uint32_t RequestID;
-  MSGEvent(const T* im, uint32_t rid) : InnerMsg(im), RequestID(rid) {}
+struct MSGEvent
+{
+   const T* InnerMsg;
+   uint32_t RequestID;
+   MSGEvent(const T* im, uint32_t rid) : InnerMsg(im), RequestID(rid) {}
 };
 
-class MCUToMCU {
+class MCUToMCU
+{
 public:
-  static const int ENVELOP_HEADER = 4;
-  static const int ENVELOP_HEADER_SIZE_MASK = 0x7FF;
-  static const int MAX_MESSAGE_SIZE = 300;
-  static const int TOTAL_MESSAGE_SIZE = MAX_MESSAGE_SIZE + ENVELOP_HEADER;
+   static const int ENVELOP_HEADER = 4;
+   static const int ENVELOP_HEADER_SIZE_MASK = 0x7FF;
+   static const int MAX_MESSAGE_SIZE = 300;
+   static const int TOTAL_MESSAGE_SIZE = MAX_MESSAGE_SIZE + ENVELOP_HEADER;
 public:
-  class Message {
-  public:
-    static const uint16_t MESSAGE_FLAG_TRANSMITTED = 0x8000; //bit 15
-  public:
-    const darknet7::ESPToSTM* asESPToSTM();
-    bool verifyESPToSTM();
-    Message(uint16_t sf, uint16_t crc, uint8_t* data)
-      : SizeAndFlags(sf), Crc16(crc)
-    {
-      MessageData[0] = sf & 0xFF;
-      MessageData[1] = (sf & 0xFF00) >> 8;
-      //uint16_t s = MessageData[0];
-      //s |= ((uint16_t) MessageData[1]) << 8;
-      //assert(s==getDataSize());
-      MessageData[2] = Crc16 & 0xFF;
-      MessageData[3] = (Crc16 & 0xFF00) >> 8;
-      memcpy(&MessageData[ENVELOP_HEADER], data, getDataSize());
-    }
+   class Message
+   {
+   public:
+      static const uint16_t MESSAGE_FLAG_TRANSMITTED = 0x8000; //bit 15
+   public:
+      const darknet7::ESPToSTM* asESPToSTM();
+      bool verifyESPToSTM();
+      Message(uint16_t sf, uint16_t crc, uint8_t* data)
+         : SizeAndFlags(sf), Crc16(crc)
+      {
+         MessageData[0] = sf & 0xFF;
+         MessageData[1] = (sf & 0xFF00) >> 8;
+         //uint16_t s = MessageData[0];
+         //s |= ((uint16_t) MessageData[1]) << 8;
+         //assert(s==getDataSize());
+         MessageData[2] = Crc16 & 0xFF;
+         MessageData[3] = (Crc16 & 0xFF00) >> 8;
+         memcpy(&MessageData[ENVELOP_HEADER], data, getDataSize());
+      }
 
-  protected:
-    Message() = default;
-    void setFlag(uint16_t flags);
-    bool checkFlags(uint16_t flags);
-#if !defined VIRTUAL_DEVICE
-    HAL_StatusTypeDef transmit(UART_HandleTypeDef* huart);
-#endif
-    uint16_t getMessageSize() { return getDataSize() + ENVELOP_HEADER; }
-    uint16_t getDataSize() { return SizeAndFlags & ENVELOP_HEADER_SIZE_MASK; }
-    static uint16_t getDataSize(uint16_t s) { return s & ENVELOP_HEADER_SIZE_MASK; }
-  private:
-    uint16_t SizeAndFlags = 0;
-    uint16_t Crc16 = 0;
-    uint8_t MessageData[MAX_MESSAGE_SIZE] = { 0 };
-    friend class MCUToMCU;
-  };
+   protected:
+      Message() = default;
+      void setFlag(uint16_t flags);
+      bool checkFlags(uint16_t flags);
+      HAL_StatusTypeDef transmit(UART_HandleTypeDef* huart);
+
+      uint16_t getMessageSize() { return getDataSize() + ENVELOP_HEADER; }
+      uint16_t getDataSize() { return SizeAndFlags & ENVELOP_HEADER_SIZE_MASK; }
+      static uint16_t getDataSize(uint16_t s) { return s & ENVELOP_HEADER_SIZE_MASK; }
+   private:
+      uint16_t SizeAndFlags = 0;
+      uint16_t Crc16 = 0;
+      uint8_t MessageData[MAX_MESSAGE_SIZE] = { 0 };
+      friend class MCUToMCU;
+   };
 public:
-  typedef cmdc0de::EventBus<3, 11, 5, 3> UART_EVENT_BUS_TYPE;
+   typedef cmdc0de::EventBus<3, 11, 5, 3> UART_EVENT_BUS_TYPE;
 public:
+   void init(UART_HandleTypeDef*);
+   bool send(const flatbuffers::FlatBufferBuilder& fbb);
+   void process();
+   void onTransmissionComplete();
+   void onError();
+   void handleMcuToMcu();
 #if !defined VIRTUAL_DEVICE
-  void init(UART_HandleTypeDef*);
+   const UART_HandleTypeDef* getUART() const { return UartHandler; }
 #endif
-  bool send(const flatbuffers::FlatBufferBuilder& fbb);
-  void process();
-  void onTransmitionComplete();
-  void onError();
-  void handleMcuToMcu();
-#if !defined VIRTUAL_DEVICE
-  const UART_HandleTypeDef* getUART() const { return UartHandler; }
-  UART_EVENT_BUS_TYPE& getBus() { return MessageBus; }
-#endif
+   UART_EVENT_BUS_TYPE& getBus()
+   {
+      return MessageBus;
+   }
 
 protected:
 #if !defined VIRTUAL_DEVICE
-  void resetUART();
+   void resetUART();
 #endif
-  bool transmitNow();
+   bool transmitNow();
 
 private:
-  etl::queue<Message, 4> InComing{};
-  etl::queue<Message, 4> Outgoing{};
-#if !defined VIRTUAL_DEVICE
-  UART_HandleTypeDef* UartHandler{ 0 };
-  UART_EVENT_BUS_TYPE MessageBus;
-#endif
+   uint8_t UartRXBuffer[TOTAL_MESSAGE_SIZE * 2] = { 0 };
+   etl::queue<Message, 4> IncomingMessages{};
+   etl::queue<Message, 4> OutgoingMessages{};
+   UART_HandleTypeDef* UartHandler{ 0 };
+   UART_EVENT_BUS_TYPE MessageBus;
 };
 
 #endif

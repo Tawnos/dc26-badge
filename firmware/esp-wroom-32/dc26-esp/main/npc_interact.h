@@ -8,21 +8,26 @@
 #include "mcu_to_mcu.h"
 #include <stdint.h>
 #include <string>
-#include <queue>
+#include <chrono>
+#include <array>
+#include "command_queue.h"
+#include "task_handler.h"
 
-typedef void* QueueHandle_t;
+using namespace std::chrono_literals;
 
 struct NPCMsg
 {
 	enum class NPCRequestType { None, Hello, Interact };
-	NPCRequestType RType{ NPCRequestType::None };
+
+	NPCRequestType RequestType{ NPCRequestType::None };
 	uint32_t MsgID{ 0 };
 	char NpcName[32]{ 0 };
 	char Action[32]{ 0 };
 
-	NPCMsg(const NPCRequestType& r, uint32_t msgID) : RType(r), MsgID(msgID) {}
+	NPCMsg() = default;
+	NPCMsg(const NPCRequestType& r, uint32_t msgID) : RequestType(r), MsgID(msgID) {}
 	NPCMsg(const NPCRequestType& r, uint32_t msgID, const char* name, const char* action)
-		: RType(r), MsgID(msgID)
+		: RequestType(r), MsgID(msgID)
 	{
 		if (name)
 		{
@@ -43,18 +48,22 @@ struct NPCMsg
 	}
 };
 
-class NPCInteractionTask : public Task {
+class NPCInteractionTask : public TaskHandler {
 public:
-	static const int NPCMSG_QUEUE_SIZE = 10;
-	static const int NPCMSG_ITEM_SIZE = sizeof(NPCMsg);
-	static const char *LOGTAG;
-public:
-	bool init();
-	virtual void run(void *data);
-	virtual ~NPCInteractionTask() = default;
+	virtual void run(std::stop_token stoken) override;
+	auto& getMessageQueue()
+	{
+		return npcMessageQueue;
+	}
 private:
-	uint8_t CommandBuffer[NPCMSG_QUEUE_SIZE * NPCMSG_ITEM_SIZE]{ 0 };
-	std::queue<NPCMsg> npcMessageQueue;// { CommandBuffer };
+	CommandQueue<NPCMsg, 10> npcMessageQueue{1000ms};
+	//std::array<NPCMsg, 10> commandBuffer{ };
+	//InQueueHandle = xQueueCreateStatic(NPCMSG_QUEUE_SIZE, NPCMSG_ITEM_SIZE, &CommandBuffer[0], &npcMessageQueue);
+	//if (InQueueHandle == nullptr)
+	//{
+	//   ESP_LOGI(LOGTAG, "Failed creating incoming queue");
+	//}
+	//uint8_t CommandBuffer[NPCMSG_QUEUE_SIZE * NPCMSG_ITEM_SIZE]{ 0 };
 }; 
 
 #endif

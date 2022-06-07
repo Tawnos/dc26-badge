@@ -27,6 +27,7 @@ set( INCLUDEDIRS
     #${CMAKE_CURRENT_SOURCE_DIR}/../../esp-idf/components/newlib/include
     #${CMAKE_CURRENT_SOURCE_DIR}/../../esp-idf/components/newlib/platform_include
 
+    ${CMAKE_CURRENT_SOURCE_DIR}/../components/libcrc/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../components/flatbuffer/
     ${CMAKE_CURRENT_SOURCE_DIR}/../components/mkfatfs/src/idf/modified/driver/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../components/mkfatfs/src/idf/modified/log/include
@@ -41,22 +42,25 @@ set ( COMPILEDEFS
 )
 
 set (SOURCEFILES
-    # command_handler.cpp
-    # command_handler.h
+    command_handler.cpp
+    command_handler.h
+    command_queue.h
     # common_generated.h
     # dc26.cpp
     # dc26.h
-    # display_handler.cpp
-    # display_handler.h
-    # mcu_to_mcu.cpp
-    # mcu_to_mcu.h
+    display_handler.cpp
+    display_handler.h
+    mcu_to_mcu.cpp
+    mcu_to_mcu.h
     ../sdkconfig.h
     npc_interact.cpp
     npc_interact.h
     esp_to_stm_generated.h 
     stm_to_esp_generated.h 
+    task_handler.h
 
     ../components/flatbuffer/flatbuffers/flatbuffers.h
+    ../components/libcrc/include/checksum.h
     ../../esp-idf/components/esp_http_client/include/esp_http_client.h
     ../../esp-idf/components/esp32/include/esp_system.h
     ../../esp-idf/components/json/cJSON/cJSON.h

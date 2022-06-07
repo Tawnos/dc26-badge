@@ -1,11 +1,13 @@
 #include "contact_store.h"
 #include <string.h>
 #include <crypto/micro-ecc/uECC.h>
-#if !defined VIRTUAL_DEVICE
-#include "mcu_to_mcu.h"
 #include "messaging/stm_to_esp_generated.h"
 #include "messaging/esp_to_stm_generated.h"
+
+#if !defined VIRTUAL_DEVICE
+#include "mcu_to_mcu.h"
 #endif
+
 #include "../darknet7.h"
 
 void SettingsInfo::receiveSignal(MCUToMCU* mcu, const MSGEvent<darknet7::BLEInfectionData>* mevt)

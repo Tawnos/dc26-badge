@@ -2,17 +2,21 @@
 #include "stm_to_esp_generated.h"
 #include "esp_to_stm_generated.h"
 #include "command_handler.h"
-#include "dc26.h"
-#include "dc26_ble/ble.h"
 extern "C" {
 #include "checksum.h"
 }
 
+#define LOGTAG "MCUToMCUTask"
+
+#if !defined VIRTUAL_DEVICE
+#include "dc26.h"
+#include "dc26_ble/ble.h"
 const char* MCUToMCUTask::LOGTAG = "MCUToMCUTask";
 static uint8_t ESPToSTMBuffer[MCUToMCUTask::ESP_TO_STM_MSG_QUEUE_SIZE * MCUToMCUTask::ESP_TO_STM_MSG_ITEM_SIZE];
 static StaticQueue_t OutgoingQueue;
 static QueueHandle_t OutgoingQueueHandle = nullptr;
 static xTaskHandle UARTSendTaskhandle = 0;
+#endif
 
 
 const darknet7::ESPToSTM* MCUToMCUTask::Message::asESPToSTM()
@@ -40,18 +44,6 @@ const darknet7::STMToESPRequest* MCUToMCUTask::Message::asSTMToESPVerify()
    }
 }
 
-//We listen for the for our envelop portion of our message which is: 4 bytes:
-// bits 0-10 is the size of the message coming max message size = 1024
-// bit 11: reserved
-// bit 12: reserved
-// bit 13: reserved
-// bit 14: reserved
-// bit 15: reserved
-// bit 16-31: CRC 16 of entire message
-//set up for our 4 byte envelop header
-MCUToMCUTask::Message::Message() :
-   SizeAndFlags(0), Crc16(0), MessageData()
-{}
 
 bool MCUToMCUTask::Message::read(const uint8_t* data, uint32_t dataSize)
 {
@@ -104,75 +96,26 @@ bool MCUToMCUTask::Message::checkFlags(uint16_t flags)
 }
 
 /////////////////////////
-static void uart_send(void* arg)
-{
-   MCUToMCUTask::Message* m = 0;
-   for (;;)
-   {
-      if (xQueueReceive(OutgoingQueueHandle, &m, portMAX_DELAY))
-      {
-         if (m != 0)
-         {
-            ESP_LOGI(MCUToMCUTask::LOGTAG, "sending %d bytes of msg type %d with break!",
-               (int)m->getMessageSize(), (int)m->asESPToSTM()->Msg_type());
-            uint32_t bytesSent = uart_write_bytes_with_break(UART_NUM_1, m->getMessageData(), m->getMessageSize(), 16);
-            if (m->getMessageSize() != bytesSent)
-            {
-               ESP_LOGI(MCUToMCUTask::LOGTAG, "failed to send all bytes! %u of %u",
-                  bytesSent, m->getMessageSize());
-            }
-            ESP_LOGI(MCUToMCUTask::LOGTAG, "Sent!");
-            delete m;
-         }
-      }
-   }
-}
 
-////////////
-MCUToMCUTask::MCUToMCUTask(CmdHandlerTask* pcht, const std::string& tName,
-   uint16_t stackSize, uint8_t p) :
-   Task(tName, stackSize, p), CmdHandler(pcht)
-{
 
-}
+//
+//void MCUToMCUTask::onStart()
+//{
+//   xTaskCreate(uart_send, "uart_send", 6048, NULL, 5, &UARTSendTaskhandle);
+//}
+//
+//void MCUToMCUTask::onStop()
+//{
+//   xTaskHandle temp = UARTSendTaskhandle;
+//   UARTSendTaskhandle = nullptr;
+//   vTaskDelete(temp);
+//}
 
-void MCUToMCUTask::onStart()
-{
-   xTaskCreate(uart_send, "uart_send", 6048, NULL, 5, &UARTSendTaskhandle);
-}
-
-void MCUToMCUTask::onStop()
-{
-   xTaskHandle temp = UARTSendTaskhandle;
-   UARTSendTaskhandle = nullptr;
-   vTaskDelete(temp);
-}
-
-bool MCUToMCUTask::init(uint8_t tx, uint8_t rx, uint16_t rxBufSize)
-{
-   ESP_LOGI(LOGTAG, "INIT");
-
-   OutgoingQueueHandle = xQueueCreateStatic(ESP_TO_STM_MSG_QUEUE_SIZE, ESP_TO_STM_MSG_ITEM_SIZE, &ESPToSTMBuffer[0], &OutgoingQueue);
-   if (OutgoingQueueHandle == nullptr)
-   {
-      ESP_LOGI(LOGTAG, "Failed creating OutgoingQueue");
-   }
-
-   uart_config_t uart_config = { .baud_rate = 115200, .data_bits =
-         UART_DATA_8_BITS, .parity = UART_PARITY_DISABLE, .stop_bits =
-         UART_STOP_BITS_1, .flow_ctrl = UART_HW_FLOWCTRL_DISABLE };
-   uart_config.use_ref_tick = 0;
-   uart_param_config(UART_NUM_1, &uart_config);
-   uart_set_pin(UART_NUM_1, tx, rx, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
-   // added a buffer for send and receive that we don't have to handle the async send
-   uart_driver_install(UART_NUM_1, rxBufSize * 2, 0, 0, NULL, 0);
-   return true;
-}
-
-MCUToMCUTask::~MCUToMCUTask()
-{
-   uart_driver_delete(UART_NUM_1);
-}
+//
+//MCUToMCUTask::~MCUToMCUTask()
+//{
+//   uart_driver_delete(UART_NUM_1);
+//}
 
 void MCUToMCUTask::send(const flatbuffers::FlatBufferBuilder& fbb)
 {
@@ -183,7 +126,9 @@ void MCUToMCUTask::send(const flatbuffers::FlatBufferBuilder& fbb)
    assert(size < MAX_MESSAGE_SIZE);
    Message* m = new Message();
    m->set(size, crc, msg);
-   xQueueSend(OutgoingQueueHandle, (void*)&m, (TickType_t)100);
+   uartQueue.push(m);
+   delete m;
+   //xQueueSend(OutgoingQueueHandle, (void*)&m, (TickType_t)100);
 }
 
 
@@ -209,9 +154,11 @@ int32_t MCUToMCUTask::processMessage(const uint8_t* data, uint32_t size)
          case darknet7::STMToESPAny_WiFiScan:
          case darknet7::STMToESPAny_WiFiNPCInteract:
             ESP_LOGI(LOGTAG, "sending to cmd handler");
-            xQueueSend(CmdHandler->getQueueHandle(), (void*)&m, (TickType_t)0);
+            CmdHandler->getMessageQueue().push(m);
+            //xQueueSend(CmdHandler->getQueueHandle(), (void*)&m, (TickType_t)0);
             ESP_LOGI(LOGTAG, "after send to cmd handler");
             break;
+#if !defined VIRTUAL_DEVICE
          case darknet7::STMToESPAny_BLEAdvertise:
          case darknet7::STMToESPAny_BLESetDeviceName:
          case darknet7::STMToESPAny_BLEGetInfectionData:
@@ -228,6 +175,7 @@ int32_t MCUToMCUTask::processMessage(const uint8_t* data, uint32_t size)
             xQueueSend(getBLETask().getQueueHandle(), (void*)&m, (TickType_t)0);
             ESP_LOGI(LOGTAG, "after send to bluetooth task");
             break;
+#endif
          default:
             break;
          }
@@ -244,17 +192,19 @@ int32_t MCUToMCUTask::processMessage(const uint8_t* data, uint32_t size)
    return retVal;
 }
 
-void MCUToMCUTask::run(void* data)
+void MCUToMCUTask::run(std::stop_token stoken)
 {
-   esp_log_level_set(LOGTAG, ESP_LOG_INFO);
+   //esp_log_level_set(LOGTAG, ESP_LOG_INFO);
    uint8_t dataBuf[MAX_MESSAGE_SIZE * 2] = { 0 };
    size_t receivePtr = 0;
-   while (1)
+   while (!stoken.stop_requested())
    {
+#if !defined VIRTUAL_DEVICE
       receivePtr += uart_read_bytes(UART_NUM_1, &dataBuf[0], sizeof(dataBuf), 100);
+#endif
       if (receivePtr > ENVELOP_HEADER)
       {
-         ESP_LOG_BUFFER_HEXDUMP(LOGTAG, &dataBuf[0], receivePtr, ESP_LOG_INFO);
+         //ESP_LOG_BUFFER_HEXDUMP(LOGTAG, &dataBuf[0], receivePtr, ESP_LOG_INFO);
          int32_t consumed = processMessage(&dataBuf[0], receivePtr);
          if (consumed > 0)
          {
@@ -266,13 +216,13 @@ void MCUToMCUTask::run(void* data)
          else if (consumed < 0)
          {
             ESP_LOGI(LOGTAG, "error process message resetting queue");
-            bzero(&dataBuf[0], sizeof(dataBuf));
+            memset(&dataBuf[0], 0, sizeof(dataBuf));
          }
          else /*0*/
          {
          }
       }
-      vTaskDelay(50 / portTICK_PERIOD_MS);
+      std::this_thread::sleep_for(50ms);
    }
 }
 

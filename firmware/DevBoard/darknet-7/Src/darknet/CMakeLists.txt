@@ -42,7 +42,8 @@ set (SOURCEFILES
     init.h
     contact_store.cpp         
     contact_store.h         
-    #mcu_to_mcu.cpp      
+    mcu_to_mcu.h    
+    mcu_to_mcu.cpp
     my_info.h 
     settings_info.h
     virtual_key_board.cpp

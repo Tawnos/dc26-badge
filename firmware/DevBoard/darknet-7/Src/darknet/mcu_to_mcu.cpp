@@ -7,13 +7,14 @@
 
 #if !defined VIRTUAL_DEVICE
 #include <usart.h>
+#include <logger.h>
 #endif
 
 #include "mcu_to_mcu.h"
 #include <etl/crc16.h>
-#include <logger.h>
 #include "../../../GUI/include/virtualHAL.h"
 
+#define ERRMSG(x) // x;
 
 
 #if !defined VIRTUAL_DEVICE
@@ -49,49 +50,15 @@ void MCUToMCU::resetUART()
 }
 #endif
 
-const darknet7::ESPToSTM* MCUToMCU::Message::asESPToSTM()
+const darknet7::ESPToSTM* MCUMessage::asESPToSTM()
 {
    return darknet7::GetSizePrefixedESPToSTM(&MessageData[ENVELOP_HEADER]);
 }
 
-bool MCUToMCU::Message::verifyESPToSTM()
+bool MCUMessage::verifyESPToSTM()
 {
    flatbuffers::Verifier v(&MessageData[ENVELOP_HEADER], getDataSize());
    return darknet7::VerifySizePrefixedESPToSTMBuffer(v);
-}
-
-// We listen for the for our envelop portion of our message which is: 4 bytes:
-//  bits 0-10 is the size of the message coming max message size = 1024
-//  bit 11: reserved
-//  bit 12: reserved
-//  bit 13: reserved
-//  bit 14: reserved
-//  bit 15: reserved
-//  bit 16-31: CRC 16 of entire message
-// set up for our 4 byte envelop header
-
-void MCUToMCU::Message::setFlag(uint16_t flags)
-{
-   SizeAndFlags |= flags;
-}
-
-bool MCUToMCU::Message::checkFlags(uint16_t flags)
-{
-   return (SizeAndFlags & flags) == flags;
-}
-
-HAL_StatusTypeDef MCUToMCU::Message::transmit(UART_HandleTypeDef* huart)
-{
-   HAL_StatusTypeDef status = HAL_OK;// HAL_UART_Transmit_IT(huart, &MessageData[0], getMessageSize());
-   if (status == HAL_OK)
-   {
-      setFlag(MESSAGE_FLAG_TRANSMITTED);
-   }
-   else
-   {
-      ERRMSG("transmit failed: %d", status);
-   }
-   return status;
 }
 
 void MCUToMCU::init(UART_HandleTypeDef* uart)
@@ -111,32 +78,32 @@ void MCUToMCU::onError()
 
 void MCUToMCU::onTransmissionComplete()
 {
-   Message& m = OutgoingMessages.front();
-   if (m.checkFlags(Message::MESSAGE_FLAG_TRANSMITTED))
+   MCUMessage& m = OutgoingMessages.front();
+   if (m.checkFlags(MCUMessage::MESSAGE_FLAG_TRANSMITTED))
    {
       OutgoingMessages.pop();
       // HAL_LIN_SendBreak(UartHandler);
    }
-   transmitNow();
+   //transmitNow();
 }
 
 void MCUToMCU::handleMcuToMcu()
 {
    uint16_t size = UartHandler->RxXferSize - UartHandler->RxXferCount;
    // we have received something and we have also gotten a line break
-   if (size > ENVELOP_HEADER)// && __HAL_UART_GET_FLAG(UartHandler, UART_FLAG_LBD))
+   if (size > MCUMessage::ENVELOP_HEADER)// && __HAL_UART_GET_FLAG(UartHandler, UART_FLAG_LBD))
    {
       uint16_t firstTwo = (*((uint16_t*)&UartRXBuffer[0]));
       uint16_t dataSize = firstTwo & 0x7FF; // 0-10 bits are size
       uint16_t crcFromESP = (*((uint16_t*)&UartRXBuffer[2]));
       if (dataSize <= size)
       {
-         etl::crc16 crc(&UartRXBuffer[ENVELOP_HEADER], &UartRXBuffer[ENVELOP_HEADER] + dataSize);
+         etl::crc16 crc(&UartRXBuffer[MCUMessage::ENVELOP_HEADER], &UartRXBuffer[MCUMessage::ENVELOP_HEADER] + dataSize);
          if (crc.value() != crcFromESP)
          {
             ERRMSG("CRC ERROR in handle MCU To MCU.\n");
          }
-         auto m = Message{ firstTwo, crcFromESP, &UartRXBuffer[ENVELOP_HEADER] };
+         auto m = MCUMessage{ firstTwo, crcFromESP, &UartRXBuffer[MCUMessage::ENVELOP_HEADER] };
          if (m.verifyESPToSTM())
          {
             IncomingMessages.push(m);
@@ -169,34 +136,29 @@ bool MCUToMCU::send(const flatbuffers::FlatBufferBuilder& fbb)
 {
    uint8_t* msg = fbb.GetBufferPointer();
    uint32_t size = fbb.GetSize();
-   assert(size < MAX_MESSAGE_SIZE);
+   assert(size < MCUMessage::MAX_MESSAGE_SIZE);
    etl::crc16 crc(msg, msg + size);
-   OutgoingMessages.push(Message{ static_cast<uint16_t>(size), crc.value(), msg });
+   OutgoingMessages.push(MCUMessage{ static_cast<uint16_t>(size), crc.value(), msg });
 
-   return transmitNow();
-}
-
-bool MCUToMCU::transmitNow()
-{
 #if !defined VIRTUAL_DEVICE
    if ((UartHandler->gState == HAL_UART_STATE_ERROR || UartHandler->gState == HAL_UART_STATE_TIMEOUT))
    {
       resetUART();
    }
-#endif
    if ((UartHandler->gState == HAL_UART_STATE_READY) && !OutgoingMessages.empty())
    {
-      Message& m = OutgoingMessages.front();
-      m.transmit(UartHandler);
+      MCUMessage& m = OutgoingMessages.front();
+      //m.transmit(UartHandler);
    }
+#endif
    return true;
 }
 
-void MCUToMCU::process()
+void MCUToMCU::process(std::stop_token stoken)
 {
    if (!IncomingMessages.empty())
    {
-      Message& m = IncomingMessages.front();
+      MCUMessage& m = IncomingMessages.front();
       const darknet7::ESPToSTM* msg = m.asESPToSTM();
       switch (msg->Msg_type())
       {

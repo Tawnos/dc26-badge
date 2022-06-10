@@ -328,7 +328,7 @@ void BluetoothTask::disconnect()
 
 	Switch on message type, and dispatch to the appropriate function
 */
-void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
+void BluetoothTask::commandHandler(MCUMessage* msg)
 {
 	auto m = msg->asSTMToESP();
 	switch (m->Msg_type())
@@ -386,7 +386,7 @@ void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 void BluetoothTask::run(void * data)
 {
 	static int loopsSinceScan = 0;
-	MCUToMCUTask::Message* m = nullptr;
+	MCUMessage* m = nullptr;
 	while (1)
 	{
 		loopsSinceScan += 1;

@@ -186,7 +186,7 @@ void CmdHandlerTask::run(std::stop_token stoken)
    while (!stoken.stop_requested())
    {
       //if (xQueueReceive(getQueueHandle(), &m, (TickType_t)1000 / portTICK_PERIOD_MS))
-      auto m = messageQueue.pop(stoken);
+      auto m = getQueue().pop();
       if (m)
       {
          ESP_LOGI(LOGTAG, "got message from queue");
@@ -256,7 +256,8 @@ void CmdHandlerTask::run(std::stop_token stoken)
                                                               break;
          case darknet7::STMToESPAny_WiFiScan: {
             ESP_LOGI(LOGTAG, "processing wifi scan request");
-            display->showMessage("Scanning!", 0, 16, 2000);
+            display->getQueue().push(new	DisplayMsg("Scanning!", 0, 16, 2000));
+
 #if !defined VIRTUAL_DEVICE
             MyWiFiEventHandler* eh = (MyWiFiEventHandler*)wifi.getWifiEventHandler();
             const darknet7::WiFiScan* ws = msg->Msg_as_WiFiScan();
@@ -304,7 +305,7 @@ void CmdHandlerTask::run(std::stop_token stoken)
                      nmsg = new NPCMsg(NPCMsg::NPCRequestType::Interact, msg->msgInstanceID(), ws->npcname()->c_str(), 0);
                   }
                }
-               NPCITask.getMessageQueue().push(nmsg);
+               NPCITask.getQueue().push(nmsg);
                delete nmsg;
 #if !defined VIRTUAL_DEVICE
                xQueueSend(NPCITask.getQueueHandle(), (void*)&nmsg, (TickType_t)100);

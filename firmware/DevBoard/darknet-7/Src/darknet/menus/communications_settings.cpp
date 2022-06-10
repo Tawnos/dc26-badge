@@ -6,8 +6,8 @@
  */
 #include "../darknet7.h"
 #include "communications_settings.h"
-#include "../messaging/stm_to_esp_generated.h"
-#include "../messaging/esp_to_stm_generated.h"
+#include <messaging/stm_to_esp_generated.h>
+#include <messaging/esp_to_stm_generated.h>
 #include "gui_list_processor.h"
 #include "menu_state.h"
 

@@ -9,7 +9,7 @@
 #define DARKNET_MENUS_DARKNET7_BASE_STATE_H_
 
 #include "../virtual_key_board.h"
-#include "../messaging/stm_to_esp_generated.h"
+#include <messaging/stm_to_esp_generated.h>
 #include "../libstm32/display/gui.h"
 
  /*

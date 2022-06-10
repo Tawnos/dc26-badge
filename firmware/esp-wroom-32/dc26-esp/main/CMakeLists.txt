@@ -12,6 +12,7 @@ set( INCLUDEDIRS
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/..
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../common
     ${CMAKE_CURRENT_SOURCE_DIR}/lib
     ${CMAKE_CURRENT_SOURCE_DIR}/../../esp-idf/components/esp32/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../../esp-idf/components/soc/include
@@ -55,8 +56,6 @@ set (SOURCEFILES
     ../sdkconfig.h
     npc_interact.cpp
     npc_interact.h
-    esp_to_stm_generated.h 
-    stm_to_esp_generated.h 
     task_handler.h
 
     ../components/flatbuffer/flatbuffers/flatbuffers.h
@@ -66,6 +65,11 @@ set (SOURCEFILES
     ../../esp-idf/components/json/cJSON/cJSON.h
     ../../esp-idf/components/log/include/esp_log.h
     ../../esp-idf/components/freertos/include/freertos/queue.h
+
+    ../../../common/messaging/mcu_message.h 
+    ../../../common/messaging/mcu_message.cpp
+    ../../../common/messaging/esp_to_stm_generated.h 
+    ../../../common/messaging/stm_to_esp_generated.h 
 
     # dc26_ble/ble_serial.cpp    
     # dc26_ble/ble_serial.h
@@ -78,80 +82,6 @@ set (SOURCEFILES
     # dc26_ble/security.cpp
     # dc26_ble/security.h
     # dc26_ble/services.h
-
-    # lib/FATFS_VFS.cpp   
-    # lib/FATFS_VFS.h     
-    # lib/File.cpp        
-    # lib/File.h          
-    # lib/FileSystem.cpp  
-    # lib/FileSystem.h    
-    # lib/fonts.cpp       
-    # lib/fonts.h         
-    # lib/FreeRTOS.cpp    
-    # lib/FreeRTOS.h      
-    # lib/GeneralUtils.cpp
-    # lib/GeneralUtils.h  
-    lib/gui.cpp         
-    lib/gui.h           
-    # lib/i2c.cpp         
-    lib/i2c.hpp         
-    # lib/Memory.cpp      
-    # lib/Memory.h        
-    # lib/ssd1306.cpp     
-    lib/ssd1306.h       
-    # lib/System.cpp      
-    lib/System.h        
-    # lib/Task.cpp        
-    # lib/Task.h   
-    
-    # lib/ble/BLE2902.cpp
-    # lib/ble/BLE2902.h
-    # lib/ble/BLE2904.cpp
-    # lib/ble/BLE2904.h
-    # lib/ble/BLEAddress.cpp
-    # lib/ble/BLEAddress.h
-    # lib/ble/BLEAdvertisedDevice.cpp
-    # lib/ble/BLEAdvertisedDevice.h
-    # lib/ble/BLEAdvertising.cpp
-    # lib/ble/BLEAdvertising.h
-    # lib/ble/BLEBeacon.cpp
-    # lib/ble/BLEBeacon.h
-    # lib/ble/BLECharacteristic.cpp
-    # lib/ble/BLECharacteristic.h
-    # lib/ble/BLECharacteristicMap.cpp
-    # lib/ble/BLEClient.cpp
-    # lib/ble/BLEClient.h
-    # lib/ble/BLEDescriptor.cpp
-    # lib/ble/BLEDescriptor.h
-    # lib/ble/BLEDescriptorMap.cpp
-    # lib/ble/BLEDevice.cpp
-    # lib/ble/BLEDevice.h
-    # lib/ble/BLEExceptions.cpp
-    # lib/ble/BLEExceptions.h
-    # lib/ble/BLEHIDDevice.cpp
-    # lib/ble/BLEHIDDevice.h
-    # lib/ble/BLERemoteCharacteristic.cpp
-    # lib/ble/BLERemoteCharacteristic.h
-    # lib/ble/BLERemoteDescriptor.cpp
-    # lib/ble/BLERemoteDescriptor.h
-    # lib/ble/BLERemoteService.cpp
-    # lib/ble/BLERemoteService.h
-    # lib/ble/BLEScan.cpp
-    # lib/ble/BLEScan.h
-    # lib/ble/BLESecurity.cpp
-    # lib/ble/BLESecurity.h
-    # lib/ble/BLEServer.cpp
-    # lib/ble/BLEServer.h
-    # lib/ble/BLEService.cpp
-    # lib/ble/BLEService.h
-    # lib/ble/BLEServiceMap.cpp
-    # lib/ble/BLEUtils.cpp
-    # lib/ble/BLEUtils.h
-    # lib/ble/BLEUUID.cpp
-    # lib/ble/BLEUUID.h
-    # lib/ble/BLEValue.cpp
-    # lib/ble/BLEValue.h
-    # lib/ble/HIDTypes.h
 
     lib/json/JSON.h
     lib/json/JSON.cpp

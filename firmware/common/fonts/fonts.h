@@ -19,6 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
    ----------------------------------------------------------------------
  */
+#pragma once
 #ifndef FONTS_H
 #define FONTS_H 120
 
@@ -38,8 +39,8 @@
  *  - 11 x 18 pixels
  *  - 16 x 26 pixels
  */
-#include <esp_types.h>
 #include "string.h"
+#include <stdint.h> 
 
 /**
  * @defgroup LIB_Typedefs
@@ -78,6 +79,7 @@ typedef struct {
 /**
  * @brief  7 x 10 pixels font size structure 
  */
+extern FontDef_t Font_6x10;
 extern FontDef_t Font_7x10;
 extern FontDef_t Font_5x7;
 extern FontDef_t Font_11x18;

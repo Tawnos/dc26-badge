@@ -4,6 +4,7 @@
 #include <queue>
 #include <mutex>
 #include <array>
+#include <cassert>
 
 using namespace std::chrono_literals;
 
@@ -15,32 +16,42 @@ public:
       : pollTimeout(pollTimeout)
    {}
 
-   TMessage* push(TMessage* msg)
+   const TMessage* push(TMessage* msg)
    {
-      std::unique_lock<std::mutex> queue_lock(queue_mutex);
-      currentItem++;
-      if (currentItem < NElements)
+      std::unique_lock<std::mutex> queue_lock(queue_mutex, std::defer_lock);
+      //while (!stoken.stop_requested())
+      while (true)
       {
-         auto msgDest = &queueStorage[currentItem];
-         memcpy((void*)msgDest, msg, sizeof(TMessage));
-         queue.push(msgDest);
-         return msgDest;
+         queue_lock.lock();
+         //queue_lock.try_lock_for(pollTimeout)
+         currentItem++;
+         if (currentItem < NElements)
+         {
+            auto msgDest = &queueStorage[currentItem];
+            memcpy((void*)msgDest, msg, sizeof(TMessage));
+            queue_condition.notify_one();
+            return msgDest;
+         }
+         currentItem--;
+
+         // before continuing the loop, temporarily unlock to allow a pop to occur
+         queue_lock.unlock();
       }
-      currentItem--;
       return nullptr;
    }
 
-   TMessage* pop(std::stop_token stoken)
+   TMessage* pop()
    {
       std::unique_lock<std::mutex> queue_lock(queue_mutex);
       if (currentItem == -1)
          queue_condition.wait_for(queue_lock, pollTimeout);
 
-      if (queue.empty())
-         return nullptr;
+      if (currentItem == -1)
+            return nullptr;
 
-      auto m = queue.front();
-      queue.pop();
+      auto m = new TMessage{};
+      memcpy((void*)m, &queueStorage[currentItem], sizeof(TMessage));
+      currentItem--;
       return m;
    }
 
@@ -48,7 +59,6 @@ private:
    std::chrono::milliseconds pollTimeout;
 
    int currentItem{ -1 };
-   std::queue<TMessage*> queue{};
    std::array<TMessage, NElements> queueStorage{};
    std::mutex queue_mutex;
    std::unique_lock<std::mutex> queue_lock;

@@ -17,8 +17,8 @@
 #include "sao_menu.h"
 #include "darknet7_base_state.h"
 #include "../mcu_to_mcu.h"
-#include "../messaging/stm_to_esp_generated.h"
-#include "../messaging/esp_to_stm_generated.h"
+#include <messaging/stm_to_esp_generated.h>
+#include <messaging/esp_to_stm_generated.h>
 #include <libstm32/rgbcolor.h>
 
 using cmdc0de::ErrorType;

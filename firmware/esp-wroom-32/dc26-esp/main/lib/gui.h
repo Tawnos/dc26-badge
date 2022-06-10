@@ -2,8 +2,9 @@
 #define GUI_H
 
 #include <stdio.h>
-#include "fonts.h"
-#include "ssd1306.h"
+#include <fonts/fonts.h>
+#include "display_handler.h"
+//#include "ssd1306.h"
 
 #define GUI_DefFont Font_7x10
 
@@ -57,7 +58,7 @@ class GUI_TickerData
 {
 	public:
 		GUI_TickerData(const char * txt, uint8_t X, uint8_t Y, uint8_t W, uint8_t H) 
-			: text(txt), x(X), y(Y), w(W), h(H), bg(SSD1306_COLOR_BLACK), border(SSD1306_COLOR_WHITE), startTick(0) {
+			: text(txt), x(X), y(Y), w(W), h(H), bg(0), border(1), startTick(0) {
 		}
 	const char *text;
 	uint8_t x, y, w, h, bg, border;

@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 set( INCLUDEDIRS
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../../common
     ${CMAKE_CURRENT_SOURCE_DIR}/../../Inc
     ${CMAKE_CURRENT_SOURCE_DIR}/3dParty/flatbuffer
     ${CMAKE_CURRENT_SOURCE_DIR}/libstm32
@@ -66,8 +67,6 @@ set (SOURCEFILES
     libstm32/display/DrawBuffer2D16BitPerPixel1Buffer.h
     libstm32/display/display_device.cpp
     libstm32/display/display_device.h
-    libstm32/display/fonts.cpp
-    libstm32/display/fonts.h
     libstm32/display/framebuf.h
     libstm32/display/gui.cpp
     libstm32/display/gui.h
@@ -119,9 +118,15 @@ set (SOURCEFILES
     #menus/3d/renderer.cpp
     #menus/3d/vec_math.cpp
 
-    messaging/common_generated.h
-    messaging/esp_to_stm_generated.h
-    messaging/stm_to_esp_generated.h
+    ../../../../common/messaging/common_generated.h
+    ../../../../common/messaging/esp_to_stm_generated.h
+    ../../../../common/messaging/stm_to_esp_generated.h
+
+    ../../../../common/messaging/mcu_message.h
+    ../../../../common/messaging/mcu_message.cpp
+    
+    ../../../../common/fonts/fonts.cpp
+    ../../../../common/fonts/fonts.h
 )
 
 add_library(darknet7 STATIC ${SOURCEFILES})

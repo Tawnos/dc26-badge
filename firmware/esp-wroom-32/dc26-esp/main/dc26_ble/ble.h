@@ -46,7 +46,7 @@ public:
 
 	// STM to ESP Queue
 	static const int STM_MSG_QUEUE_SIZE = 3;
-	static const int STM_MSG_ITEM_SIZE = sizeof(MCUToMCUTask::Message *);
+	static const int STM_MSG_ITEM_SIZE = sizeof(MCUMessage *);
 	StaticQueue_t STMQueue;
 	QueueHandle_t STMQueueHandle = nullptr;
 	uint8_t fromSTMBuffer[STM_MSG_QUEUE_SIZE*STM_MSG_ITEM_SIZE];
@@ -70,7 +70,7 @@ public: // API
 public:
 	BluetoothTask(const std::string &tName, uint16_t stackSize=10000, uint8_t p=5);
 	bool init();
-	void commandHandler(MCUToMCUTask::Message* cmd);
+	void commandHandler(MCUMessage* cmd);
 	virtual void run(void *data);
 	virtual ~BluetoothTask();
 protected:

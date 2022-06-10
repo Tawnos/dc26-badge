@@ -15,12 +15,8 @@
 #include "npc_interact.h"
 #include "display_handler.h"
 
-class CmdHandlerTask : public TaskHandler
+class CmdHandlerTask : public TaskHandler<MCUMessage, 4>
 {
-public:
-   static const int STM_TO_ESP_MSG_QUEUE_SIZE = 4;
-   static const int STM_TO_ESP_MSG_ITEM_SIZE = sizeof(MCUToMCUTask::Message*);
-   static const char* LOGTAG;
 public:
    CmdHandlerTask(const std::string& tName, uint16_t stackSize = 4196, uint8_t p = 5) {};
    //	
@@ -49,21 +45,16 @@ public:
 
 public:
    virtual void run(std::stop_token stoken) override;
-   constexpr CommandQueue<MCUToMCUTask::Message, 4>& getMessageQueue()
-   {
-      return messageQueue;
-   }
 
 protected:
-   CommandQueue<MCUToMCUTask::Message, 4> messageQueue{};
 
 #if !defined VIRTUAL_DEVICE
    WiFi wifi;
 #endif
 private:
    MCUToMCUTask* mcuToMcu{ nullptr };
-   DisplayTask* display{ nullptr };
-   NPCInteractionTask NPCITask{};// ("NPCInteractTask");
+   DisplayHandlerTask* display{ nullptr };
+   NPCInteractionTask NPCITask{mcuToMcu};// ("NPCInteractTask");
 };
 
 #endif

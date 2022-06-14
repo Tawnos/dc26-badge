@@ -72,20 +72,20 @@ Darknet7BaseState*  SettingState::onRun()
             memset(&AgentName[0], 0, sizeof(AgentName));
             VKB->init(VirtualKeyBoard::STDKBNames, &IHC, 5, cmdc0de::DISPLAY_WIDTH - 5, 80, cmdc0de::RGBColor::WHITE, RGBColor::BLACK, RGBColor::BLUE, '_');
             darknet->getGUI()->drawString(0, 10, (const char*)"Current agent name:");
-            if (*darknet->getContacts()->getSettings().getAgentName() == '\0')
+            if (*darknet->getContactStore()->getSettings().getAgentName() == '\0')
             {
                darknet->getGUI()->drawString(0, 20, (const char*)"NOT SET");
             }
             else
             {
-               darknet->getGUI()->drawString(0, 20, darknet->getContacts()->getSettings().getAgentName());
+               darknet->getGUI()->drawString(0, 20, darknet->getContactStore()->getSettings().getAgentName());
             }
             darknet->getGUI()->drawString(0, 40, (const char*)"MID button completes entry");
             darknet->getGUI()->drawString(0, 50, (const char*)"Set agent name:");
             darknet->getGUI()->drawString(0, 60, &AgentName[0]);
             break;
          case 101:
-            MiscCounter = darknet->getContacts()->getSettings().getScreenSaverTime();
+            MiscCounter = darknet->getContactStore()->getSettings().getScreenSaverTime();
             break;
          case 102:
             darknet->getGUI()->drawString(0, 10, (const char*)"ERASE ALL\nCONTACTS?");
@@ -103,10 +103,10 @@ Darknet7BaseState*  SettingState::onRun()
          if (buttonInfo->wereAnyOfTheseButtonsReleased(ButtonPress::Mid) && AgentName[0] != '\0' && AgentName[0] != ' ' && AgentName[0] != '_')
          {
             AgentName[AGENT_NAME_LENGTH - 1] = '\0';
-            if (darknet->getContacts()->getSettings().setAgentname(&AgentName[0]))
+            if (darknet->getContactStore()->getSettings().setAgentname(&AgentName[0]))
             {
                flatbuffers::FlatBufferBuilder fbb;
-               auto r = darknet7::CreateBLESetDeviceNameDirect(fbb, darknet->getContacts()->getSettings().getAgentName());
+               auto r = darknet7::CreateBLESetDeviceNameDirect(fbb, darknet->getContactStore()->getSettings().getAgentName());
                auto z = darknet7::CreateSTMToESPRequest(fbb, darknet->nextSeq(), darknet7::STMToESPAny_BLESetDeviceName, r.Union());
                darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, z);
                darknet->getMcuToMcu()->send(fbb);
@@ -140,7 +140,7 @@ Darknet7BaseState*  SettingState::onRun()
          }
          else if (buttonInfo->wereAnyOfTheseButtonsReleased(ButtonPress::Mid))
          {
-            if (darknet->getContacts()->getSettings().setScreenSaverTime(MiscCounter))
+            if (darknet->getContactStore()->getSettings().setScreenSaverTime(MiscCounter))
             {
                nextState = darknet->getDisplayMessageState(darknet->getDisplayMenuState(), (const char*)"Setting saved", 2000);
             }
@@ -154,7 +154,7 @@ Darknet7BaseState*  SettingState::onRun()
       case 102:
          if (buttonInfo->wereAnyOfTheseButtonsReleased(ButtonPress::Fire))
          {
-            darknet->getContacts()->resetToFactory();
+            darknet->getContactStore()->resetToFactory();
             nextState = darknet->getDisplayMenuState();
          }
          else if (buttonInfo->wasAnyButtonReleased())

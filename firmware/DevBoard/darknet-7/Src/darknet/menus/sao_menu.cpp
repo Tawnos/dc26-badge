@@ -130,7 +130,7 @@ protected:
 				value<<=1; //fix off by one bug in eggplant
 				if(((value&ContactStore::SettingsInfo::CHLAMYDIA)==ContactStore::SettingsInfo::CHLAMYDIA) || ((value&ContactStore::SettingsInfo::HERPES)==ContactStore::SettingsInfo::HERPES)
 						|| ((value&BOTH)==BOTH)) {
-					DarkNet7::get().getContacts()->getSettings().setHealth(value);
+					DarkNet7::get().getContactStore()->getSettings().setHealth(value);
 				}
 			}
 			//HAL_I2C_Master_Receive(&hi2c3,getAddress(),&crap[0],sizeof(crap),500);

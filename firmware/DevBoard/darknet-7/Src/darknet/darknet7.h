@@ -50,7 +50,7 @@ public:
       ContactStore* contactStore = new ContactStore{ this, cmdc0de::MyAddressInfoSector, cmdc0de::MyAddressInfoOffSet, cmdc0de::SettingSector, cmdc0de::SettingOffset, cmdc0de::StartContactSector, cmdc0de::EndContactSector })
       : Apa106s(leds)
       //		       my Info, start setting address, start Contact address, end contact address
-      MyContacts(contactStore),
+      contactStore(contactStore),
       Display(displayDevice),
       DisplayBuffer(displayDevice, DrawBuffer),
       MyGUI(Display)
@@ -63,11 +63,11 @@ public:
       : Display(displayDevice),
          DisplayBuffer(displayDevice->getFrameBuffer()),
          gui{ DisplayBuffer, &Font_6x10 },
-      MyContacts(new ContactStore( mcu, SettingsMemoryStart, SettingsMemoryEnd )){ }
+      contactStore(new ContactStore( mcu, SettingsMemoryStart, SettingsMemoryEnd )){ }
 #endif
    virtual ~DarkNet7()
    {
-      delete MyContacts;
+      delete contactStore;
    };
 
    cmdc0de::DisplayMessageState* getDisplayMessageState(Darknet7BaseState* bm, const char* message, uint16_t timeToDisplay)
@@ -99,8 +99,8 @@ public:
    cmdc0de::DisplayDevice* getDisplay() { return Display; }
    const cmdc0de::DisplayDevice* getDisplay() const { return Display; }
 
-   ContactStore* getContacts() { return MyContacts; }
-   const ContactStore* getContacts() const { return MyContacts; }
+   ContactStore* getContactStore() { return contactStore; }
+   const ContactStore* getContactStore() const { return contactStore; }
 
    cmdc0de::GUI* getGUI() { return &gui; }
    const cmdc0de::GUI* getGUI() const { return &gui; }
@@ -121,7 +121,7 @@ private:
 #if !defined VIRTUAL_DEVICE
    cmdc0de::WS2818 Apa106s;
 #endif
-   ContactStore* MyContacts{ nullptr };
+   ContactStore* contactStore{ nullptr };
    cmdc0de::DisplayDevice* Display;
    cmdc0de::FrameBuf* DisplayBuffer;
    cmdc0de::GUI gui;

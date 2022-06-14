@@ -23,7 +23,7 @@ using cmdc0de::RGBColor;
 
 ErrorType MenuState::onInit() {
 	Items[0].id = 0;
-	if (darknet->getContacts()->getSettings().isNameSet()) {
+	if (darknet->getContactStore()->getSettings().isNameSet()) {
 		Items[0].text = (const char *) "Settings";
 	} else {
 		Items[0].text = (const char *) "Settings *";
@@ -68,7 +68,7 @@ Darknet7BaseState*  MenuState::onRun() {
 					nextState = darknet->getSettingState();
 					break;
 				case 1:
-					if (darknet->getContacts()->getSettings().getAgentName()[0] != '\0') {
+					if (darknet->getContactStore()->getSettings().getAgentName()[0] != '\0') {
 						nextState = darknet->getPairingState();
 					} else {
 						nextState = darknet->getDisplayMessageState(darknet->getDisplayMenuState(),

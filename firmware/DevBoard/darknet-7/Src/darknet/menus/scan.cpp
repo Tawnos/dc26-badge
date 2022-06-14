@@ -69,7 +69,7 @@ public:
 					sprintf(&ListBuffer[7][0], "R: %s", mevt->InnerMsg->response()->c_str());
 				}
 				if(mevt->InnerMsg->infections()!=0) {
-					DarkNet7::get().getContacts()->getSettings().setHealth(mevt->InnerMsg->infections());
+					DarkNet7::get().getContactStore()->getSettings().setHealth(mevt->InnerMsg->infections());
 				}
 				DarkNet7::get().getDisplay()->fillScreen(RGBColor::BLACK);
 				DarkNet7::get().getGUI()->drawList(&DisplayList);

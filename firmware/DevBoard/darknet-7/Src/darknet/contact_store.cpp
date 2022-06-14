@@ -137,13 +137,11 @@ bool SettingsInfo::writeSettings(const DataStructure& ds)
       memset(getSettings(), 0, SettingsInfo::SIZE);
 #endif
       CurrentAddress = StartAddress;
-      startNewAddress = CurrentAddress;
-      endNewAddress = CurrentAddress + SettingsInfo::SIZE;
    }
    else
    {
-#if !defined VIRTUAL_DEVICE
       //zero out the one we were on
+#if !defined VIRTUAL_DEVICE
       HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, CurrentAddress, 0); //2
       HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, CurrentAddress + 4, 0); //4
       HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, CurrentAddress + 8, 0);
@@ -152,10 +150,8 @@ bool SettingsInfo::writeSettings(const DataStructure& ds)
 #else
       memset(CurrentAddress, 0, SettingsInfo::SIZE);
 #endif
-      CurrentAddress = startNewAddress;
    }
 
-   auto settingsData = *((uint32_t*)&ds);
 #if !defined VIRTUAL_DEVICE
    HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, CurrentAddress, SETTING_MARKER);
    if (HAL_OK == HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, (CurrentAddress + sizeof(uint32_t)), settingsData))
@@ -175,6 +171,7 @@ bool SettingsInfo::writeSettings(const DataStructure& ds)
    }
    return false;
 #else
+   auto settingsData = *((uint32_t*)&ds);
    auto target = (uint32_t*)CurrentAddress;
    target[0] = SETTING_MARKER;
    target[1] = settingsData;
@@ -241,12 +238,9 @@ uint8_t SettingsInfo::getSleepTime()
 
 /////////////////////////////////////////////////////////////////////////////////
 
-void Contact::setCompressedPublicKey(const uint8_t key1[PUBLIC_KEY_COMPRESSED_LENGTH])
+void Contact::setCompressedPublicKey(const uint8_t key[PUBLIC_KEY_COMPRESSED_LENGTH])
 {
    uint8_t* s = StartAddress + _OFFSET_OF_PUBKEY;
-   uint8_t key[PUBLIC_KEY_COMPRESSED_STORAGE_LENGTH];
-   memset(&key[0], 0, sizeof(key)); //set array to 0
-   memcpy(&key[0], &key1[0], PUBLIC_KEY_COMPRESSED_LENGTH); //copy over just the 25 bytes of the compressed public key
 #if !defined VIRTUAL_DEVICE
    FLASH_LOCKER f;
    //store all bits
@@ -257,6 +251,8 @@ void Contact::setCompressedPublicKey(const uint8_t key1[PUBLIC_KEY_COMPRESSED_LE
    HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s + 16, (*((uint32_t*)&key[16])));
    HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s + 20, (*((uint32_t*)&key[20])));
    HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, s + 24, (*((uint32_t*)&key[24])));
+#else
+   memcpy(s, key, PUBLIC_KEY_COMPRESSED_LENGTH);
 #endif
 }
 
@@ -281,6 +277,8 @@ void Contact::setPairingSignature(const uint8_t sig[SIGNATURE_LENGTH])
    HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s + 36, (*((uint32_t*)&sig[36])));
    HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s + 40, (*((uint32_t*)&sig[40])));
    HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s + 44, (*((uint32_t*)&sig[44])));
+#else
+   memcpy(s, sig, SIGNATURE_LENGTH);
 #endif
 }
 

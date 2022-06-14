@@ -29,10 +29,10 @@ void AddressState::resetSelection() {
 }
 
 void AddressState::setNext4Items(uint16_t startAt) {
-	uint8_t num = darknet->getContacts()->getSettings().getNumContacts();
+	uint8_t num = darknet->getContactStore()->getSettings().getNumContacts();
 	for (uint16_t i = startAt, j = 0; j < (4); i++, j++) {
 		if (i < num) {
-			if (darknet->getContacts()->getContactAt(i, CurrentContactList[j])) {
+			if (darknet->getContactStore()->getContactAt(i, CurrentContactList[j])) {
 				Items[j].id = CurrentContactList[j].getUniqueID();
 				Items[j].text = CurrentContactList[j].getAgentName();
 			}
@@ -64,7 +64,7 @@ Darknet7BaseState*  AddressState::onRun() {
 				Index--;
 			}
 		} else if (buttonInfo->wereTheseButtonsReleased(ButtonPress::Down)) {
-			uint16_t num = darknet->getContacts()->getSettings().getNumContacts();
+			uint16_t num = darknet->getContactStore()->getSettings().getNumContacts();
 			if (Index < num) {
 				if (AddressList.selectedItem == (sizeof(Items) / sizeof(Items[0]) - 1)) {
 					if (num > Index + 4) {

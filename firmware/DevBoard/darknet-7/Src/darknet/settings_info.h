@@ -39,6 +39,8 @@ public:
    static const uint8_t SIZE = 8 + AGENT_NAME_LENGTH;
    struct DataStructure
    {
+      uint32_t Magic;
+
       uint32_t Health : 12;
       uint32_t NumContacts : 8;
       uint32_t ScreenSaverType : 4;
@@ -57,31 +59,35 @@ public:
       const MSGEvent<darknet7::BLEInfectionData>* removebob = 0;
       // mcu->getBus().addListener(this, removebob, mcu);
 
-      auto foundSettingsMarker = false;
-      for (uint8_t* addr = StartAddress; addr < EndAddress; addr += SettingsInfo::SIZE)
-      {
-         uint32_t value = *((uint32_t*)addr);
-         if (value == SETTING_MARKER)
-         {
-            CurrentAddress = addr;
-            //const char* AgentNameAddr = ((const char*)(CurrentAddress + sizeof(uint32_t) + sizeof(uint32_t)));
-            //strncpy(&AgentName[0], AgentNameAddr, sizeof(AgentName));
-            foundSettingsMarker = true;
-         }
-      }
+      auto ds = (DataStructure*)StartAddress;
 
-      if (!foundSettingsMarker)
+      //auto foundSettingsMarker = false;
+      //for (uint8_t* addr = StartAddress; addr < EndAddress; addr += SettingsInfo::SIZE)
+      //{
+      //   uint32_t value = *((uint32_t*)addr);
+      //   if (value == SETTING_MARKER)
+      //   {
+      //      CurrentAddress = addr;
+      //      //const char* AgentNameAddr = ((const char*)(CurrentAddress + sizeof(uint32_t) + sizeof(uint32_t)));
+      //      //strncpy(&AgentName[0], AgentNameAddr, sizeof(AgentName));
+      //      foundSettingsMarker = true;
+      //   }
+      //}
+      
+      if (ds->Magic != SETTING_MARKER)
       {
          //couldn't find DS
          CurrentAddress = EndAddress;
 
          //0x1FE; //all the virus
          DataStructure ds{
+            .Magic = SETTING_MARKER,
             .Health = 0,
             .NumContacts = 0,
             .ScreenSaverType = 0,
             .SleepTimer = 3,
-            .ScreenSaverTime = 1
+            .ScreenSaverTime = 1,
+            .AgentName = ""
          };
          writeSettings(ds);
       }

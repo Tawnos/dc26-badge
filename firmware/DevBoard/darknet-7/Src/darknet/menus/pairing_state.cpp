@@ -255,9 +255,9 @@ Darknet7BaseState* PairingState::onRun()
       darknet->getGUI()->drawString(5, 20, (const char*)"Alice Send 1", cmdc0de::RGBColor::BLUE);
       //Make the Message
       AIC.irmsgid = ALICE_SEND_ONE;
-      memcpy(&AIC.AlicePublicKey[0], darknet->getContacts()->getMyInfo().getCompressedPublicKey(), PUBLIC_KEY_COMPRESSED_LENGTH);
-      AIC.AliceRadioID = darknet->getContacts()->getMyInfo().getUniqueID();
-      strncpy(&AIC.AliceName[0], darknet->getContacts()->getSettings().getAgentName(), sizeof(AIC.AliceName));
+      memcpy(&AIC.AlicePublicKey[0], darknet->getContactStore()->getMyInfo().getCompressedPublicKey(), PUBLIC_KEY_COMPRESSED_LENGTH);
+      AIC.AliceRadioID = darknet->getContactStore()->getMyInfo().getUniqueID();
+      strncpy(&AIC.AliceName[0], darknet->getContactStore()->getSettings().getAgentName(), sizeof(AIC.AliceName));
 
       //Send the message
       auto sdata = fbb.CreateString((char*)&AIC, sizeof(AIC));
@@ -280,9 +280,9 @@ Darknet7BaseState* PairingState::onRun()
       uint8_t msgHash[SHA256_HASH_SIZE];
       ShaOBJ msgHashCtx;
       sha256_init(&msgHashCtx);
-      uint16_t radioID = darknet->getContacts()->getMyInfo().getUniqueID();
+      uint16_t radioID = darknet->getContactStore()->getMyInfo().getUniqueID();
       sha256_add(&msgHashCtx, (uint8_t*)&radioID, sizeof(uint16_t));
-      sha256_add(&msgHashCtx, (uint8_t*)darknet->getContacts()->getMyInfo().getCompressedPublicKey(),
+      sha256_add(&msgHashCtx, (uint8_t*)darknet->getContactStore()->getMyInfo().getCompressedPublicKey(),
          PUBLIC_KEY_COMPRESSED_LENGTH);
       sha256_digest(&msgHashCtx, &msgHash[0]);
 
@@ -298,14 +298,14 @@ Darknet7BaseState* PairingState::onRun()
          uint8_t tmp[32 + 32 + 64];
          ATBS.irmsgid = ALICE_SEND_TWO;
          SHA256_HashContext ctx = { { &init_SHA256, &update_SHA256, &finish_SHA256, 64, 32, tmp } };
-         uECC_sign_deterministic((const unsigned char*)darknet->getContacts()->getMyInfo().getPrivateKey(),
+         uECC_sign_deterministic((const unsigned char*)darknet->getContactStore()->getMyInfo().getPrivateKey(),
             message_hash, sizeof(message_hash), &ctx.uECC, &ATBS.signature[0], THE_CURVE);
 
          //Add to contacts
          Contact c;
-         if (!darknet->getContacts()->findContactByID(brti->BoBRadioID, c))
+         if (!darknet->getContactStore()->findContactByID(brti->BoBRadioID, c))
          {
-            darknet->getContacts()->addContact(brti->BoBRadioID, &brti->BobAgentName[0],
+            darknet->getContactStore()->addContact(brti->BoBRadioID, &brti->BobAgentName[0],
                &brti->BoBPublicKey[0], &brti->SignatureOfAliceData[0]);
          }
       }
@@ -338,13 +338,13 @@ Darknet7BaseState* PairingState::onRun()
 
       uint8_t tmp[32 + 32 + 64];
       SHA256_HashContext ctx = { { &init_SHA256, &update_SHA256, &finish_SHA256, 64, 32, &tmp[0] } };
-      uECC_sign_deterministic(darknet->getContacts()->getMyInfo().getPrivateKey(), message_hash,
+      uECC_sign_deterministic(darknet->getContactStore()->getMyInfo().getPrivateKey(), message_hash,
          sizeof(message_hash), &ctx.uECC, signature, THE_CURVE);
       BRTI.irmsgid = BOB_SEND_ONE;
-      BRTI.BoBRadioID = darknet->getContacts()->getMyInfo().getUniqueID();
-      memcpy(&BRTI.BoBPublicKey[0], darknet->getContacts()->getMyInfo().getCompressedPublicKey(),
+      BRTI.BoBRadioID = darknet->getContactStore()->getMyInfo().getUniqueID();
+      memcpy(&BRTI.BoBPublicKey[0], darknet->getContactStore()->getMyInfo().getCompressedPublicKey(),
          sizeof(BRTI.BoBPublicKey));
-      strncpy(&BRTI.BobAgentName[0], darknet->getContacts()->getSettings().getAgentName(),
+      strncpy(&BRTI.BobAgentName[0], darknet->getContactStore()->getSettings().getAgentName(),
          sizeof(BRTI.BobAgentName));
       memcpy(&BRTI.SignatureOfAliceData[0], &signature[0], sizeof(BRTI.SignatureOfAliceData));
 
@@ -366,16 +366,16 @@ Darknet7BaseState* PairingState::onRun()
       uint8_t msgHash[SHA256_HASH_SIZE];
       ShaOBJ msgHashCtx;
       sha256_init(&msgHashCtx);
-      uint16_t radioID = darknet->getContacts()->getMyInfo().getUniqueID();
+      uint16_t radioID = darknet->getContactStore()->getMyInfo().getUniqueID();
       sha256_add(&msgHashCtx, (uint8_t*)&radioID, sizeof(uint16_t));
-      sha256_add(&msgHashCtx, (uint8_t*)darknet->getContacts()->getMyInfo().getCompressedPublicKey(), PUBLIC_KEY_COMPRESSED_LENGTH);
+      sha256_add(&msgHashCtx, (uint8_t*)darknet->getContactStore()->getMyInfo().getCompressedPublicKey(), PUBLIC_KEY_COMPRESSED_LENGTH);
       //verify alice's signature of my public key and unique id
       sha256_digest(&msgHashCtx, &msgHash[0]);
       if (uECC_verify(&uncompressedPublicKey[0], &msgHash[0], sizeof(msgHash), &atbs->signature[0], THE_CURVE))
       {
          Contact c;
-         if ((darknet->getContacts()->findContactByID(AIC.AliceRadioID, c) ||
-            darknet->getContacts()->addContact(AIC.AliceRadioID, &AIC.AliceName[0], &AIC.AlicePublicKey[0], &atbs->signature[0])))
+         if ((darknet->getContactStore()->findContactByID(AIC.AliceRadioID, c) ||
+            darknet->getContactStore()->addContact(AIC.AliceRadioID, &AIC.AliceName[0], &AIC.AlicePublicKey[0], &atbs->signature[0])))
          {
             darknet->getGUI()->drawString(5, 40, (const char*)"BOB Send Complete", cmdc0de::RGBColor::BLUE);
             auto r = darknet7::CreateBLESendDNPairComplete(fbb);

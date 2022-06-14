@@ -36,14 +36,14 @@ static const char *VERSION = "dn7.dc26.1";
 ErrorType BadgeInfoState::onInit() {
 	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
 	sprintf(&ListBuffer[0][0], "Name: %s",
-			darknet->getContacts()->getSettings().getAgentName());
+			darknet->getContactStore()->getSettings().getAgentName());
 	sprintf(&ListBuffer[1][0], "Num contacts: %u",
-			darknet->getContacts()->getSettings().getNumContacts());
+			darknet->getContactStore()->getSettings().getNumContacts());
 	sprintf(&ListBuffer[2][0], "REG: %s",
-			getRegCode(darknet->getContacts()));
+			getRegCode(darknet->getContactStore()));
 	sprintf(&ListBuffer[3][0], "UID: %u",
-			darknet->getContacts()->getMyInfo().getUniqueID());
-	uint8_t *pCP =	darknet->getContacts()->getMyInfo().getCompressedPublicKey();
+			darknet->getContactStore()->getMyInfo().getUniqueID());
+	uint8_t *pCP =	darknet->getContactStore()->getMyInfo().getCompressedPublicKey();
 	sprintf(&ListBuffer[4][0], "PK: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
 			pCP[0], pCP[1], pCP[2], pCP[3], pCP[4], pCP[5], pCP[6], pCP[7],
 			pCP[8], pCP[9], pCP[10], pCP[11], pCP[12], pCP[13], pCP[14],

@@ -14,14 +14,14 @@
 ErrorType Health::onInit()
 {
    memset(&ListBuffer[0], 0, sizeof(ListBuffer));
-   sprintf(&ListBuffer[0][0], "Avian Flu    : %s", darknet->getContacts()->getSettings().isInfectedWith(SettingsInfo::AVIAN_FLU) ? cmdc0de::sYES : cmdc0de::sNO);
-   sprintf(&ListBuffer[1][0], "Measles      : %s", darknet->getContacts()->getSettings().isInfectedWith(SettingsInfo::MEASLES) ? cmdc0de::sYES : cmdc0de::sNO);
-   sprintf(&ListBuffer[2][0], "Tetanus      : %s", darknet->getContacts()->getSettings().isInfectedWith(SettingsInfo::TETANUS) ? cmdc0de::sYES : cmdc0de::sNO);
-   sprintf(&ListBuffer[3][0], "Polio        : %s", darknet->getContacts()->getSettings().isInfectedWith(SettingsInfo::POLIO) ? cmdc0de::sYES : cmdc0de::sNO);
-   sprintf(&ListBuffer[4][0], "Plague       : %s", darknet->getContacts()->getSettings().isInfectedWith(SettingsInfo::PLAGUE) ? cmdc0de::sYES : cmdc0de::sNO);
-   sprintf(&ListBuffer[5][0], "Toxoplasmosis: %s", darknet->getContacts()->getSettings().isInfectedWith(SettingsInfo::TOXOPLASMOSIS) ? cmdc0de::sYES : cmdc0de::sNO);
-   sprintf(&ListBuffer[6][0], "Chlamydia    : %s", darknet->getContacts()->getSettings().isInfectedWith(SettingsInfo::CHLAMYDIA) ? cmdc0de::sYES : cmdc0de::sNO);
-   sprintf(&ListBuffer[7][0], "Herpes       : %s", darknet->getContacts()->getSettings().isInfectedWith(SettingsInfo::HERPES) ? cmdc0de::sYES : cmdc0de::sNO);
+   sprintf(&ListBuffer[0][0], "Avian Flu    : %s", darknet->getContactStore()->getSettings().isInfectedWith(SettingsInfo::AVIAN_FLU) ? cmdc0de::sYES : cmdc0de::sNO);
+   sprintf(&ListBuffer[1][0], "Measles      : %s", darknet->getContactStore()->getSettings().isInfectedWith(SettingsInfo::MEASLES) ? cmdc0de::sYES : cmdc0de::sNO);
+   sprintf(&ListBuffer[2][0], "Tetanus      : %s", darknet->getContactStore()->getSettings().isInfectedWith(SettingsInfo::TETANUS) ? cmdc0de::sYES : cmdc0de::sNO);
+   sprintf(&ListBuffer[3][0], "Polio        : %s", darknet->getContactStore()->getSettings().isInfectedWith(SettingsInfo::POLIO) ? cmdc0de::sYES : cmdc0de::sNO);
+   sprintf(&ListBuffer[4][0], "Plague       : %s", darknet->getContactStore()->getSettings().isInfectedWith(SettingsInfo::PLAGUE) ? cmdc0de::sYES : cmdc0de::sNO);
+   sprintf(&ListBuffer[5][0], "Toxoplasmosis: %s", darknet->getContactStore()->getSettings().isInfectedWith(SettingsInfo::TOXOPLASMOSIS) ? cmdc0de::sYES : cmdc0de::sNO);
+   sprintf(&ListBuffer[6][0], "Chlamydia    : %s", darknet->getContactStore()->getSettings().isInfectedWith(SettingsInfo::CHLAMYDIA) ? cmdc0de::sYES : cmdc0de::sNO);
+   sprintf(&ListBuffer[7][0], "Herpes       : %s", darknet->getContactStore()->getSettings().isInfectedWith(SettingsInfo::HERPES) ? cmdc0de::sYES : cmdc0de::sNO);
 
    for (uint32_t i = 0; i < (sizeof(Items) / sizeof(Items[0])); i++)
    {
@@ -46,7 +46,7 @@ Darknet7BaseState*  Health::onRun()
          nextState = darknet->getDisplayMenuState();
       }
       else if (buttonInfo->wereAnyOfTheseButtonsReleased(ButtonPress::Fire) &&
-         darknet->getContacts()->getSettings().isInfectedWith(HealthList.items[HealthList.selectedItem].id))
+         darknet->getContactStore()->getSettings().isInfectedWith(HealthList.items[HealthList.selectedItem].id))
       {
          EnterCure.setVirus(HealthList.selectedItem);
          nextState = &EnterCure;
@@ -92,12 +92,12 @@ Darknet7BaseState*  CureEntry::onRun()
             uint8_t mhash[SHA256_HASH_SIZE] = { 0 };
             ShaOBJ HCtx;
             sha256_init(&HCtx);
-            sha256_add(&HCtx, darknet->getContacts()->getMyInfo().getPublicKey(), PUBLIC_KEY_LENGTH);
+            sha256_add(&HCtx, darknet->getContactStore()->getMyInfo().getPublicKey(), PUBLIC_KEY_LENGTH);
             sha256_add(&HCtx, (const unsigned char*)&CureCodes[CurrentVirus], strlen((const char*)&CureCodes[CurrentVirus]));
             sha256_digest(&HCtx, &mhash[0]);
             sprintf((char*)&FinalHexHash[0], "%02x%02x%02x%02x%02x%02x%02x%02x", mhash[0], mhash[1], mhash[2], mhash[3], mhash[4], mhash[5], mhash[6], mhash[7]);
             //+1 bc cure all is 0 bit
-            darknet->getContacts()->getSettings().cure(1 << (CurrentVirus + 1));
+            darknet->getContactStore()->getSettings().cure(1 << (CurrentVirus + 1));
          }
          else
          {

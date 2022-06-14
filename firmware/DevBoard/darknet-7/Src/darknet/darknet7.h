@@ -22,6 +22,8 @@
 #include <display/display_device.h>
 #include <display/gui.h>
 #include <libstm32/error_type.h>
+
+#include "settings_info.h"
 #include "contact_store.h"
 #include "contact.h"
 #include "button_info.h"
@@ -55,14 +57,18 @@ public:
    {}
 #else
    DarkNet7(
-      cmdc0de::DisplayDevice* displayDevice,
-      ContactStore* contactStore) 
+      uint8_t* SettingsMemoryStart,
+      uint8_t* SettingsMemoryEnd,
+      cmdc0de::DisplayDevice* displayDevice) 
       : Display(displayDevice),
          DisplayBuffer(displayDevice->getFrameBuffer()),
          gui{ DisplayBuffer, &Font_6x10 },
-      MyContacts(contactStore){ }
+      MyContacts(new ContactStore( mcu, SettingsMemoryStart, SettingsMemoryEnd )){ }
 #endif
-   virtual ~DarkNet7() = default;
+   virtual ~DarkNet7()
+   {
+      delete MyContacts;
+   };
 
    cmdc0de::DisplayMessageState* getDisplayMessageState(Darknet7BaseState* bm, const char* message, uint16_t timeToDisplay)
    {
@@ -79,13 +85,14 @@ public:
    BadgeInfoState* getBadgeInfoState() { return MyBadgeInfoState; }
    Health* getHealthState() { return MyHealth; }
    GameOfLife* getGameOfLifeState() { return MyGameOfLifeState; }
+   PairingState* getPairingState() { return pairingState; }
+
 #if !defined VIRTUAL_DEVICE
    MCUInfoState* getMCUInfoState();
    TestState* getTestState();
    Menu3D* get3DState();
    //Tamagotchi *getTamagotchiState();
    Scan* getScanState();
-   PairingState* getPairingState();
    SAO* getSAOMenuState();
 #endif
 
@@ -103,8 +110,8 @@ public:
 
    uint32_t nextSeq() { return ++SequenceNum; }
 
-   MCUToMCU& getMcuToMcu() { return mcu; }
-   const MCUToMCU& getMcuToMcu() const { return mcu; }
+   MCUToMCU* getMcuToMcu() { return mcu; }
+   const MCUToMCU* getMcuToMcu() const { return mcu; }
 
 protected:
    virtual cmdc0de::ErrorType onInit() override;
@@ -126,11 +133,12 @@ private:
    SendMsgState* MySendMsgState = new SendMsgState(this);
    SettingState* MySettingState = new SettingState(this);
    AddressState* MyAddressState = new AddressState(this);
+   PairingState* pairingState = new PairingState(this); 
    CommunicationSettingState* MyCommunicationSettings = new CommunicationSettingState(this);
    BadgeInfoState* MyBadgeInfoState = new BadgeInfoState(this);
    Health* MyHealth = new Health(this);
    GameOfLife* MyGameOfLifeState = new GameOfLife(this);
-   MCUToMCU mcu = MCUToMCU{};
+   MCUToMCU* mcu = new MCUToMCU{};
 };
 
 

@@ -35,18 +35,11 @@ ErrorType DarkNet7::onInit() {
 	gui.drawList(&DrawList);
 	Display.swap();
 	HAL_Delay(500);
-	if (MyContacts.getMyInfo().init()) {
-		items[1].set(1, "Flash INIT");
-	}
-	else {
-		items[1].set(1, "Flash INIT FAILED!");
-	}
 	DrawList.ItemsCount++;
 	DrawList.selectedItem++;
 	gui.drawList(&DrawList);
 	Display.swap();
 	HAL_Delay(500);
-	MyContacts.getSettings().init();
 	Display.fillScreen(cmdc0de::RGBColor::BLACK);
 	Display.swap();
 	Display.drawImage(32, 16, getLogo1());

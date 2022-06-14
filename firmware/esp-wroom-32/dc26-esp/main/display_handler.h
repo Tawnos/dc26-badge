@@ -15,6 +15,7 @@
 #include "task_handler.h"
 #include "command_queue.h"
 #include <fonts/fonts.h>
+#include "display_device.h"
 
 
 struct DisplayMsg
@@ -31,40 +32,12 @@ struct DisplayMsg
 	}
 };
 
-class DisplayDevice {
-public:
-	void Fill(uint8_t color) {}
-	void GotoXY(uint8_t x, uint8_t y) {}
-	void Puts(const char* s, const FontDef_t* font, uint8_t color) {}
-	void UpdateScreen() {}
-
-};
 
 class DisplayHandlerTask : public TaskHandler<DisplayMsg, 6>
 {
 public:
-
-	//	bool DisplayHandlerTask::init()
-	//{
-	//	ESP_LOGI(LOGTAG, "INIT");
-	//	if (SSD1306_Init(&I2cDisplay) > 0)
-	//	{
-	//		ESP_LOGI(LOGTAG, "display init successful");
-	//		SSD1306_Puts("BOOTING...", &Font_11x18, SSD1306_COLOR_WHITE);
-	//		SSD1306_UpdateScreen();
-	//	}
-	//	else
-	//	{
-	//		ESP_LOGI(LOGTAG, "display init UN-successful");
-	//	}
-	//	IncomingQueueHandle = xQueueCreateStatic(DISPLAY_QUEUE_SIZE,
-	//		DISPLAY_MSG_ITEM_SIZE, &CommandBuffer[0], &IncomingQueue);
-	//	if (IncomingQueueHandle == nullptr)
-	//	{
-	//		ESP_LOGI(LOGTAG, "Failed creating incoming queue");
-	//	}
-	//	return true;
-	//}
+	DisplayHandlerTask(DisplayDevice* display)
+		: display(display) {}
 	virtual void run(std::stop_token stoken) override;
 private:
 	DisplayDevice* display{ nullptr };

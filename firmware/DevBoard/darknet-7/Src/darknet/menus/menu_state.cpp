@@ -1,5 +1,4 @@
 #include "menu_state.h"
-#include "../libstm32/display/display_device.h"
 #include "../darknet7.h"
 #include "test_state.h"
 #include "setting_state.h"
@@ -16,9 +15,6 @@
 #include "gui_list_processor.h"
 #include "sao_menu.h"
 #include "darknet7_base_state.h"
-#include "../mcu_to_mcu.h"
-#include <messaging/stm_to_esp_generated.h>
-#include <messaging/esp_to_stm_generated.h>
 #include <libstm32/rgbcolor.h>
 
 using cmdc0de::ErrorType;
@@ -73,7 +69,7 @@ Darknet7BaseState*  MenuState::onRun() {
 					break;
 				case 1:
 					if (darknet->getContacts()->getSettings().getAgentName()[0] != '\0') {
-						//nextState = darknet->getPairingState();
+						nextState = darknet->getPairingState();
 					} else {
 						nextState = darknet->getDisplayMessageState(darknet->getDisplayMenuState(),
 								(const char *) "You must set your agent name first", 3000);

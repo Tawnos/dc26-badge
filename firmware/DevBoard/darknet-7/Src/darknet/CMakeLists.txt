@@ -105,7 +105,8 @@ set (SOURCEFILES
     menus/menu_state.cpp             
     menus/menu_state.h             
     #menus/menu3d.cpp                 
-    #menus/pairing_state.cpp          
+    menus/pairing_state.cpp          
+    menus/pairing_state.h          
     #menus/sao_menu.cpp               
     #menus/scan.cpp                   
     menus/SendMsgState.cpp           

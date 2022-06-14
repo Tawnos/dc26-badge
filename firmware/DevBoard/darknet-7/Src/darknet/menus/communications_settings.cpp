@@ -49,7 +49,7 @@ protected:
 			auto r = darknet7::CreateBLESetDeviceNameDirect(fbb,&NewDeviceName[0]);
 			auto z = darknet7::CreateSTMToESPRequest(fbb,darknet->nextSeq(),darknet7::STMToESPAny_BLESetDeviceName,r.Union());
 			darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,z);
-			darknet->getMcuToMcu().send(fbb);
+			darknet->getMcuToMcu()->send(fbb);
 			nextState = darknet->getCommunicationSettingState();
 		}
 		return nextState;
@@ -104,10 +104,8 @@ protected:
 					auto z = darknet7::CreateSTMToESPRequest(fbb,darknet->nextSeq(),darknet7::STMToESPAny_BLEAdvertise,r.Union());
 					darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,z);
 				}
-				darknet->getMcuToMcu().send(fbb);
-#if !defined VIRTUAL_DEVICE
+				darknet->getMcuToMcu()->send(fbb);
 				HAL_Delay(1000);
-#endif
 				nextState = darknet->getCommunicationSettingState();
 			}
 		}
@@ -205,7 +203,7 @@ protected:
 								}
 								auto z = darknet7::CreateSTMToESPRequest(fbb,darknet->nextSeq(),Msg_type,msgOffset);
 								darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,z);
-								darknet->getMcuToMcu().send(fbb);
+								darknet->getMcuToMcu()->send(fbb);
 								nextState = darknet->getDisplayMessageState(darknet->getCommunicationSettingState(),(const char *)"Updating ESP",5000);
 							} else {
 								darknet->getGUI()->drawString(0,80,(const char *)"SID Can't be blank");
@@ -289,9 +287,7 @@ void CommunicationSettingState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7:
 		strcpy(&CurrentDeviceName[0],mevt->InnerMsg->BLEDeviceName()->c_str());
 		darknet->getGUI()->fillScreen(RGBColor::BLACK);
 		darknet->getGUI()->drawList(&CommSettingList);
-#if !defined VIRTUAL_DEVICE
-		darknet->getMcuToMcu().getBus().removeListener(this,mevt,&darknet->getMcuToMcu());
-#endif
+		darknet->getMcuToMcu()->getBus().removeListener(this,mevt,darknet->getMcuToMcu());
 		InternalState = DISPLAY_DATA;
 	}
 }
@@ -305,15 +301,10 @@ ErrorType CommunicationSettingState::onInit() {
 	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
 	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
 	const MSGEvent<darknet7::CommunicationStatusResponse> *si = 0;
-#if !defined VIRTUAL_DEVICE
-	darknet->getMcuToMcu().getBus().addListener(this,si,&darknet->getMcuToMcu());
-#endif
+	darknet->getMcuToMcu()->getBus().addListener(this,si,darknet->getMcuToMcu());
 	darknet->getGUI()->fillScreen(RGBColor::BLACK);
-
 	darknet->getGUI()->drawString(5,10,(const char *)"Fetching data from ESP",RGBColor::BLUE);
-
-	darknet->getMcuToMcu().send(fbb);
-
+	darknet->getMcuToMcu()->send(fbb);
 	return ErrorType();
 }
 
@@ -323,9 +314,7 @@ Darknet7BaseState*  CommunicationSettingState::onRun() {
 	if(InternalState==FETCHING_DATA) {
 		if(this->getTimesRunCalledSinceLastReset()>200) {
 			const MSGEvent<darknet7::CommunicationStatusResponse> *mevt=0;
-#if !defined VIRTUAL_DEVICE
-			darknet->getMcuToMcu().getBus().removeListener(this,mevt,&darknet->getMcuToMcu());
-#endif
+			darknet->getMcuToMcu()->getBus().removeListener(this,mevt,darknet->getMcuToMcu());
 			nextState = darknet->getDisplayMessageState(darknet->getDisplayMenuState(),cmdc0de::NO_DATA_FROM_ESP,2000);
 		}
 	} else {

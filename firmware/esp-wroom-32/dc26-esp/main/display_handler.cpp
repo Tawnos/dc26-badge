@@ -1,4 +1,5 @@
 #include "display_handler.h"
+#include "display_device.h"
 //#include "lib/ssd1306.h"
 #include <chrono>
 #include <thread>
@@ -46,7 +47,7 @@ void DisplayHandlerTask::run(std::stop_token stoken)
 {
    ESP_LOGI(LOGTAG, "Display Task started");
    display->Fill(0);
-   display->GotoXY(0, 8);
+   display->GotoXY(0, 8);  
    display->Puts(" Welcome ", &Font_11x18, 1);
    display->GotoXY(0, 40);
    display->Puts("Darknet 7", &Font_11x18, 1);

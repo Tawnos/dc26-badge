@@ -109,7 +109,7 @@ Darknet7BaseState*  SettingState::onRun()
                auto r = darknet7::CreateBLESetDeviceNameDirect(fbb, darknet->getContacts()->getSettings().getAgentName());
                auto z = darknet7::CreateSTMToESPRequest(fbb, darknet->nextSeq(), darknet7::STMToESPAny_BLESetDeviceName, r.Union());
                darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, z);
-               darknet->getMcuToMcu().send(fbb);
+               darknet->getMcuToMcu()->send(fbb);
                nextState = darknet->getDisplayMessageState(darknet->getDisplayMenuState(), (const char*)"Save Successful", 2000);
             }
             else

@@ -113,9 +113,7 @@ public:
 
    uint32_t& lastTickButtonPushed() { return LastTickButtonPushed; }
 
-protected:
    void processButtons();
-   friend class DarkNet7;
 private:
    ButtonPress buttonState{ ButtonPress::None };
    ButtonPress LastButtonState{ ButtonPress::None };

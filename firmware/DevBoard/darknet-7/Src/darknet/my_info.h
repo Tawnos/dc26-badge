@@ -1,42 +1,41 @@
 #pragma once
 #include "contact.h"
+#include <stdint.h>
+#include <exception>
+
 class MyInfo
 {
 public:
-    //								          0xdcdc			        radio id								               static settings
-    static const uint8_t SIZE = sizeof(uint16_t) + sizeof(uint16_t) + PRIVATE_KEY_LENGTH + sizeof(uint16_t);
+   //								          0xdcdc		  radio id								         static settings
+   static const uint8_t SIZE = sizeof(uint16_t) + sizeof(uint16_t) + PRIVATE_KEY_LENGTH + sizeof(uint16_t);
 
 public:
-    MyInfo(uint8_t* startAddress)
-        : StartAddress(startAddress) {}
+   MyInfo(uint8_t* startAddress) 
+      : startAddress(startAddress)
+   {
+      // given our private key, generate our public key and ensure its good
+      if (!uECC_compute_public_key(getPrivateKey(), publicKey, THE_CURVE)
+         || !uECC_valid_public_key(publicKey, THE_CURVE))
+      {
+         throw std::exception{};
+      }
+   }
 
-    bool init() { return (*(uint16_t *)StartAddress) == 0xdcdc; }
-    uint8_t *getCompressedPublicKey()
-    {
-        uECC_compress(getPublicKey(), &compressedPublicKey[0], THE_CURVE);
-        return &compressedPublicKey[0];
-    }
-    uint8_t *getPrivateKey() { return ((uint8_t *)(StartAddress + sizeof(uint16_t) + sizeof(uint16_t))); }
-    uint8_t *getPublicKey()
-    {
-        // given our private key, generate our public key and ensure its good
-        if (uECC_compute_public_key(getPrivateKey(), &publicKey[0], THE_CURVE))
-        {
-            if (uECC_valid_public_key(&publicKey[0], THE_CURVE) == 1)
-            {
-                return &publicKey[0];
-            }
-        }
-        return 0;
-    }
-    uint16_t getUniqueID() { return *((uint16_t *)(StartAddress + sizeof(uint16_t))); }
-    bool isUberBadge() { return ((getFlags() & 0x1) != 0); }
+   uint8_t* getCompressedPublicKey()
+   {
+      uECC_compress(getPublicKey(), &compressedPublicKey[0], THE_CURVE);
+      return &compressedPublicKey[0];
+   }
+   constexpr const uint8_t* getPrivateKey() const { return ((uint8_t*)(startAddress + sizeof(uint16_t) + sizeof(uint16_t))); }
+   constexpr const uint8_t* getPublicKey() const { return publicKey; }
+   constexpr uint16_t getUniqueID() const { return *((uint16_t*)(startAddress + sizeof(uint16_t))); } 
+   constexpr bool isUberBadge() const { return ((getFlags() & 0x1) != 0); }
 
 protected:
-    uint16_t getFlags() { return *((uint16_t *)(StartAddress + sizeof(uint16_t) + sizeof(uint16_t) + PRIVATE_KEY_LENGTH)); }
+   constexpr uint16_t getFlags() const { return *((uint16_t*)(startAddress + sizeof(uint16_t) + sizeof(uint16_t) + PRIVATE_KEY_LENGTH)); } 
 
 private:
-    uint8_t* StartAddress{nullptr};
-    uint8_t publicKey[PUBLIC_KEY_LENGTH]{0};
-    uint8_t compressedPublicKey[PUBLIC_KEY_COMPRESSED_STORAGE_LENGTH]{0};
+   uint8_t* startAddress;
+   uint8_t publicKey[PUBLIC_KEY_LENGTH]{ 0 };
+   uint8_t compressedPublicKey[PUBLIC_KEY_COMPRESSED_STORAGE_LENGTH]{ 0 };
 };

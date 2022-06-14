@@ -15,4 +15,4 @@ private:
 	CommandQueue<TMessage, NQueueSlots> queue{};
 };
 
-#define ESP_LOGI(tag, string) printf("%s: %s", tag, string);
+#define ESP_LOGI(tag, stringf) printf("%s: %s", tag, stringf);

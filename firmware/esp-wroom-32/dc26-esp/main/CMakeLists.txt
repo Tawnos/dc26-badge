@@ -51,6 +51,7 @@ set (SOURCEFILES
     # dc26.h
     display_handler.cpp
     display_handler.h
+    display_device.h
     mcu_to_mcu.cpp
     mcu_to_mcu.h
     ../sdkconfig.h
@@ -60,10 +61,10 @@ set (SOURCEFILES
 
     ../components/flatbuffer/flatbuffers/flatbuffers.h
     ../components/libcrc/include/checksum.h
-    ../../esp-idf/components/esp_http_client/include/esp_http_client.h
-    ../../esp-idf/components/esp32/include/esp_system.h
+    # ../../esp-idf/components/esp_http_client/include/esp_http_client.h
+    # ../../esp-idf/components/esp32/include/esp_system.h
     ../../esp-idf/components/json/cJSON/cJSON.h
-    ../../esp-idf/components/log/include/esp_log.h
+    # ../../esp-idf/components/log/include/esp_log.h
     ../../esp-idf/components/freertos/include/freertos/queue.h
 
     ../../../common/messaging/mcu_message.h 

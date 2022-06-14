@@ -1,14 +1,12 @@
 #include "contact_store.h"
 #include <string.h>
 #include <crypto/micro-ecc/uECC.h>
-#include "messaging/stm_to_esp_generated.h"
-#include "messaging/esp_to_stm_generated.h"
+#include <messaging/stm_to_esp_generated.h>
+#include <messaging/esp_to_stm_generated.h>
 
-#if !defined VIRTUAL_DEVICE
 #include "mcu_to_mcu.h"
-#endif
 
-#include "../darknet7.h"
+//#include "../darknet7.h"
 
 void SettingsInfo::receiveSignal(MCUToMCU* mcu, const MSGEvent<darknet7::BLEInfectionData>* mevt)
 {
@@ -32,38 +30,9 @@ void SettingsInfo::receiveSignal(MCUToMCU* mcu, const MSGEvent<darknet7::BLEInfe
    return;
 }
 
-bool SettingsInfo::init()
-{
-   const MSGEvent<darknet7::BLEInfectionData>* removebob = 0;
-#if !defined VIRTUAL_DEVICE
-   darknet->getMcuToMcu().getBus().addListener(this, removebob, &darknet->getMcuToMcu());
-#endif
-
-   for (uint8_t* addr = StartAddress; addr < EndAddress; addr += SettingsInfo::SIZE)
-   {
-      uint32_t value = *((uint32_t*)addr);
-      if (value == SETTING_MARKER)
-      {
-         CurrentAddress = addr;
-         const char* AgentNameAddr = ((const char*)(CurrentAddress + sizeof(uint32_t) + sizeof(uint32_t)));
-         strncpy(&AgentName[0], AgentNameAddr, sizeof(AgentName));
-         return true;
-      }
-   }
-   //couldn't find DS
-   CurrentAddress = EndAddress;
-   DataStructure ds;
-   ds.Health = 0; //0x1FE; //all the virus
-   ds.ScreenSaverTime = 1;
-   ds.ScreenSaverType = 0;
-   ds.SleepTimer = 3;
-   ds.NumContacts = 0;
-   return writeSettings(ds);
-}
-
 bool SettingsInfo::setAgentname(const char name[AGENT_NAME_LENGTH])
 {
-   strncpy(&AgentName[0], &name[0], sizeof(AgentName));
+   strncpy(getSettings()->AgentName, &name[0], AGENT_NAME_LENGTH);
    auto ds = getSettings();
    return writeSettings(*ds);
 }
@@ -103,12 +72,12 @@ bool SettingsInfo::cure(uint16_t v)
 
 bool SettingsInfo::isNameSet()
 {
-   return (AgentName[0] != '\0' && AgentName[0] != '_');
+   return (getSettings()->AgentName[0] != '\0' && getSettings()->AgentName[0] != '_');
 }
 
 const char* SettingsInfo::getAgentName()
 {
-   return &AgentName[0];
+   return getSettings()->AgentName;
 }
 
 uint32_t SettingsInfo::getVersion()
@@ -123,7 +92,7 @@ uint8_t SettingsInfo::getNumContacts()
 
 SettingsInfo::DataStructure* SettingsInfo::getSettings()
 {
-   return (SettingsInfo::DataStructure*)(&CurrentAddress[sizeof(uint32_t)]);
+   return (SettingsInfo::DataStructure*)(&CurrentAddress[SETTING_MARKER_LENGTH]);
 }
 
 void SettingsInfo::resetToFactory()
@@ -142,7 +111,6 @@ void SettingsInfo::resetToFactory()
    }
 #endif
    memset(this->StartAddress, 0, SettingsInfo::SIZE);
-   init();
 }
 
 bool SettingsInfo::writeSettings(const DataStructure& ds)
@@ -212,9 +180,10 @@ bool SettingsInfo::writeSettings(const DataStructure& ds)
    target[1] = settingsData;
 
    auto agentStart = &target[2];
-   agentStart[0] = *((uint32_t*)&AgentName[0]);
-   agentStart[1] = *((uint32_t*)&AgentName[4]);
-   agentStart[2] = *((uint32_t*)&AgentName[8]);
+   auto agentName = getSettings()->AgentName;
+   agentStart[0] = *((uint32_t*)&agentName[0]);
+   agentStart[1] = *((uint32_t*)&agentName[4]);
+   agentStart[2] = *((uint32_t*)&agentName[8]);
    return true;
 #endif
 }

@@ -3,6 +3,7 @@
 #define KEY_STORE_H
 
 //#include <stm32f4xx_hal.h>
+#include "mcu_to_mcu.h"
 #include "common.h"
 #include "contact.h"
 #include "my_info.h"
@@ -49,6 +50,7 @@ public:
 //				...
 //				880-967 Contact 22
 //
+// 
 //	...
 //	Sector 63:
 //				0-87 Contact 55
@@ -124,7 +126,7 @@ public:
    {
       if (numContact < Settings.getNumContacts())
       {
-         c.StartAddress = startAddress + ((numContact % CONTACTS_PER_PAGE) * Contact::SIZE);
+         c.StartAddress = startAddress + ((numContact % CONTACTS_PER_PAGE) * _SIZE_OF_CONTACT);
       }
       return false;
    }
@@ -134,6 +136,7 @@ public:
 private:
    SettingsInfo Settings;
    MyInfo MeInfo;
+   Contact contacts[MAX_CONTACTS]{};
    uint8_t* startAddress;
    uint8_t* endAddress;
 };

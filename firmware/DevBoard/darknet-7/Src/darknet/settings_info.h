@@ -37,29 +37,16 @@ public:
    static const uint32_t SETTING_MARKER = 0xDCDCDCDC;
    static const uint32_t SETTING_MARKER_LENGTH = 4;
    static const uint8_t SIZE = 8 + AGENT_NAME_LENGTH;
-   struct DataStructure
-   {
-      uint32_t Magic;
-
-      uint32_t Health : 12;
-      uint32_t NumContacts : 8;
-      uint32_t ScreenSaverType : 4;
-      uint32_t SleepTimer : 4;
-      uint32_t ScreenSaverTime : 4;
-
-      char AgentName[AGENT_NAME_LENGTH];
-   };
-
+   
+   
    SettingsInfo(MCUToMCU* mcu, uint8_t* startAddress, uint8_t* endAddress)
-      : StartAddress(startAddress),
-      CurrentAddress(startAddress),
-      EndAddress(endAddress)
    {
 
       const MSGEvent<darknet7::BLEInfectionData>* removebob = 0;
       // mcu->getBus().addListener(this, removebob, mcu);
 
-      auto ds = (DataStructure*)StartAddress;
+      for (settings = (DataStructure*)startAddress; settings->Magic != SETTING_MARKER; settings += sizeof(DataStructure));
+      
 
       //auto foundSettingsMarker = false;
       //for (uint8_t* addr = StartAddress; addr < EndAddress; addr += SettingsInfo::SIZE)
@@ -74,21 +61,11 @@ public:
       //   }
       //}
       
-      if (ds->Magic != SETTING_MARKER)
+      if (settings->Magic != SETTING_MARKER)
       {
          //couldn't find DS
-         CurrentAddress = EndAddress;
-
          //0x1FE; //all the virus
-         DataStructure ds{
-            .Magic = SETTING_MARKER,
-            .Health = 0,
-            .NumContacts = 0,
-            .ScreenSaverType = 0,
-            .SleepTimer = 3,
-            .ScreenSaverTime = 1,
-            .AgentName = ""
-         };
+         DataStructure ds{};
          writeSettings(ds);
       }
    }
@@ -112,12 +89,19 @@ public:
    bool isInfectedWith(uint16_t v);
    bool cure(uint16_t v);
 
-protected:
+private:
+   struct alignas(32) DataStructure
+   {
+      uint32_t Magic{ SETTING_MARKER };
+      uint32_t Health : 12{0};
+      uint32_t NumContacts : 8{0};
+      uint32_t ScreenSaverType : 4{0};
+      uint32_t SleepTimer : 4{3};
+      uint32_t ScreenSaverTime : 4{1};
+      char AgentName[AGENT_NAME_LENGTH]{ 0 };
+   };
+   DataStructure* settings;
+
    bool writeSettings(const DataStructure& ds);
    DataStructure* getSettings();
-
-private:
-   uint8_t* StartAddress;
-   uint8_t* EndAddress;
-   uint8_t* CurrentAddress;
 };

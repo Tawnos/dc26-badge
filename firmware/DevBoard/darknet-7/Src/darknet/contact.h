@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <crypto/micro-ecc/uECC.h>
+#include <cstring>
 
 struct SectorInfo
 {
@@ -55,19 +56,31 @@ static const uint8_t _OFFSET_OF_AGENT_NAME = (_OFFSET_OF_SIG + _SIZE_OF_SIG_STOR
 static const uint8_t MAX_CONTACTS = 186; //16384/88;
 static const uint8_t CONTACTS_PER_PAGE = MAX_CONTACTS; //for STM32F411 1 sector is being used of 16K so numbers are the same
 
+struct alignas(32) StoredContact
+{
+   const uint32_t Id;
+   const char PublicKey[PUBLIC_KEY_COMPRESSED_LENGTH];
+   const char Signature[SIGNATURE_LENGTH];
+   const char AgentName[AGENT_NAME_LENGTH];
+};
+
+//		Contact
+//				[0-3] unique id
+//				[4-31] public key (compressed version - 25 (26) bytes)
+//				[32-79] Signature (contact signs your id+public key)
+//				[80-91] Agent name
 class Contact
 {
 public:
    friend class ContactStore;
-   static const uint8_t SIZE = _SIZE_OF_CONTACT;
 
    void setUniqueID(uint16_t id)
    {
-      ((uint16_t*)StartAddress)[0] = id;
 #if !defined VIRTUAL_DEVICE
-
       FLASH_LOCKER f;
       HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, StartAddress, id);
+#else
+      ((uint16_t*)StartAddress)[0] = id;
 #endif
    }
 
@@ -82,6 +95,8 @@ public:
       HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s, (*((uint32_t*)&name[0])));
       HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s + 4, (*((uint32_t*)&name[4])));
       HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s + 8, (*((uint32_t*)&name[8])));
+#else
+      memcpy(s, name, AGENT_NAME_LENGTH);
 #endif
    }
 

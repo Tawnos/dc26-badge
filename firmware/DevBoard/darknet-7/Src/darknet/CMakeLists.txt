@@ -47,6 +47,7 @@ set (SOURCEFILES
     mcu_to_mcu.cpp
     my_info.h 
     settings_info.h
+    settings_info.cpp
     virtual_key_board.cpp
     virtual_key_board.h
 

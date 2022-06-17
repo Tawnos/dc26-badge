@@ -213,23 +213,25 @@ void CmdHandlerTask::run(std::stop_token stoken)
                                           break;
          case darknet7::STMToESPAny_ESPRequest: {
             ESP_LOGI(LOGTAG, "processing esp system info request");
-#if !defined VIRTUAL_DEVICE
             flatbuffers::FlatBufferBuilder fbb;
-            System::logSystemInfo();
-            esp_chip_info_t chip;
-            System::getChipInfo(&chip);
+            //System::logSystemInfo();
+            //esp_chip_info_t chip;
+            //System::getChipInfo(&chip);
             auto info = darknet7::CreateESPSystemInfoDirect(fbb,
-               System::getFreeHeapSize(), System::getMinimumFreeHeapSize(),
-               chip.model, chip.cores,
-               chip.revision, chip.features,
-               System::getIDFVersion());
+               //System::getFreeHeapSize(), System::getMinimumFreeHeapSize(),
+               1337, 31337,
+               //chip.model, chip.cores,
+               0xDC, 4,
+               //chip.revision, chip.features,
+               0xD0, 0,
+               //System::getIDFVersion()
+               0);
             flatbuffers::Offset<darknet7::ESPToSTM> of =
                darknet7::CreateESPToSTM(fbb, msg->msgInstanceID(),
                   darknet7::ESPToSTMAny_ESPSystemInfo,
                   info.Union());
             darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
             mcuToMcu->send(fbb);
-#endif
          }
                                               break;
          case darknet7::STMToESPAny_CommunicationStatusRequest: {

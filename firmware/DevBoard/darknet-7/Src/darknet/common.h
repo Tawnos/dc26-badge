@@ -19,9 +19,9 @@ namespace cmdc0de {
 
 #define START_LANDSCAPE
 #ifdef START_LANDSCAPE
-  static constexpr const uint32_t DISPLAY_WIDTH = 160;
-  static constexpr const uint32_t DISPLAY_HEIGHT = 128;
-  static constexpr const uint32_t DISPLAY_OPT_WRITE_ROWS = 128;
+  static constexpr const uint8_t DISPLAY_WIDTH = 160;
+  static constexpr const uint8_t DISPLAY_HEIGHT = 128;
+  static constexpr const uint8_t DISPLAY_OPT_WRITE_ROWS = 128;
   static constexpr const cmdc0de::RotationType START_ROT = cmdc0de::RotationType::LandscapeTopLeft;
 #else
   static constexpr const uint32_t DISPLAY_WIDTH = 128;

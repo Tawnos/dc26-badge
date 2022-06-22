@@ -126,10 +126,10 @@ Darknet7BaseState*  SettingState::onRun()
          if (MiscCounter > 9) MiscCounter = 9;
          else if (MiscCounter < 1) MiscCounter = 1;
          sprintf(&Misc[0], "%d", (int)MiscCounter);
-         darknet->getGUI()->drawString(0, 10, (const char*)"Badge Sleep Time:", RGBColor::WHITE, RGBColor::BLACK, 1, true);
-         darknet->getGUI()->drawString(0, 30, (const char*)"Up to increase, down to decrease", RGBColor::WHITE, RGBColor::BLACK, 1, true);
-         darknet->getGUI()->drawString(10, 60, &Misc[0], RGBColor::WHITE, RGBColor::BLACK, 1, true);
-         darknet->getGUI()->drawString(0, 100, (const char*)"MID Button completes", RGBColor::WHITE, RGBColor::BLACK, 1, true);
+         darknet->getGUI()->drawString(0, 10, (const char*)"Badge Sleep Time:");
+         darknet->getGUI()->drawString(0, 30, (const char*)"Up to increase, down to decrease",true);
+         darknet->getGUI()->drawString(10, 60, &Misc[0]);
+         darknet->getGUI()->drawString(0, 100, (const char*)"MID Button completes");
          if (buttonInfo->wereAnyOfTheseButtonsReleased(ButtonPress::Up))
          {
             MiscCounter++;

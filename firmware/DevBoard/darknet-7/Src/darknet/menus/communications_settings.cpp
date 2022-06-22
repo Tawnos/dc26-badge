@@ -303,7 +303,7 @@ ErrorType CommunicationSettingState::onInit() {
 	const MSGEvent<darknet7::CommunicationStatusResponse> *si = 0;
 	darknet->getMcuToMcu()->getBus().addListener(this,si,darknet->getMcuToMcu());
 	darknet->getGUI()->fillScreen(RGBColor::BLACK);
-	darknet->getGUI()->drawString(5,10,(const char *)"Fetching data from ESP",RGBColor::BLUE);
+	darknet->getGUI()->drawString(5, 10, (const char*)"Fetching data from ESP");// , RGBColor::BLUE);
 	darknet->getMcuToMcu()->send(fbb);
 	return ErrorType();
 }

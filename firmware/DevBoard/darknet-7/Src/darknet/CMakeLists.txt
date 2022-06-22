@@ -66,9 +66,9 @@ set (SOURCEFILES
     libstm32/display/DrawBuffer2D16BitColor.h
     libstm32/display/DrawBuffer2D16BitPerPixel1Buffer.cpp
     libstm32/display/DrawBuffer2D16BitPerPixel1Buffer.h
-    libstm32/display/display_device.cpp
     libstm32/display/display_device.h
     libstm32/display/framebuf.h
+    libstm32/display/framebuf.cpp
     libstm32/display/gui.cpp
     libstm32/display/gui.h
 

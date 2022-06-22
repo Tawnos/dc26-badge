@@ -31,7 +31,7 @@ Darknet7BaseState*  GameOfLife::onRun() {
 	}
 		break;
 	case MESSAGE:
-		darknet->getGUI()->drawString(0, 10, &UtilityBuf[0], RGBColor::BLACK, RGBColor::WHITE, 1, true);
+		darknet->getGUI()->drawString(0, 10, &UtilityBuf[0]);
 		InternalState = TIME_WAIT;
 		break;
 	case TIME_WAIT:

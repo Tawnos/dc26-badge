@@ -58,7 +58,7 @@ void VirtualKeyBoard::init(const char* vkb,
    CursorColor = cursorColor;
    CursorChar = cursorChar;
    CursorPos = 0;
-   uint8_t FontPixelWidth = gui->getFont()->FontWidth;
+   uint8_t FontPixelWidth = 6;// gui->getFont()->FontWidth;
    CharsPerRow = (XEndDisplayPos - XDisplayPos) / FontPixelWidth;
    InputContext = ic;
 }
@@ -94,17 +94,20 @@ void VirtualKeyBoard::process()
    }
    uint16_t y = 0;
    const char* ptr = VKB;
-   uint8_t FontPixelHeight = gui->getFont()->FontHeight;
-   uint8_t FontPixelWidth = gui->getFont()->FontWidth;
+   uint8_t FontPixelHeight = 10;// gui->getFont()->FontHeight;
+   uint8_t FontPixelWidth = 6;  // gui->getFont()->FontWidth;
    uint8_t cursorRow = getCursorY();
    uint8_t curosrColumn = getCursorX();
+
+   //gui->drawString(XDisplayPos, YDisplayPos, ptr, FontColor, BackGround, 1, true);
+
    for (int i = 0; i < SizeOfKeyboard && y < (cmdc0de::DISPLAY_HEIGHT - (y * FontPixelHeight)); i += CharsPerRow, ++y)
    {
-      gui->drawString(XDisplayPos, (YDisplayPos + (y * FontPixelHeight)), ptr, FontColor, BackGround, 1, false, CharsPerRow);
+      gui->drawString(XDisplayPos, (YDisplayPos + (y * FontPixelHeight)), ptr, false, CharsPerRow);
       if (y == cursorRow)
       {
          if((HAL_GetTick()%1000)<500) {
-            gui->drawString(XDisplayPos+(curosrColumn*FontPixelWidth), YDisplayPos+(y*FontPixelHeight), "_", CursorColor, BackGround, 1, false);
+            gui->drawString(XDisplayPos+(curosrColumn*FontPixelWidth), YDisplayPos+(y*FontPixelHeight), "_");
          }
       }
       ptr = ptr + CharsPerRow;

@@ -48,9 +48,9 @@ void DisplayHandlerTask::run(std::stop_token stoken)
    ESP_LOGI(LOGTAG, "Display Task started");
    display->Fill(0);
    display->GotoXY(0, 8);  
-   display->Puts(" Welcome ", &Font_11x18, 1);
-   display->GotoXY(0, 40);
-   display->Puts("Darknet 7", &Font_11x18, 1);
+   display->Puts(" Welcome ");
+   display->GotoXY(0, 39);
+   display->Puts("Darknet 7");
    display->UpdateScreen();
    while (!stoken.stop_requested())
    {
@@ -59,7 +59,7 @@ void DisplayHandlerTask::run(std::stop_token stoken)
          ESP_LOGI(LOGTAG, "got message from queue");
          display->Fill(0);
          display->GotoXY(m->x, m->y);
-         display->Puts(&m->Msg[0], &Font_11x18, 1);
+         display->Puts(&m->Msg[0]);
          display->UpdateScreen();
          uint32_t time = m->TimeInMSToDisplay;
          delete m;
@@ -75,7 +75,7 @@ void DisplayHandlerTask::run(std::stop_token stoken)
             int msg = rand() % RANDOM_MSG;
             display->Fill(0);
             display->GotoXY(0, 32);
-            display->Puts(RandomMessages[msg], &Font_11x18, 1);
+            display->Puts(RandomMessages[msg]);
             display->UpdateScreen();
             timeOfLastDisplay = now;
          }

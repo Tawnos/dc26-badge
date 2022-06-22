@@ -21,7 +21,6 @@ ErrorType DarkNet7::onInit() {
 	if ((et = Display.init(DisplayST7735::SixteenBit, &Font_6x10, &DisplayBuffer)).ok()) {
 		items[0].set(0, "OLED_INIT");
 		DrawList.ItemsCount++;
-		Display.setTextColor(cmdc0de::RGBColor::WHITE);
 	}
 	else {
 		while (1) {

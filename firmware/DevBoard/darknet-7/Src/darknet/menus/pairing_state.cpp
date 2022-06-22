@@ -62,7 +62,7 @@ ErrorType PairingState::onInit()
    mcu->getBus().addListener(this, si5, mcu);
 
    darknet->getGUI()->fillScreen(cmdc0de::RGBColor::BLACK);
-   darknet->getGUI()->drawString(5, 10, (const char*)"Scanning for Badges", cmdc0de::RGBColor::BLUE);
+   darknet->getGUI()->drawString(5, 10, (const char*)"Scanning for Badges");
 
 
    // Send the STMToESP Message
@@ -206,17 +206,17 @@ Darknet7BaseState* PairingState::onRun()
    else if (InternalState == INITIATING_CONNECTION)
    {
       darknet->getGUI()->fillScreen(cmdc0de::RGBColor::BLACK);
-      darknet->getGUI()->drawString(5, 10, (const char*)"Connecting", cmdc0de::RGBColor::BLUE);
+      darknet->getGUI()->drawString(5, 10, (const char*)"Connecting");
       if (this->timesRunCalledSinceReset > 2000)
          this->InternalState = PAIRING_FAILED;
    }
    else if (InternalState == CONNECTING)
    {
       darknet->getGUI()->fillScreen(cmdc0de::RGBColor::BLACK);
-      darknet->getGUI()->drawString(5, 10, (const char*)"Connect with This Badge?", cmdc0de::RGBColor::BLUE);
-      darknet->getGUI()->drawString(5, 20, (const char*)"Verify Number On Second Screen", cmdc0de::RGBColor::BLUE);
-      darknet->getGUI()->drawString(5, 30, (const char*)"Fire1: YES", cmdc0de::RGBColor::BLUE);
-      darknet->getGUI()->drawString(5, 40, (const char*)"MID  : NO", cmdc0de::RGBColor::BLUE);
+      darknet->getGUI()->drawString(5, 10, (const char*)"Connect with This Badge?");
+      darknet->getGUI()->drawString(5, 20, (const char*)"Verify Number On Second Screen");
+      darknet->getGUI()->drawString(5, 30, (const char*)"Fire1: YES");
+      darknet->getGUI()->drawString(5, 40, (const char*)"MID  : NO");
       if (darknet->getButtonInfo()->wereAnyOfTheseButtonsReleased(ButtonPress::Mid))
       {
          auto r = darknet7::CreateBLESendPINConfirmation(fbb, darknet7::RESPONSE_SUCCESS_False);
@@ -241,18 +241,18 @@ Darknet7BaseState* PairingState::onRun()
    else if (InternalState == CONFIRMING)
    {
       darknet->getGUI()->fillScreen(cmdc0de::RGBColor::BLACK);
-      darknet->getGUI()->drawString(5, 10, (const char*)"Confirming", cmdc0de::RGBColor::BLUE);
+      darknet->getGUI()->drawString(5, 10, (const char*)"Confirming");
       if (this->timesRunCalledSinceReset > 1500)
          this->InternalState = PAIRING_FAILED;
    }
    else if (InternalState == ALICE_SEND_ONE)
    {
       darknet->getGUI()->fillScreen(cmdc0de::RGBColor::BLACK);
-      darknet->getGUI()->drawString(5, 20, (const char*)"Waiting", cmdc0de::RGBColor::BLUE);
+      darknet->getGUI()->drawString(5, 20, (const char*)"Waiting");
       // Wait for 1/2 a second until BOB is probably set up
       HAL_Delay(1000);
       darknet->getGUI()->fillScreen(cmdc0de::RGBColor::BLACK);
-      darknet->getGUI()->drawString(5, 20, (const char*)"Alice Send 1", cmdc0de::RGBColor::BLUE);
+      darknet->getGUI()->drawString(5, 20, (const char*)"Alice Send 1");
       //Make the Message
       AIC.irmsgid = ALICE_SEND_ONE;
       memcpy(&AIC.AlicePublicKey[0], darknet->getContactStore()->getMyInfo().getCompressedPublicKey(), PUBLIC_KEY_COMPRESSED_LENGTH);
@@ -271,7 +271,7 @@ Darknet7BaseState* PairingState::onRun()
    }
    else if (InternalState == ALICE_SEND_TWO)
    {
-      darknet->getGUI()->drawString(5, 40, (const char*)"Alice Data 2", cmdc0de::RGBColor::BLUE);
+      darknet->getGUI()->drawString(5, 40, (const char*)"Alice Data 2");
 
       BobReplyToInit* brti = (BobReplyToInit*)MesgBuf;
       //using signature validate our data that bob signed
@@ -324,7 +324,7 @@ Darknet7BaseState* PairingState::onRun()
    }
    else if (InternalState == BOB_SEND_ONE)
    {
-      darknet->getGUI()->drawString(5, 20, (const char*)"BOB Send 1", cmdc0de::RGBColor::BLUE);
+      darknet->getGUI()->drawString(5, 20, (const char*)"BOB Send 1");
 
       AliceInitConvo* aic = (AliceInitConvo*)MesgBuf;
       memcpy(&AIC, aic, sizeof(AIC));
@@ -377,7 +377,7 @@ Darknet7BaseState* PairingState::onRun()
          if ((darknet->getContactStore()->findContactByID(AIC.AliceRadioID, c) ||
             darknet->getContactStore()->addContact(AIC.AliceRadioID, &AIC.AliceName[0], &AIC.AlicePublicKey[0], &atbs->signature[0])))
          {
-            darknet->getGUI()->drawString(5, 40, (const char*)"BOB Send Complete", cmdc0de::RGBColor::BLUE);
+            darknet->getGUI()->drawString(5, 40, (const char*)"BOB Send Complete");
             auto r = darknet7::CreateBLESendDNPairComplete(fbb);
             auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDNPairComplete, r.Union());
             darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, e);
@@ -395,18 +395,18 @@ Darknet7BaseState* PairingState::onRun()
       if (this->isAlice)
       {
          if (this->msgId == 1)
-            darknet->getGUI()->drawString(5, 30, (const char*)"Alice Receive 1", cmdc0de::RGBColor::BLUE);
+            darknet->getGUI()->drawString(5, 30, (const char*)"Alice Receive 1");
          else
-            darknet->getGUI()->drawString(5, 50, (const char*)"Alice Receive 2", cmdc0de::RGBColor::BLUE);
+            darknet->getGUI()->drawString(5, 50, (const char*)"Alice Receive 2");
          if (this->timesRunCalledSinceReset > 500)
             InternalState = PAIRING_FAILED;
       }
       else
       {
          if (this->msgId == 1)
-            darknet->getGUI()->drawString(5, 10, (const char*)"BOB Receiving 1", cmdc0de::RGBColor::BLUE);
+            darknet->getGUI()->drawString(5, 10, (const char*)"BOB Receiving 1");
          else if (this->msgId == 2)
-            darknet->getGUI()->drawString(5, 30, (const char*)"BOB Receiving 2", cmdc0de::RGBColor::BLUE);
+            darknet->getGUI()->drawString(5, 30, (const char*)"BOB Receiving 2");
          if (this->timesRunCalledSinceReset > 500)
             InternalState = PAIRING_FAILED;
       }

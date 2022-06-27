@@ -21,7 +21,7 @@ enum
 };
 
 PairingState::PairingState(DarkNet7* darknet)
-: Darknet7BaseState(darknet), mcu(darknet->getMcuToMcu()) {}
+: Darknet7BaseState(darknet) {}
 
 ErrorType PairingState::onInit()
 {
@@ -45,6 +45,7 @@ ErrorType PairingState::onInit()
    auto e = darknet7::CreateSTMToESPRequest(fbb, ESPRequestID, darknet7::STMToESPAny_BLEScanForDevices, r.Union());
    darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, e);
 
+   auto mcu = darknet->getMcuToMcu();
    // Register a callback handler
    const MSGEvent<darknet7::BadgesInArea>* si = 0;
    mcu->getBus().addListener(this, si, mcu);
@@ -153,6 +154,7 @@ void PairingState::receiveSignal(MCUToMCU*, const MSGEvent<darknet7::BLEPairingC
 
 void PairingState::CleanUp()
 {
+   auto mcu = darknet->getMcuToMcu();
    const MSGEvent<darknet7::BadgesInArea>* mevt = 0;
    mcu->getBus().removeListener(this, mevt, mcu);
    const MSGEvent<darknet7::BLESecurityConfirm>* si2 = 0;
@@ -168,6 +170,7 @@ void PairingState::CleanUp()
 Darknet7BaseState* PairingState::onRun()
 {
    Darknet7BaseState* nextState = this;
+   auto mcu = darknet->getMcuToMcu();
    flatbuffers::FlatBufferBuilder fbb;
    if (InternalState == FETCHING_DATA)
    {

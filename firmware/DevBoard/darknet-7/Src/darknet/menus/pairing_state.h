@@ -54,7 +54,6 @@ protected:
 							PAIRING_SUCCESS, PAIRING_COMPLETE, PAIRING_FAILED };
 	void CleanUp();
 private:
-	MCUToMCU* mcu;
 	// Badge:Address list
 	cmdc0de::GUIListData BadgeList{ "Badge List:", Items, 0, 0, 160, 128, 0, (sizeof(Items) / sizeof(Items[0])) };
 	cmdc0de::GUIListItemData Items[8]{};

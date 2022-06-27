@@ -62,7 +62,7 @@ public:
       cmdc0de::DisplayDevice* displayDevice) 
       : Display(displayDevice),
          DisplayBuffer(displayDevice->getFrameBuffer()),
-         gui{ DisplayBuffer, &Font_5x7 },
+         gui{ DisplayBuffer, &Font_6x10 },
       contactStore(new ContactStore( mcu, SettingsMemoryStart, SettingsMemoryEnd )){ }
 #endif
    virtual ~DarkNet7()

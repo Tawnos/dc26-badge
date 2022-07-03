@@ -52,15 +52,13 @@ struct NPCMsg
    }
 };
 
-class NPCInteractionTask : public TaskHandler<NPCMsg, 10>
+class NPCInteractionTask : public TaskHandler<NPCInteractionTask, NPCMsg, 10>
 {
 public:
-   NPCInteractionTask(MCUToMCUTask* mcuToMcu) :mcuToMcu(mcuToMcu) {}
-   virtual void run(std::stop_token stoken) override;
+   void handleTask(const NPCMsg* message);
 private:
    std::string HttpResponseStr;
    const char* TAG = "httpclient";
-   MCUToMCUTask* mcuToMcu{ nullptr };
 
    void helo(uint32_t msgId)
    {
@@ -85,17 +83,17 @@ private:
          /*ESP_LOGI(TAG, "Status = %d, content_length = %d",
             esp_http_client_get_status_code(client),
             esp_http_client_get_content_length(client));*/
-         ESP_LOGI(TAG, "%s", HttpResponseStr.c_str());
-         ESP_LOGI(TAG, "parsing json");
+         //ESP_LOGI(TAG, "%s", HttpResponseStr.c_str());
+         //ESP_LOGI(TAG, "parsing json");
          root = cJSON_Parse(HttpResponseStr.c_str());
          if (cJSON_IsArray(root->child))
          {
-            ESP_LOGI(TAG, "child is array");
+            //ESP_LOGI(TAG, "child is array");
             int size = cJSON_GetArraySize(root->child);
             for (int i = 0; i < size; i++)
             {
                cJSON* item = cJSON_GetArrayItem(root->child, i);
-               ESP_LOGI(TAG, "item %d, %s", i, cJSON_GetStringValue(item));
+               //ESP_LOGI(TAG, "item %d, %s", i, cJSON_GetStringValue(item));
                auto n = fbb.CreateString(cJSON_GetStringValue(item), strlen(cJSON_GetStringValue(item)));
                npcnames.push_back(n);
             }
@@ -112,7 +110,8 @@ private:
       auto s = darknet7::CreateNPCListDirect(fbb, &npcnames, wasError);
       auto of = darknet7::CreateESPToSTM(fbb, msgId, darknet7::ESPToSTMAny_NPCList, s.Union());
       darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
-      mcuToMcu->send(fbb);
+      //mcuToMcu->
+         send(fbb);
 
       if (root) cJSON_Delete(root);
 #if !defined VIRTUAL_DEVICE
@@ -120,7 +119,7 @@ private:
 #endif
    }
 
-   void interact(NPCMsg* m)
+   void interact(const NPCMsg* m)
    {
       HttpResponseStr.clear();
 #if !defined VIRTUAL_DEVICE
@@ -158,8 +157,8 @@ private:
             esp_http_client_get_status_code(client),
             esp_http_client_get_content_length(client));
 #endif
-         ESP_LOGI(TAG, "%s", HttpResponseStr.c_str());
-         ESP_LOGI(TAG, "parsing json");
+         //ESP_LOGI(TAG, "%s", HttpResponseStr.c_str());
+         //ESP_LOGI(TAG, "parsing json");
          root = cJSON_Parse(HttpResponseStr.c_str());
          cJSON* a = cJSON_GetObjectItem(root, "a");
          cJSON* d = cJSON_GetObjectItem(root, "d");
@@ -168,12 +167,12 @@ private:
          cJSON* r = cJSON_GetObjectItem(root, "r");
          if (a && d && ji && n && cJSON_IsArray(a) && cJSON_IsArray(ji))
          {
-            ESP_LOGI(TAG, "actions and infects is an arrary");
+            //ESP_LOGI(TAG, "actions and infects is an arrary");
             int size = cJSON_GetArraySize(a);
             for (int i = 0; i < size; i++)
             {
                cJSON* item = cJSON_GetArrayItem(a, i);
-               ESP_LOGI(TAG, "item %d, %s", i, cJSON_GetStringValue(item));
+               //ESP_LOGI(TAG, "item %d, %s", i, cJSON_GetStringValue(item));
                auto n = fbb.CreateString(cJSON_GetStringValue(item), strlen(cJSON_GetStringValue(item)));
                actions.push_back(n);
             }
@@ -199,7 +198,8 @@ private:
       flatbuffers::Offset<darknet7::ESPToSTM> of =
          darknet7::CreateESPToSTM(fbb, m->MsgID, darknet7::ESPToSTMAny_NPCInteractionResponse, s.Union());
       darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
-      mcuToMcu->send(fbb);
+      //mcuToMcu->
+         send(fbb);
 
       if (root)
       {

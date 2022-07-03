@@ -43,43 +43,32 @@ const char* RandomMessages[RANDOM_MSG] = {
    , "mansel"
 };
 
-void DisplayHandlerTask::run(std::stop_token stoken)
+void DisplayHandlerTask::handleTask(std::unique_ptr<const DisplayHandlerMessage> m)
 {
-   ESP_LOGI(LOGTAG, "Display Task started");
+   //ESP_LOGI(LOGTAG, "got message from queue");
    display->Fill(0);
-   display->GotoXY(0, 8);  
-   display->Puts(" Welcome ");
-   display->GotoXY(0, 39);
-   display->Puts("Darknet 7");
+   display->GotoXY(m->x, m->y);
+   display->Puts(&m->Message[0]);
    display->UpdateScreen();
-   while (!stoken.stop_requested())
+   uint32_t time = m->TimeInMSToDisplay;
+
+   std::this_thread::sleep_for(std::chrono::milliseconds{ time });
+   if (false)
    {
-      if (auto m = getQueue().pop())
+   }
+   else
+   {
+      static auto timeOfLastDisplay = std::chrono::steady_clock::now();
+      auto now = std::chrono::steady_clock::now();
+      //ESP_LOGI(LOGTAG, "NOw = %u, last = %u",now, timeOfLastDisplay);
+      if (std::chrono::duration_cast<std::chrono::seconds>(now - timeOfLastDisplay) > 30s)
       {
-         ESP_LOGI(LOGTAG, "got message from queue");
+         int msg = rand() % RANDOM_MSG;
          display->Fill(0);
-         display->GotoXY(m->x, m->y);
-         display->Puts(&m->Msg[0]);
+         display->GotoXY(0, 32);
+         display->Puts(RandomMessages[msg]);
          display->UpdateScreen();
-         uint32_t time = m->TimeInMSToDisplay;
-         delete m;
-         std::this_thread::sleep_for(std::chrono::milliseconds{ time });
-      }
-      else
-      {
-         static auto timeOfLastDisplay = std::chrono::steady_clock::now();
-         auto now = std::chrono::steady_clock::now();
-         //ESP_LOGI(LOGTAG, "NOw = %u, last = %u",now, timeOfLastDisplay);
-         if (std::chrono::duration_cast<std::chrono::seconds>(now - timeOfLastDisplay) > 30s)
-         {
-            int msg = rand() % RANDOM_MSG;
-            display->Fill(0);
-            display->GotoXY(0, 32);
-            display->Puts(RandomMessages[msg]);
-            display->UpdateScreen();
-            timeOfLastDisplay = now;
-         }
+         timeOfLastDisplay = now;
       }
    }
 }
-

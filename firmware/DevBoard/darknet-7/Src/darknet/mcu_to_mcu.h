@@ -24,10 +24,11 @@ class MCUToMCU
 public:
    using UartEventBus_t = cmdc0de::EventBus<3, 11, 5, 3>;
 
-   void init(UART_HandleTypeDef*);
+   MCUToMCU(UART_HandleTypeDef* uart);
+   void run(std::stop_token stoken);
+
    bool send(const flatbuffers::FlatBufferBuilder& fbb);
-   void process(std::stop_token stoken);
-   int32_t processMessage(const uint8_t* data, uint32_t size, std::stop_token stoken);
+   //int32_t processMessage(const uint8_t* data, uint32_t size, std::stop_token stoken);
    void onTransmissionComplete();
    void onError();
    void handleMcuToMcu();

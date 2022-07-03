@@ -18,27 +18,28 @@
 #include "display_device.h"
 
 
-struct DisplayMsg
+struct DisplayHandlerMessage
 {
-	char Msg[30]{ 0 };
+	char Message[30]{ 0 };
 	uint8_t x{ 0 }, y{ 16 };
 	uint16_t TimeInMSToDisplay{ 2000 };
-	DisplayMsg() = default;
-	DisplayMsg(const char* msg, uint8_t x1, uint8_t y1, uint16_t ms)
+	DisplayHandlerMessage() = default;
+	DisplayHandlerMessage(const char* msg, uint8_t x1, uint8_t y1, uint16_t ms)
 		: x(x1), y(y1), TimeInMSToDisplay(ms)
 	{
-		strncpy(&Msg[0], msg, sizeof(Msg));
-		// strcpy(&Msg[0],msg);
+		strncpy(&Message[0], msg, sizeof(Message));
+		// strcpy(&Message[0],msg);
 	}
 };
+//using DisplayHandlerTask = TaskHandler<DisplayHandlerMessage, 6>;
 
 
-class DisplayHandlerTask : public TaskHandler<DisplayMsg, 6>
+class DisplayHandlerTask : public TaskHandler<DisplayHandlerTask, DisplayHandlerMessage, 6>
 {
 public:
 	DisplayHandlerTask(DisplayDevice* display)
 		: display(display) {}
-	virtual void run(std::stop_token stoken) override;
+	void handleTask(std::unique_ptr<const DisplayHandlerMessage> message);
 private:
 	DisplayDevice* display{ nullptr };
 };

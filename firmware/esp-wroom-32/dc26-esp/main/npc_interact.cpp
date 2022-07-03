@@ -11,26 +11,16 @@ using namespace std::chrono_literals;
 
 #define LOGTAG "NPCITTask"
 
-void NPCInteractionTask::run(std::stop_token stoken)
+void NPCInteractionTask::handleTask(const NPCMsg* message)
 {
-   ESP_LOGI(LOGTAG, "NPCInteractionTask started");
-   while (!stoken.stop_requested())
+   if (message->RequestType == NPCMsg::NPCRequestType::Hello)
    {
-      auto m = getQueue().pop();
-      //if (xQueueReceive(getQueueHandle(), &m, 1000 / portTICK_PERIOD_MS))
-      if (m)
-      {
-         if (m->RequestType == NPCMsg::NPCRequestType::Hello)
-         {
-            ESP_LOGI(LOGTAG, "got HELO");
-            helo(m->MsgID);
-         }
-         else if (m->RequestType == NPCMsg::NPCRequestType::Interact)
-         {
-            ESP_LOGI(LOGTAG, "got Interact");
-            interact(m);
-         }
-         delete m;
-      }
+      ESP_LOGI(LOGTAG, "got HELO");
+      helo(message->MsgID);
+   }
+   else if (message->RequestType == NPCMsg::NPCRequestType::Interact)
+   {
+      ESP_LOGI(LOGTAG, "got Interact");
+      interact(message);
    }
 }

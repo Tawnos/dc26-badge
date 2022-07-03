@@ -15,10 +15,18 @@
 #include "npc_interact.h"
 #include "display_handler.h"
 
-class CmdHandlerTask : public TaskHandler<MCUMessage, 4>
+//template <template<typename TMessage>... TTaskHandlers>//, typename TTaskHandlers = std::common_type<Args...>>
+class CommandHandler
 {
 public:
-   CmdHandlerTask(const std::string& tName, uint16_t stackSize = 4196, uint8_t p = 5) {};
+   //CommandHandler(DisplayHandler) {}
+
+   //const TMessage*... Push(TMessage... message) {  }
+   //TMessage*... Pop() { }
+
+   //constexpr CommandQueue<TMessage, NQueueSlots>& getQueue() {}
+   //void 
+   //CmdHandlerTask(const std::string& tName, uint16_t stackSize = 4196, uint8_t p = 5) {};
    //	
    //bool CmdHandlerTask::init()
    //{
@@ -29,9 +37,9 @@ public:
    //   {
    //      ESP_LOGI(LOGTAG, "Failed creating incoming queue");
    //   }
-   //   if (NPCITask.init())
+   //   if (npcInteractionTask.init())
    //   {
-   //      NPCITask.start();
+   //      npcInteractionTask.start();
    //   }
    //   else
    //   {
@@ -44,7 +52,7 @@ public:
    //}
 
 public:
-   virtual void run(std::stop_token stoken) override;
+   //virtual void run(std::stop_token stoken) override;
 
 protected:
 
@@ -52,9 +60,11 @@ protected:
    WiFi wifi;
 #endif
 private:
-   MCUToMCUTask* mcuToMcu{ nullptr };
-   DisplayHandlerTask* display{ nullptr };
-   NPCInteractionTask NPCITask{mcuToMcu};// ("NPCInteractTask");
+
+   //MCUToMCUTask mcuTask{this};
+   //DisplayHandlerTask* displayTask;
+   //NPCInteractionTask npcInteractionTask{ &mcuTask };
+   //std::jthread npcInteractionTaskRunner{ std::bind_front(&NPCInteractionTask::run, &npcInteractionTask) };
 };
 
 #endif

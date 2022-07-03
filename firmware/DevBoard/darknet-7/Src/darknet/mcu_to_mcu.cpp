@@ -49,6 +49,15 @@ void MCUToMCU::resetUART()
    init(UartHandler);
 }
 #endif
+MCUToMCU::MCUToMCU(UART_HandleTypeDef* uart) 
+   : UartHandler(uart)
+{
+#if !defined VIRTUAL_DEVICE
+   MX_USART1_UART_Init();
+   HAL_LIN_Init(UartHandler, UART_LINBREAKDETECTLENGTH_10B);
+   HAL_UART_Receive_IT(UartHandler, &UartRXBuffer[0], MCUToMCU::TOTAL_MESSAGE_SIZE);
+#endif
+}
 
 const darknet7::ESPToSTM* MCUMessage::asESPToSTM()
 {
@@ -59,16 +68,6 @@ bool MCUMessage::verifyESPToSTM()
 {
    flatbuffers::Verifier v(&MessageData[ENVELOP_HEADER], getDataSize());
    return darknet7::VerifySizePrefixedESPToSTMBuffer(v);
-}
-
-void MCUToMCU::init(UART_HandleTypeDef* uart)
-{
-   UartHandler = uart;
-#if !defined VIRTUAL_DEVICE
-   MX_USART1_UART_Init();
-   HAL_LIN_Init(UartHandler, UART_LINBREAKDETECTLENGTH_10B);
-   HAL_UART_Receive_IT(UartHandler, &UartRXBuffer[0], MCUToMCU::TOTAL_MESSAGE_SIZE);
-#endif
 }
 
 void MCUToMCU::onError()
@@ -148,20 +147,31 @@ bool MCUToMCU::send(const flatbuffers::FlatBufferBuilder& fbb)
    if ((UartHandler->gState == HAL_UART_STATE_READY) && !OutgoingMessages.empty())
    {
       MCUMessage& m = OutgoingMessages.front();
-      //m.transmit(UartHandler);
+      m.transmit(UartHandler);
    }
 #endif
    return true;
 }
 
-void MCUToMCU::process(std::stop_token stoken)
+void MCUToMCU::run(std::stop_token stoken)
 {
-   if (!IncomingMessages.empty())
+   while (!stoken.stop_requested())
    {
-      MCUMessage& m = IncomingMessages.front();
-      const darknet7::ESPToSTM* msg = m.asESPToSTM();
-      switch (msg->Msg_type())
+      if (!OutgoingMessages.empty()) 
       {
+         MCUMessage& m = OutgoingMessages.front();
+         if (m.checkFlags(MCUMessage::MESSAGE_FLAG_TRANSMITTED))
+         {
+            OutgoingMessages.pop();
+            // HAL_LIN_SendBreak(UartHandler);
+         }
+      }
+      if (!IncomingMessages.empty())
+      {
+         MCUMessage& m = IncomingMessages.front();
+         const darknet7::ESPToSTM* msg = m.asESPToSTM();
+         switch (msg->Msg_type())
+         {
          case darknet7::ESPToSTMAny_ESPSystemInfo:
          {
             MSGEvent<darknet7::ESPSystemInfo> mevt(msg->Msg_as_ESPSystemInfo(), msg->msgInstanceID());
@@ -230,7 +240,8 @@ void MCUToMCU::process(std::stop_token stoken)
          }
          default:
             break;
+         }
+         IncomingMessages.pop();
       }
-      IncomingMessages.pop();
    }
 }

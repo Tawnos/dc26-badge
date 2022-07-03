@@ -4,11 +4,6 @@
 #include <messaging/stm_to_esp_generated.h>
 #include <messaging/esp_to_stm_generated.h>
 
-namespace darknet7 {
-   class STMToESPRequest;
-   class ESPToSTM;
-}
-
 //We listen for the for our envelop portion of our message which is: 4 bytes:
 // bits 0-10 is the size of the message coming max message size = 1024
 // bit 11: reserved

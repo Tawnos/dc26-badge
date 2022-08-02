@@ -42,8 +42,8 @@ protected:
 	}
 };
 
-template <typename TTaskHandler, typename TMessageIn, auto NQueueSlots, typename... TMessagesOut>
-class TaskHandler : public TaskHandlerBase<TMessageIn, TaskHandler<TMessageIn>, TMessagesOut>
+template <typename TTaskHandler, typename TMessageIn>
+class TaskHandler : public TaskHandlerBase<TMessageIn, TaskHandler<TMessageIn>>
 {
 protected:
 	void handleTask(std::unique_ptr<const TMessageIn> message)
